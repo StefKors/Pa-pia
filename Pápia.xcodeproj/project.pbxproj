@@ -15,6 +15,16 @@
 		8AA903902BDF940D00D553A9 /* Pa_piaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA9038F2BDF940D00D553A9 /* Pa_piaTests.swift */; };
 		8AA9039A2BDF940D00D553A9 /* Pa_piaUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA903992BDF940D00D553A9 /* Pa_piaUITests.swift */; };
 		8AA9039C2BDF940D00D553A9 /* Pa_piaUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA9039B2BDF940D00D553A9 /* Pa_piaUITestsLaunchTests.swift */; };
+		8AA903AB2BDF993500D553A9 /* Get in Frameworks */ = {isa = PBXBuildFile; productRef = 8AA903AA2BDF993500D553A9 /* Get */; };
+		8AA903AD2BDF993A00D553A9 /* Get in Frameworks */ = {isa = PBXBuildFile; productRef = 8AA903AC2BDF993A00D553A9 /* Get */; };
+		8AA903AF2BDF993D00D553A9 /* Get in Frameworks */ = {isa = PBXBuildFile; productRef = 8AA903AE2BDF993D00D553A9 /* Get */; };
+		8AA903B12BDFA07B00D553A9 /* DataMuseViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA903B02BDFA07A00D553A9 /* DataMuseViewModel.swift */; };
+		8AA903B32BDFA09B00D553A9 /* DataMuseWord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA903B22BDFA09B00D553A9 /* DataMuseWord.swift */; };
+		8AA903B52BDFAFE200D553A9 /* IndeterminateProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA903B42BDFAFE200D553A9 /* IndeterminateProgressView.swift */; };
+		8AA903B72BDFB83C00D553A9 /* SearchProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA903B62BDFB83C00D553A9 /* SearchProgress.swift */; };
+		8AA903B92BDFB84C00D553A9 /* ProgressIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA903B82BDFB84C00D553A9 /* ProgressIcon.swift */; };
+		8AA903BB2BDFB89200D553A9 /* WordDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA903BA2BDFB89200D553A9 /* WordDetailView.swift */; };
+		8AA903BD2BDFBA9D00D553A9 /* WrappingHStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA903BC2BDFBA9D00D553A9 /* WrappingHStack.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +57,13 @@
 		8AA903952BDF940D00D553A9 /* PápiaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "PápiaUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AA903992BDF940D00D553A9 /* Pa_piaUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pa_piaUITests.swift; sourceTree = "<group>"; };
 		8AA9039B2BDF940D00D553A9 /* Pa_piaUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pa_piaUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		8AA903B02BDFA07A00D553A9 /* DataMuseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataMuseViewModel.swift; sourceTree = "<group>"; };
+		8AA903B22BDFA09B00D553A9 /* DataMuseWord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataMuseWord.swift; sourceTree = "<group>"; };
+		8AA903B42BDFAFE200D553A9 /* IndeterminateProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndeterminateProgressView.swift; sourceTree = "<group>"; };
+		8AA903B62BDFB83C00D553A9 /* SearchProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchProgress.swift; sourceTree = "<group>"; };
+		8AA903B82BDFB84C00D553A9 /* ProgressIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressIcon.swift; sourceTree = "<group>"; };
+		8AA903BA2BDFB89200D553A9 /* WordDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordDetailView.swift; sourceTree = "<group>"; };
+		8AA903BC2BDFBA9D00D553A9 /* WrappingHStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WrappingHStack.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8AA903AB2BDF993500D553A9 /* Get in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,6 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8AA903AD2BDF993A00D553A9 /* Get in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,6 +87,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8AA903AF2BDF993D00D553A9 /* Get in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,6 +101,7 @@
 				8AA9038E2BDF940D00D553A9 /* PápiaTests */,
 				8AA903982BDF940D00D553A9 /* PápiaUITests */,
 				8AA903792BDF940C00D553A9 /* Products */,
+				8AA903A92BDF993500D553A9 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -99,6 +120,13 @@
 			children = (
 				8AA9037B2BDF940C00D553A9 /* Pa_piaApp.swift */,
 				8AA9037D2BDF940C00D553A9 /* ContentView.swift */,
+				8AA903BA2BDFB89200D553A9 /* WordDetailView.swift */,
+				8AA903BC2BDFBA9D00D553A9 /* WrappingHStack.swift */,
+				8AA903B82BDFB84C00D553A9 /* ProgressIcon.swift */,
+				8AA903B62BDFB83C00D553A9 /* SearchProgress.swift */,
+				8AA903B42BDFAFE200D553A9 /* IndeterminateProgressView.swift */,
+				8AA903B02BDFA07A00D553A9 /* DataMuseViewModel.swift */,
+				8AA903B22BDFA09B00D553A9 /* DataMuseWord.swift */,
 				8AA9037F2BDF940C00D553A9 /* Item.swift */,
 				8AA903812BDF940D00D553A9 /* Assets.xcassets */,
 				8AA903832BDF940D00D553A9 /* Pa_pia.entitlements */,
@@ -132,6 +160,13 @@
 			path = "PápiaUITests";
 			sourceTree = "<group>";
 		};
+		8AA903A92BDF993500D553A9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -148,6 +183,9 @@
 			dependencies = (
 			);
 			name = "Pápia";
+			packageProductDependencies = (
+				8AA903AA2BDF993500D553A9 /* Get */,
+			);
 			productName = "Pápia";
 			productReference = 8AA903782BDF940C00D553A9 /* Pápia.app */;
 			productType = "com.apple.product-type.application";
@@ -166,6 +204,9 @@
 				8AA9038D2BDF940D00D553A9 /* PBXTargetDependency */,
 			);
 			name = "PápiaTests";
+			packageProductDependencies = (
+				8AA903AC2BDF993A00D553A9 /* Get */,
+			);
 			productName = "PápiaTests";
 			productReference = 8AA9038B2BDF940D00D553A9 /* PápiaTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -184,6 +225,9 @@
 				8AA903972BDF940D00D553A9 /* PBXTargetDependency */,
 			);
 			name = "PápiaUITests";
+			packageProductDependencies = (
+				8AA903AE2BDF993D00D553A9 /* Get */,
+			);
 			productName = "PápiaUITests";
 			productReference = 8AA903952BDF940D00D553A9 /* PápiaUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -220,6 +264,9 @@
 				Base,
 			);
 			mainGroup = 8AA9036F2BDF940C00D553A9;
+			packageReferences = (
+				8AA903A82BDF982700D553A9 /* XCRemoteSwiftPackageReference "Get" */,
+			);
 			productRefGroup = 8AA903792BDF940C00D553A9 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -264,7 +311,14 @@
 			files = (
 				8AA9037E2BDF940C00D553A9 /* ContentView.swift in Sources */,
 				8AA903802BDF940C00D553A9 /* Item.swift in Sources */,
+				8AA903BD2BDFBA9D00D553A9 /* WrappingHStack.swift in Sources */,
+				8AA903B12BDFA07B00D553A9 /* DataMuseViewModel.swift in Sources */,
+				8AA903B92BDFB84C00D553A9 /* ProgressIcon.swift in Sources */,
+				8AA903B32BDFA09B00D553A9 /* DataMuseWord.swift in Sources */,
 				8AA9037C2BDF940C00D553A9 /* Pa_piaApp.swift in Sources */,
+				8AA903BB2BDFB89200D553A9 /* WordDetailView.swift in Sources */,
+				8AA903B72BDFB83C00D553A9 /* SearchProgress.swift in Sources */,
+				8AA903B52BDFAFE200D553A9 /* IndeterminateProgressView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -418,7 +472,7 @@
 		8AA903A02BDF940D00D553A9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Beta";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Pápia/Pa_pia.entitlements";
 				CODE_SIGN_STYLE = Automatic;
@@ -428,6 +482,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -466,6 +521,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -621,6 +677,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8AA903A82BDF982700D553A9 /* XCRemoteSwiftPackageReference "Get" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Get.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8AA903AA2BDF993500D553A9 /* Get */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8AA903A82BDF982700D553A9 /* XCRemoteSwiftPackageReference "Get" */;
+			productName = Get;
+		};
+		8AA903AC2BDF993A00D553A9 /* Get */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8AA903A82BDF982700D553A9 /* XCRemoteSwiftPackageReference "Get" */;
+			productName = Get;
+		};
+		8AA903AE2BDF993D00D553A9 /* Get */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8AA903A82BDF982700D553A9 /* XCRemoteSwiftPackageReference "Get" */;
+			productName = Get;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8AA903702BDF940C00D553A9 /* Project object */;
 }

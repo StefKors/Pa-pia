@@ -9,10 +9,12 @@ import Foundation
 import SwiftData
 
 @Model
-final class Item {
+final class SearchHistoryItem {
     var timestamp: Date
-    
-    init(timestamp: Date) {
+    var word: DataMuseWord
+
+    init(timestamp: Date, word: DataMuseWord) {
         self.timestamp = timestamp
+        self.word = word
     }
 }

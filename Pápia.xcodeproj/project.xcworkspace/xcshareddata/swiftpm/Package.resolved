@@ -1,0 +1,15 @@
+{
+  "originHash" : "a05ea1a14d943e449d39478d113875a20cefe8a6ad97222d4e02f5920647c493",
+  "pins" : [
+    {
+      "identity" : "get",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kean/Get.git",
+      "state" : {
+        "revision" : "74dba201ebe42e9c15c1db6ee1cc893025bbef94",
+        "version" : "2.2.0"
+      }
+    }
+  ],
+  "version" : 3
+}

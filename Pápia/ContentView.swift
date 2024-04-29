@@ -7,60 +7,122 @@
 
 import SwiftUI
 import SwiftData
+import Get
+
+
+struct Word: View {
+    let label: String
+    var body: some View {
+        Text(label.capitalized)
+    }
+}
+
+#Preview {
+    Word(label: "Apple")
+}
+
+
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+
+    @Bindable private var model = DataMuseViewModel()
+    @Query private var searchHistoryItems: [SearchHistoryItem]
 
     var body: some View {
-        NavigationSplitView {
+        NavigationStack {
             List {
-                ForEach(items) { item in
+                ForEach(model.searchResults) { searchResult in
                     NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
+                        WordDetailView(word: searchResult)
+                            .onAppear {
+                                addItem(word: searchResult)
+                            }
                     } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
-            }
-#if os(macOS)
-            .navigationSplitViewColumnWidth(min: 180, ideal: 200)
-#endif
-            .toolbar {
-#if os(iOS)
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-#endif
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                        Word(label: searchResult.word)
                     }
                 }
             }
-        } detail: {
-            Text("Select an item")
+            .overlay(alignment: .top) {
+                VStack {
+                    if model.isSearching {
+                        SearchProgress(searches: model.activeSearches)
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+
+                }
+                .animation(.snappy.delay(0.3), value: model.isSearching)
+            }
+            .navigationBarTitleDisplayMode(.large)
+            .navigationTitle("Search...")
+        }
+        .searchable(text: $model.searchText, prompt: "Find words...")
+//        .searchSuggestions() {
+//            ForEach(model.suggestedSearches) { suggestion in
+//                Text(suggestion.word)
+//                    .searchCompletion(suggestion.word)
+//            }
+//        }
+        .searchScopes($model.searchScope, activation: .onSearchPresentation) {
+            ForEach(model.globalSearchScopes) { scope in
+                Text(scope.label)
+                    .tag(scope)
+            }
+        }
+        .onChange(of: model.searchScope, { oldValue, newValue in
+            model.autocomplete()
+            model.search()
+        })
+        .onChange(of: model.searchText, { oldValue, newValue in
+            model.autocomplete()
+            model.search()
+        })
+        .overlay {
+//            if model.searchResults.isEmpty, !model.searchText.isEmpty {
+            if model.searchResults.isEmpty {
+                if !model.searchText.isEmpty {
+                    /// In case there aren't any search results, we can
+                    /// show the new content unavailable view.
+                    ContentUnavailableView.search(text: model.searchText)
+                } else {
+                    ContentUnavailableView {
+                        Label("Search Pápia...", systemImage: "bird.fill")
+                    } description: {
+                        Text("Start your search, then filter your query")
+                    } actions: {
+                        WrappingHStack {
+
+                            /// TODO: sort and filter to most recent x couple
+                            ForEach(searchHistoryItems) { item in
+                                Button {
+                                    withAnimation(.smooth) {
+                                        model.searchText = item.word.word
+                                    }
+                                } label: {
+                                    Word(label: item.word.word)
+                                }
+                                .foregroundStyle(.primary)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 4)
+                                .background(.tint, in: Capsule())
+                            }
+                        }
+                    }
+
+                }
+            }
         }
     }
 
-    private func addItem() {
+    private func addItem(word: DataMuseWord) {
         withAnimation {
-            let newItem = Item(timestamp: Date())
+            let newItem = SearchHistoryItem(timestamp: Date(), word: word)
             modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
         }
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .modelContainer(for: SearchHistoryItem.self, inMemory: true)
 }
