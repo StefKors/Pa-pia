@@ -61,6 +61,17 @@ require that the results are spelled similarly to this string of characters, or 
     }
 
     private func query(_ path: String, scope: SearchScope, search: String) async -> [DataMuseWord] {
+        // filter out empty queries
+        if path.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return []
+        }
+        if scope.queryParam.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return []
+        }
+        if search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return []
+        }
+
         print("Query:", path, scope.queryParam, search)
         let currentSearch = Search(path: path, scope: scope, searchText: search)
         self.activeSearches.append(currentSearch)
