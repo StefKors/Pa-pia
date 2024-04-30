@@ -57,6 +57,7 @@
 		8A80163C2BE0E655005DEE89 /* LargeNavigationBarTitleDisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeNavigationBarTitleDisplayMode.swift; sourceTree = "<group>"; };
 		8A80163E2BE0E9AF005DEE89 /* WordDetailListSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordDetailListSectionView.swift; sourceTree = "<group>"; };
 		8A8016402BE0F92F005DEE89 /* DataMuseDefinition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataMuseDefinition.swift; sourceTree = "<group>"; };
+		8A8016422BE1062E005DEE89 /* Pa-pia-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Pa-pia-Info.plist"; sourceTree = SOURCE_ROOT; };
 		8AA903782BDF940C00D553A9 /* Pápia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pápia.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AA9037B2BDF940C00D553A9 /* Pa_piaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pa_piaApp.swift; sourceTree = "<group>"; };
 		8AA9037D2BDF940C00D553A9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -130,6 +131,7 @@
 		8AA9037A2BDF940C00D553A9 /* Pápia */ = {
 			isa = PBXGroup;
 			children = (
+				8A8016422BE1062E005DEE89 /* Pa-pia-Info.plist */,
 				8AA9037B2BDF940C00D553A9 /* Pa_piaApp.swift */,
 				8AA9037D2BDF940C00D553A9 /* ContentView.swift */,
 				8A80163C2BE0E655005DEE89 /* LargeNavigationBarTitleDisplayMode.swift */,
@@ -506,6 +508,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Pa-pia-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -545,6 +548,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Pa-pia-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
