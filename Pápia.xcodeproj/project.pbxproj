@@ -12,6 +12,7 @@
 		8A80163B2BE0DBD2005DEE89 /* SearchContentUnavailableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A80163A2BE0DBD2005DEE89 /* SearchContentUnavailableView.swift */; };
 		8A80163D2BE0E655005DEE89 /* LargeNavigationBarTitleDisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A80163C2BE0E655005DEE89 /* LargeNavigationBarTitleDisplayMode.swift */; };
 		8A80163F2BE0E9AF005DEE89 /* WordDetailListSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A80163E2BE0E9AF005DEE89 /* WordDetailListSectionView.swift */; };
+		8A8016412BE0F92F005DEE89 /* DataMuseDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8016402BE0F92F005DEE89 /* DataMuseDefinition.swift */; };
 		8AA9037C2BDF940C00D553A9 /* Pa_piaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA9037B2BDF940C00D553A9 /* Pa_piaApp.swift */; };
 		8AA9037E2BDF940C00D553A9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA9037D2BDF940C00D553A9 /* ContentView.swift */; };
 		8AA903802BDF940C00D553A9 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA9037F2BDF940C00D553A9 /* Item.swift */; };
@@ -55,6 +56,7 @@
 		8A80163A2BE0DBD2005DEE89 /* SearchContentUnavailableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchContentUnavailableView.swift; sourceTree = "<group>"; };
 		8A80163C2BE0E655005DEE89 /* LargeNavigationBarTitleDisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeNavigationBarTitleDisplayMode.swift; sourceTree = "<group>"; };
 		8A80163E2BE0E9AF005DEE89 /* WordDetailListSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordDetailListSectionView.swift; sourceTree = "<group>"; };
+		8A8016402BE0F92F005DEE89 /* DataMuseDefinition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataMuseDefinition.swift; sourceTree = "<group>"; };
 		8AA903782BDF940C00D553A9 /* Pápia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pápia.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AA9037B2BDF940C00D553A9 /* Pa_piaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pa_piaApp.swift; sourceTree = "<group>"; };
 		8AA9037D2BDF940C00D553A9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -142,6 +144,7 @@
 				8AA903B42BDFAFE200D553A9 /* IndeterminateProgressView.swift */,
 				8AA903B02BDFA07A00D553A9 /* DataMuseViewModel.swift */,
 				8AA903B22BDFA09B00D553A9 /* DataMuseWord.swift */,
+				8A8016402BE0F92F005DEE89 /* DataMuseDefinition.swift */,
 				8AA9037F2BDF940C00D553A9 /* Item.swift */,
 				8AA903812BDF940D00D553A9 /* Assets.xcassets */,
 				8AA903832BDF940D00D553A9 /* Pa_pia.entitlements */,
@@ -324,6 +327,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8A8016412BE0F92F005DEE89 /* DataMuseDefinition.swift in Sources */,
 				8A80163D2BE0E655005DEE89 /* LargeNavigationBarTitleDisplayMode.swift in Sources */,
 				8A80163F2BE0E9AF005DEE89 /* WordDetailListSectionView.swift in Sources */,
 				8AA9037E2BDF940C00D553A9 /* ContentView.swift in Sources */,

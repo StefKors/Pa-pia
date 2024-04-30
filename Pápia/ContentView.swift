@@ -13,7 +13,7 @@ import Get
 struct iOSContentViewAdjustmentsView: ViewModifier {
     let searchResultsCount: Int
     let searchText: String
-    
+
     func body(content: Content) -> some View {
 #if os(macOS)
         content
@@ -30,11 +30,11 @@ struct iOSContentViewAdjustmentsView: ViewModifier {
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    
+
     @Bindable private var model = DataMuseViewModel()
-    
+
     @State private var selection: DataMuseWord? // Nothing selected by default.
-    
+
     var body: some View {
         NavigationSplitView {
             List(model.searchResults, selection: $selection) { word in
@@ -72,7 +72,7 @@ struct ContentView: View {
             self.model.searchResults = await self.model.fetch(scope: self.model.searchScope, searchText: self.model.searchText)
         }
     }
-    
+
     private func addItem(word: DataMuseWord) {
         withAnimation {
             let newItem = SearchHistoryItem(timestamp: Date(), word: word)

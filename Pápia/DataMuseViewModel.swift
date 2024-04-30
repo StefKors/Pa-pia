@@ -12,6 +12,9 @@ import Observation
 let memoryCapacity = 1024 * 1024 * 1024 // 1 GB
 let diskCapacity = 2 * 1024 * 1024 * 1024 // 2 GB
 
+
+/// https://api.datamuse.com/words?ml=tree&qe=ml&md=dpfcy&max=1&rif=1&k=olthes_r4
+/// get defintions: https://api.datamuse.com/words?ml=tree&qe=ml&md=dp&max=1
 @Observable final class DataMuseViewModel {
     var searchText: String = ""
     /// TODO: don't hardcode?
@@ -50,6 +53,35 @@ require that the results are spelled similarly to this string of characters, or 
         Task {
             self.suggestedSearches = await query("/sug", scope: autocompleteScope, search: searchText)
         }
+    }
+
+    func definitions(search: String) async -> [DataMuseDefinition] {
+        let path = "/words"
+
+        // filter out empty queries
+        if search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return []
+        }
+
+        print("Query Definition for:", search)
+        var result: [DataMuseDefinition] = []
+        do {
+            result = try await client.send(
+                Request(
+                    path: path,
+                    query: [
+                        ("ml", search),
+                        ("qe", "ml"),
+                        ("md", "dp"),
+                        ("max", "1"),
+                    ]
+                )
+            ).value
+        } catch {
+            print(error.localizedDescription)
+        }
+
+        return result
     }
 
     private func query(_ path: String, scope: SearchScope, search: String) async -> [DataMuseWord] {
