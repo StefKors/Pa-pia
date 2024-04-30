@@ -28,24 +28,29 @@ struct iOSContentViewAdjustmentsView: ViewModifier {
     }
 }
 
+@Observable class InterfaceState {
+    var selection: DataMuseWord?  // Nothing selected by default.
+}
+
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
 
     @Bindable private var model = DataMuseViewModel()
 
-    @State private var selection: DataMuseWord? // Nothing selected by default.
+    @Bindable private var state = InterfaceState()
 
     var body: some View {
         NavigationSplitView {
-            List(model.searchResults, selection: $selection) { word in
+            List(model.searchResults, selection: $state.selection) { word in
                 NavigationLink(value: word) {
                     WordView(label: word.word)
                 }
             }
             .searchable(text: $model.searchText, placement: .sidebar, prompt: "Find words...")
         } detail: {
-            if let word = selection {
+            if let word = state.selection {
                 WordDetailView(word: word)
+                    .id(state.selection)
             } else {
                 SearchContentUnavailableView(
                     searchResultsCount: model.searchResults.count,
@@ -53,6 +58,7 @@ struct ContentView: View {
                 )
             }
         }
+        .environment(state)
         .modifier(
             iOSContentViewAdjustmentsView(
                 searchResultsCount: model.searchResults.count,

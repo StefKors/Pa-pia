@@ -15,6 +15,8 @@ struct WordDetailListSectionView: View {
     }
 
     @State private var showMore: Bool = false
+    @Environment(InterfaceState.self) private var state
+
     var body: some View {
         Section(info.scope.label) {
             Text(markdownText)
@@ -29,22 +31,15 @@ struct WordDetailListSectionView: View {
             WrappingHStack(alignment: .topLeading) {
                 ForEach(info.words) { word in
                     Button {
-                        //                        withAnimation(.smooth) {
-                        //                            model.searchText = item.word.word
-                        //                        }
+                        state.selection = word
                     } label: {
                         WordView(label: word.word)
                     }
-                    .foregroundStyle(.primary)
+                    .font(.footnote)
+                    .foregroundStyle(.white)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 4)
                     .background(.tint, in: Capsule())
-                    //                            Text(word.word)
-                    //                            NavigationLink {
-                    //                                WordDetailView(word: word)
-                    //                            } label: {
-                    //
-                    //                            }
                 }
             }
         }

@@ -57,8 +57,6 @@ struct SearchContentUnavailableView: View {
                     Text("Start your search, then filter your query")
                 } actions: {
                     WrappingHStack {
-
-
                         ForEach(searchHistoryItems) { item in
                             Button {
                                 /// todo: open
