@@ -44,7 +44,7 @@ struct WordDetailListSectionView: View {
 //                            model.searchText = item.word.word
 //                        }
                     } label: {
-                        Word(label: word.word)
+                        WordView(label: word.word)
                     }
                     .foregroundStyle(.primary)
                     .padding(.horizontal, 12)
@@ -66,6 +66,8 @@ struct WordDetailListSectionView: View {
     WordDetailListSectionView(info: .preview)
 }
 
+/// TODO: Add bookmark button
+/// TODO: Support definitions with: https://api.datamuse.com/words?sl=jirraf&md=dpsr
 struct WordDetailView: View {
     let word: DataMuseWord
 
@@ -77,26 +79,14 @@ struct WordDetailView: View {
         List(results) { info in
             WordDetailListSectionView(info: info)
         }
-        .navigationBarTitleDisplayMode(.large)
+//        .navigationBarTitleDisplayMode(.large)
         .navigationTitle(word.word.capitalized)
-        .overlay(alignment: .top) {
-            VStack {
-                if model.isSearching {
-                    SearchProgress(searches: model.activeSearches, showLabel: false)
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                }
-            }
-            .animation(.snappy.delay(0.3), value: model.isSearching)
-        }
         .task {
             Task {
                 for scope in model.searchScopes {
                     let words = await model.fetch(scope: scope, searchText: word.word)
                     results.append(WordDetailInformation(scope: scope, words: words))
                 }
-
-                // BUG in search progress, clear when done
-                model.activeSearches = []
             }
         }
     }

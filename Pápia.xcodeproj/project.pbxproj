@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A8016372BE0D764005DEE89 /* WordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8016362BE0D764005DEE89 /* WordView.swift */; };
+		8A8016392BE0DB38005DEE89 /* SearchSuggestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8016382BE0DB38005DEE89 /* SearchSuggestionsView.swift */; };
+		8A80163B2BE0DBD2005DEE89 /* SearchContentUnavailableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A80163A2BE0DBD2005DEE89 /* SearchContentUnavailableView.swift */; };
 		8AA9037C2BDF940C00D553A9 /* Pa_piaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA9037B2BDF940C00D553A9 /* Pa_piaApp.swift */; };
 		8AA9037E2BDF940C00D553A9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA9037D2BDF940C00D553A9 /* ContentView.swift */; };
 		8AA903802BDF940C00D553A9 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA9037F2BDF940C00D553A9 /* Item.swift */; };
@@ -45,6 +48,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8A8016362BE0D764005DEE89 /* WordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordView.swift; sourceTree = "<group>"; };
+		8A8016382BE0DB38005DEE89 /* SearchSuggestionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSuggestionsView.swift; sourceTree = "<group>"; };
+		8A80163A2BE0DBD2005DEE89 /* SearchContentUnavailableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchContentUnavailableView.swift; sourceTree = "<group>"; };
 		8AA903782BDF940C00D553A9 /* Pápia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pápia.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AA9037B2BDF940C00D553A9 /* Pa_piaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pa_piaApp.swift; sourceTree = "<group>"; };
 		8AA9037D2BDF940C00D553A9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -120,6 +126,9 @@
 			children = (
 				8AA9037B2BDF940C00D553A9 /* Pa_piaApp.swift */,
 				8AA9037D2BDF940C00D553A9 /* ContentView.swift */,
+				8A80163A2BE0DBD2005DEE89 /* SearchContentUnavailableView.swift */,
+				8A8016382BE0DB38005DEE89 /* SearchSuggestionsView.swift */,
+				8A8016362BE0D764005DEE89 /* WordView.swift */,
 				8AA903BA2BDFB89200D553A9 /* WordDetailView.swift */,
 				8AA903BC2BDFBA9D00D553A9 /* WrappingHStack.swift */,
 				8AA903B82BDFB84C00D553A9 /* ProgressIcon.swift */,
@@ -311,13 +320,16 @@
 			files = (
 				8AA9037E2BDF940C00D553A9 /* ContentView.swift in Sources */,
 				8AA903802BDF940C00D553A9 /* Item.swift in Sources */,
+				8A8016392BE0DB38005DEE89 /* SearchSuggestionsView.swift in Sources */,
 				8AA903BD2BDFBA9D00D553A9 /* WrappingHStack.swift in Sources */,
 				8AA903B12BDFA07B00D553A9 /* DataMuseViewModel.swift in Sources */,
+				8A80163B2BE0DBD2005DEE89 /* SearchContentUnavailableView.swift in Sources */,
 				8AA903B92BDFB84C00D553A9 /* ProgressIcon.swift in Sources */,
 				8AA903B32BDFA09B00D553A9 /* DataMuseWord.swift in Sources */,
 				8AA9037C2BDF940C00D553A9 /* Pa_piaApp.swift in Sources */,
 				8AA903BB2BDFB89200D553A9 /* WordDetailView.swift in Sources */,
 				8AA903B72BDFB83C00D553A9 /* SearchProgress.swift in Sources */,
+				8A8016372BE0D764005DEE89 /* WordView.swift in Sources */,
 				8AA903B52BDFAFE200D553A9 /* IndeterminateProgressView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

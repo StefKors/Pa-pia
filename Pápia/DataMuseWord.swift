@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct DataMuseWord: Identifiable, Codable {
+struct DataMuseWord: Identifiable, Codable, Hashable {
     let word: String
     let score: Int
 

@@ -8,28 +8,45 @@
 import SwiftUI
 
 struct SearchProgress: View {
-    let searches: [DataMuseViewModel.Search]
     var showLabel: Bool = true
 
-    private var searchString: String {
-        Array(Set(searches.map { search in
-            search.scope.label
-        })).joined(separator: ", ")
-    }
+    @Environment(\.isSearching) private var isSearching
+
     var body: some View {
-        HStack {
-            if showLabel {
-                Text("Searching \(searchString)...")
+        VStack {
+            if isSearching {
+                HStack {
+                    if showLabel {
+                        Text("Searching...")
+                    }
+                    ProgressIcon()
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 12)
+                .background(.thinMaterial, in: Capsule())
+                .shadow(radius: 10)
+                .transition(.move(edge: .top).combined(with: .opacity))
             }
-            ProgressIcon()
         }
-        .padding(.horizontal)
-        .padding(.vertical, 12)
-        .background(.thinMaterial, in: Capsule())
-        .shadow(radius: 10)
+        .animation(.snappy.delay(0.3), value: isSearching)
+
+    }
+}
+
+struct searchProgressIndicator: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .overlay(alignment: .top) {
+                SearchProgress()
+            }
     }
 }
 
 #Preview {
-    SearchProgress(searches: [DataMuseViewModel.Search.preview])
+    Text("Hello, world!")
+        .modifier(searchProgressIndicator())
+}
+
+#Preview {
+    SearchProgress()
 }

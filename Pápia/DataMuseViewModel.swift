@@ -28,10 +28,6 @@ require that the results are spelled similarly to this string of characters, or 
 - A plus sign (+) followed by some letters at the end of a pattern means "restrict to these letters".
 """
     )
-    var activeSearches: [Search] = []
-    var isSearching: Bool {
-        !self.activeSearches.isEmpty
-    }
 
     var searchResults: [DataMuseWord] = []
     var suggestedSearches: [DataMuseWord] = []
@@ -73,8 +69,6 @@ require that the results are spelled similarly to this string of characters, or 
         }
 
         print("Query:", path, scope.queryParam, search)
-        let currentSearch = Search(path: path, scope: scope, searchText: search)
-        self.activeSearches.append(currentSearch)
         var result: [DataMuseWord] = []
         do {
             result = try await client.send(
@@ -85,12 +79,6 @@ require that the results are spelled similarly to this string of characters, or 
             ).value
         } catch {
             print(error.localizedDescription)
-        }
-
-        DispatchQueue.main.async {
-            self.activeSearches.removeAll { anySearch in
-                anySearch.id == currentSearch.id
-            }
         }
 
         return result
