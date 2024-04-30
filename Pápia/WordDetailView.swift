@@ -18,54 +18,6 @@ struct WordDetailInformation: Identifiable {
     static let preview = WordDetailInformation(scope: .preview, words: [.preview, .preview2])
 }
 
-struct WordDetailListSectionView: View {
-    let info: WordDetailInformation
-
-    private var markdownText: LocalizedStringKey {
-        "\(info.scope.description)"
-    }
-
-    @State private var showMore: Bool = false
-    var body: some View {
-        Section(info.scope.label) {
-            Text(markdownText)
-                .lineLimit(showMore ? 1000 : 2)
-                .foregroundStyle(.secondary)
-                .onTapGesture {
-                    withAnimation(.smooth) {
-                        showMore.toggle()
-                    }
-                }
-
-            WrappingHStack(alignment: .topLeading) {
-                ForEach(info.words) { word in
-                    Button {
-//                        withAnimation(.smooth) {
-//                            model.searchText = item.word.word
-//                        }
-                    } label: {
-                        WordView(label: word.word)
-                    }
-                    .foregroundStyle(.primary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
-                    .background(.tint, in: Capsule())
-                    //                            Text(word.word)
-                    //                            NavigationLink {
-                    //                                WordDetailView(word: word)
-                    //                            } label: {
-                    //
-                    //                            }
-                }
-            }
-        }
-    }
-}
-
-#Preview {
-    WordDetailListSectionView(info: .preview)
-}
-
 /// TODO: Add bookmark button
 /// TODO: Support definitions with: https://api.datamuse.com/words?sl=jirraf&md=dpsr
 struct WordDetailView: View {

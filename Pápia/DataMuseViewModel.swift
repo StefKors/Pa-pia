@@ -9,6 +9,8 @@ import Foundation
 import Get
 import Observation
 
+let memoryCapacity = 1024 * 1024 * 1024 // 1 GB
+let diskCapacity = 2 * 1024 * 1024 * 1024 // 2 GB
 
 @Observable final class DataMuseViewModel {
     var searchText: String = ""
@@ -32,18 +34,12 @@ require that the results are spelled similarly to this string of characters, or 
     var searchResults: [DataMuseWord] = []
     var suggestedSearches: [DataMuseWord] = []
 
-    private let client = APIClient(baseURL: URL(string: "https://api.datamuse.com"))
-
-//    func createCache() {
-//        let memoryCapacity = 500 * 1024 * 1024 // 500 MB
-//        let diskCapacity = 1 * 1024 * 1024 * 1024 // 1 GB
-//        let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: "myCachePath")
-//    }
-
-    func search() {
-        Task {
-            self.searchResults = await fetch(scope: self.searchScope, searchText: self.searchText)
-        }
+    private let client = APIClient(baseURL: URL(string: "https://api.datamuse.com")) {
+        $0.sessionConfiguration.urlCache = URLCache(
+            memoryCapacity: memoryCapacity,
+            diskCapacity: diskCapacity,
+            diskPath: "papia_url_cache"
+        )
     }
 
     func fetch(scope: SearchScope, searchText: String) async -> [DataMuseWord] {
