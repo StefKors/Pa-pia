@@ -28,18 +28,17 @@ struct iOSContentViewAdjustmentsView: ViewModifier {
     }
 }
 
-@Observable class InterfaceState {
-    var selection: DataMuseWord?  // Nothing selected by default.
+class InterfaceState: ObservableObject {
+    @Published var selection: DataMuseWord?  // Nothing selected by default.
 }
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
 
-    @Bindable private var model = DataMuseViewModel()
+    @StateObject private var model = DataMuseViewModel()
 
-    @Bindable private var state = InterfaceState()
+    @StateObject var state = InterfaceState()
 
-    var body: some View {
+    var macOSContentView: some View {
         NavigationSplitView {
             List(model.searchResults, selection: $state.selection) { word in
                 NavigationLink(value: word) {
@@ -58,13 +57,51 @@ struct ContentView: View {
                 )
             }
         }
-        .environment(state)
         .modifier(
             iOSContentViewAdjustmentsView(
                 searchResultsCount: model.searchResults.count,
                 searchText: model.searchText
             )
         )
+    }
+
+    var iOSContentView: some View {
+        NavigationSplitView {
+            List(model.searchResults, selection: $state.selection) { word in
+                NavigationLink(value: word) {
+                    WordView(label: word.word)
+                }
+            }
+            .searchable(text: $model.searchText, placement: .sidebar, prompt: "Find words...")
+        } detail: {
+            if let word = state.selection {
+                WordDetailView(word: word)
+                    .id(state.selection)
+            } else {
+                SearchContentUnavailableView(
+                    searchResultsCount: model.searchResults.count,
+                    searchText: model.searchText
+                )
+            }
+        }
+        .modifier(
+            iOSContentViewAdjustmentsView(
+                searchResultsCount: model.searchResults.count,
+                searchText: model.searchText
+            )
+        )
+    }
+
+    
+    var body: some View {
+        VStack {
+#if os(macOS)
+            macOSContentView
+#else
+            iOSContentView
+#endif
+        }
+        .environmentObject(state)
         .searchScopes($model.searchScope, activation: .onSearchPresentation) {
             ForEach(model.globalSearchScopes) { scope in
                 Text(scope.label)
@@ -78,16 +115,8 @@ struct ContentView: View {
             self.model.searchResults = await self.model.fetch(scope: self.model.searchScope, searchText: self.model.searchText)
         }
     }
-
-    private func addItem(word: DataMuseWord) {
-        withAnimation {
-            let newItem = SearchHistoryItem(timestamp: Date(), word: word)
-            modelContext.insert(newItem)
-        }
-    }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: SearchHistoryItem.self, inMemory: true)
 }

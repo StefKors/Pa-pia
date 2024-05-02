@@ -15,7 +15,6 @@
 		8A8016412BE0F92F005DEE89 /* DataMuseDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8016402BE0F92F005DEE89 /* DataMuseDefinition.swift */; };
 		8AA9037C2BDF940C00D553A9 /* Pa_piaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA9037B2BDF940C00D553A9 /* Pa_piaApp.swift */; };
 		8AA9037E2BDF940C00D553A9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA9037D2BDF940C00D553A9 /* ContentView.swift */; };
-		8AA903802BDF940C00D553A9 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA9037F2BDF940C00D553A9 /* Item.swift */; };
 		8AA903822BDF940D00D553A9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8AA903812BDF940D00D553A9 /* Assets.xcassets */; };
 		8AA903862BDF940D00D553A9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8AA903852BDF940D00D553A9 /* Preview Assets.xcassets */; };
 		8AA903902BDF940D00D553A9 /* Pa_piaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA9038F2BDF940D00D553A9 /* Pa_piaTests.swift */; };
@@ -58,10 +57,14 @@
 		8A80163E2BE0E9AF005DEE89 /* WordDetailListSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordDetailListSectionView.swift; sourceTree = "<group>"; };
 		8A8016402BE0F92F005DEE89 /* DataMuseDefinition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataMuseDefinition.swift; sourceTree = "<group>"; };
 		8A8016422BE1062E005DEE89 /* Pa-pia-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Pa-pia-Info.plist"; sourceTree = SOURCE_ROOT; };
+		8A926A932BE23BBB00BDC919 /* clues.tsv */ = {isa = PBXFileReference; lastKnownFileType = text; path = clues.tsv; sourceTree = "<group>"; };
+		8A926A942BE23BBB00BDC919 /* README */ = {isa = PBXFileReference; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		8A926A962BE23BD800BDC919 /* peter-broda-wordlist__gridtext__scored__july-25-2023.dict */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "peter-broda-wordlist__gridtext__scored__july-25-2023.dict"; sourceTree = "<group>"; };
+		8A926A972BE23BD800BDC919 /* spreadthewordlist.dict */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = spreadthewordlist.dict; sourceTree = "<group>"; };
+		8A926A982BE23BD800BDC919 /* XwiWordList.dict */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = XwiWordList.dict; sourceTree = "<group>"; };
 		8AA903782BDF940C00D553A9 /* Pápia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pápia.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AA9037B2BDF940C00D553A9 /* Pa_piaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pa_piaApp.swift; sourceTree = "<group>"; };
 		8AA9037D2BDF940C00D553A9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		8AA9037F2BDF940C00D553A9 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		8AA903812BDF940D00D553A9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8AA903832BDF940D00D553A9 /* Pa_pia.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pa_pia.entitlements; sourceTree = "<group>"; };
 		8AA903852BDF940D00D553A9 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -107,6 +110,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8A926A952BE23BBB00BDC919 /* xd-clues */ = {
+			isa = PBXGroup;
+			children = (
+				8A926A932BE23BBB00BDC919 /* clues.tsv */,
+				8A926A942BE23BBB00BDC919 /* README */,
+			);
+			path = "xd-clues";
+			sourceTree = "<group>";
+		};
+		8A926A992BE23BD800BDC919 /* WordRatings */ = {
+			isa = PBXGroup;
+			children = (
+				8A926A962BE23BD800BDC919 /* peter-broda-wordlist__gridtext__scored__july-25-2023.dict */,
+				8A926A972BE23BD800BDC919 /* spreadthewordlist.dict */,
+				8A926A982BE23BD800BDC919 /* XwiWordList.dict */,
+			);
+			path = WordRatings;
+			sourceTree = "<group>";
+		};
 		8AA9036F2BDF940C00D553A9 = {
 			isa = PBXGroup;
 			children = (
@@ -131,6 +153,8 @@
 		8AA9037A2BDF940C00D553A9 /* Pápia */ = {
 			isa = PBXGroup;
 			children = (
+				8A926A992BE23BD800BDC919 /* WordRatings */,
+				8A926A952BE23BBB00BDC919 /* xd-clues */,
 				8A8016422BE1062E005DEE89 /* Pa-pia-Info.plist */,
 				8AA9037B2BDF940C00D553A9 /* Pa_piaApp.swift */,
 				8AA9037D2BDF940C00D553A9 /* ContentView.swift */,
@@ -147,7 +171,6 @@
 				8AA903B02BDFA07A00D553A9 /* DataMuseViewModel.swift */,
 				8AA903B22BDFA09B00D553A9 /* DataMuseWord.swift */,
 				8A8016402BE0F92F005DEE89 /* DataMuseDefinition.swift */,
-				8AA9037F2BDF940C00D553A9 /* Item.swift */,
 				8AA903812BDF940D00D553A9 /* Assets.xcassets */,
 				8AA903832BDF940D00D553A9 /* Pa_pia.entitlements */,
 				8AA903842BDF940D00D553A9 /* Preview Content */,
@@ -333,7 +356,6 @@
 				8A80163D2BE0E655005DEE89 /* LargeNavigationBarTitleDisplayMode.swift in Sources */,
 				8A80163F2BE0E9AF005DEE89 /* WordDetailListSectionView.swift in Sources */,
 				8AA9037E2BDF940C00D553A9 /* ContentView.swift in Sources */,
-				8AA903802BDF940C00D553A9 /* Item.swift in Sources */,
 				8A8016392BE0DB38005DEE89 /* SearchSuggestionsView.swift in Sources */,
 				8AA903BD2BDFBA9D00D553A9 /* WrappingHStack.swift in Sources */,
 				8AA903B12BDFA07B00D553A9 /* DataMuseViewModel.swift in Sources */,
@@ -520,10 +542,10 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.stefkors.Pa-pia";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -560,10 +582,10 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.stefkors.Pa-pia";
 				PRODUCT_NAME = "$(TARGET_NAME)";

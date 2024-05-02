@@ -43,19 +43,19 @@ struct DefinitionView: View {
                 if def.isNoun {
                     Text("noun")
                         .padding(.horizontal, 4)
-                        .background(.background.secondary, in: RoundedRectangle(cornerRadius: 4))
+                        .background(.background.opacity(0.3), in: RoundedRectangle(cornerRadius: 4))
                 }
 
                 if def.isVerb {
                     Text("verb")
                         .padding(.horizontal, 4)
-                        .background(.background.secondary, in: RoundedRectangle(cornerRadius: 4))
+                        .background(.background.opacity(0.3), in: RoundedRectangle(cornerRadius: 4))
                 }
 
                 if def.isAdjective {
                     Text("adjective")
                         .padding(.horizontal, 4)
-                        .background(.background.secondary, in: RoundedRectangle(cornerRadius: 4))
+                        .background(.background.opacity(0.3), in: RoundedRectangle(cornerRadius: 4))
                 }
             }
             .font(.footnote)
@@ -96,7 +96,7 @@ struct WordDetailView: View {
     let word: DataMuseWord
 
     @State private var information: [DataMuseViewModel.SearchScope: [DataMuseWord]] = [:]
-    @Bindable private var model = DataMuseViewModel()
+    @StateObject private var model = DataMuseViewModel()
     @State private var results: [WordDetailInformation] = []
     @State private var definitions: [DataMuseDefinition] = []
     var body: some View {

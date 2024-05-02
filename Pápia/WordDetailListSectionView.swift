@@ -15,7 +15,7 @@ struct WordDetailListSectionView: View {
     }
 
     @State private var showMore: Bool = false
-    @Environment(InterfaceState.self) private var state
+    @EnvironmentObject private var state: InterfaceState
 
     var body: some View {
         Section(info.scope.label) {

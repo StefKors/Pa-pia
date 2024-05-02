@@ -15,10 +15,10 @@ let diskCapacity = 2 * 1024 * 1024 * 1024 // 2 GB
 
 /// https://api.datamuse.com/words?ml=tree&qe=ml&md=dpfcy&max=1&rif=1&k=olthes_r4
 /// get defintions: https://api.datamuse.com/words?ml=tree&qe=ml&md=dp&max=1
-@Observable final class DataMuseViewModel {
-    var searchText: String = ""
+class DataMuseViewModel: ObservableObject {
+    @Published var searchText: String = ""
     /// TODO: don't hardcode?
-    var searchScope: SearchScope = SearchScope(
+    @Published var searchScope: SearchScope = SearchScope(
         queryParam: "sp",
         label: "Spelled like",
         description: """
@@ -34,8 +34,8 @@ require that the results are spelled similarly to this string of characters, or 
 """
     )
 
-    var searchResults: [DataMuseWord] = []
-    var suggestedSearches: [DataMuseWord] = []
+    @Published var searchResults: [DataMuseWord] = []
+    @Published var suggestedSearches: [DataMuseWord] = []
 
     private let client = APIClient(baseURL: URL(string: "https://api.datamuse.com")) {
         $0.sessionConfiguration.urlCache = URLCache(
