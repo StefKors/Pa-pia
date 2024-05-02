@@ -19,76 +19,6 @@ struct WordDetailInformation: Identifiable {
     static let preview = WordDetailInformation(scope: .preview, words: [.preview, .preview2])
 }
 
-// https://api.datamuse.com/words?ml=tree&qe=ml&md=dp&max=1
-struct DefinitionView: View {
-    let def: DataMuseDefinition
-
-    private let first: String
-    private let others: [String]
-
-    @State private var showAll: Bool = false
-
-    init(def: DataMuseDefinition) {
-        self.def = def
-        var definitions = def.defs.map {
-            $0.dropFirst(1).trimmingCharacters(in: .whitespacesAndNewlines)
-        }
-        self.first = definitions.removeFirst()
-        self.others = definitions
-    }
-
-    var body: some View {
-        Section {
-            HStack {
-                if def.isNoun {
-                    Text("noun")
-                        .padding(.horizontal, 4)
-                        .background(.background.opacity(0.3), in: RoundedRectangle(cornerRadius: 4))
-                }
-
-                if def.isVerb {
-                    Text("verb")
-                        .padding(.horizontal, 4)
-                        .background(.background.opacity(0.3), in: RoundedRectangle(cornerRadius: 4))
-                }
-
-                if def.isAdjective {
-                    Text("adjective")
-                        .padding(.horizontal, 4)
-                        .background(.background.opacity(0.3), in: RoundedRectangle(cornerRadius: 4))
-                }
-            }
-            .font(.footnote)
-
-
-            VStack(alignment: .leading, spacing: 12) {
-                Text(first)
-
-                if showAll {
-                    ForEach(others, id: \.self) { definition in
-                        Divider()
-
-                        Text(definition)
-                    }
-                }
-            }
-            .lineLimit(nil)
-            .font(.body)
-            .italic()
-        }
-        .foregroundStyle(.secondary)
-        .onTapGesture {
-            showAll.toggle()
-        }
-    }
-
-
-}
-
-#Preview {
-    DefinitionView(def: .preview)
-}
-
 
 /// TODO: Add bookmark button
 /// TODO: Support definitions with: https://api.datamuse.com/words?sl=jirraf&md=dpsr
@@ -100,8 +30,8 @@ struct WordDetailView: View {
     @State private var results: [WordDetailInformation] = []
     @State private var definitions: [DataMuseDefinition] = []
     var body: some View {
-        VStack {
-            List {
+        ScrollView {
+            VStack(alignment: .leading) {
                 ForEach(definitions) { definition in
                     DefinitionView(def: definition)
                 }
@@ -110,6 +40,7 @@ struct WordDetailView: View {
                     WordDetailListSectionView(info: info)
                 }
             }
+            .scenePadding()
         }
         .navigationTitle(word.word.capitalized)
         .task(id: word) {

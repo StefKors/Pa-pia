@@ -1,0 +1,108 @@
+//
+//  DefinitionView.swift
+//  Pápia
+//
+//  Created by Stef Kors on 02/05/2024.
+//
+
+import SwiftUI
+
+struct MyDisclosureStyle: DisclosureGroupStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        VStack {
+            Button {
+                withAnimation {
+                    configuration.isExpanded.toggle()
+                }
+            } label: {
+                HStack(alignment: .lastTextBaseline) {
+                    configuration.label
+                    Spacer()
+                    Text(configuration.isExpanded ? "hide" : "show")
+                        .foregroundColor(.accentColor)
+                        .font(.caption.lowercaseSmallCaps())
+                        .animation(nil, value: configuration.isExpanded)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            if configuration.isExpanded {
+                configuration.content
+            }
+        }
+    }
+}
+
+
+// https://api.datamuse.com/words?ml=tree&qe=ml&md=dp&max=1
+struct DefinitionView: View {
+    let def: DataMuseDefinition
+
+    private let first: String
+    private let others: [String]
+
+    init(def: DataMuseDefinition) {
+        self.def = def
+        var definitions = def.defs.map {
+            $0.dropFirst(1).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        self.first = definitions.removeFirst()
+        self.others = definitions
+    }
+
+    var body: some View {
+        GroupBox {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    if def.isNoun {
+                        Text("noun")
+                            .padding(.horizontal, 4)
+                            .background(.background.blendMode(.multiply).opacity(0.6), in: RoundedRectangle(cornerRadius: 4))
+                    }
+
+                    if def.isVerb {
+                        Text("verb")
+                            .padding(.horizontal, 4)
+                            .background(.background.blendMode(.multiply).opacity(0.6), in: RoundedRectangle(cornerRadius: 4))
+                    }
+
+                    if def.isAdjective {
+                        Text("adjective")
+                            .padding(.horizontal, 4)
+                            .background(.background.blendMode(.multiply).opacity(0.6), in: RoundedRectangle(cornerRadius: 4))
+                    }
+                    Spacer()
+                }
+                .frame(alignment: .leading)
+                .font(.footnote)
+
+                DisclosureGroup {
+                    VStack(alignment: .leading, spacing: 12) {
+                        ForEach(others, id: \.self) { definition in
+                            Divider()
+
+                            Text(definition)
+                                .multilineTextAlignment(.leading)
+                        }
+                    }
+                } label: {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(first)
+                            .multilineTextAlignment(.leading)
+                    }
+                }
+                .disclosureGroupStyle(MyDisclosureStyle())
+            }
+            .lineLimit(nil)
+            .font(.body)
+            .italic()
+        }
+        .foregroundStyle(.secondary)
+    }
+
+
+}
+
+#Preview {
+    DefinitionView(def: .preview)
+}
