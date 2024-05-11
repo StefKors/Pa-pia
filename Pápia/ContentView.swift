@@ -33,7 +33,13 @@ class InterfaceState: ObservableObject {
     @Published var navigationPath: NavigationPath = NavigationPath()
 }
 
-//@Environment(\.isSearching) private var isSearching
+// TODO: add search progress @Environment(\.isSearching) private var isSearching
+// TODO: add indicator if the word exists in the wordle dictionary
+// TODO: add buttons to insert wild card character for complex searches
+// TODO: add indicator if the word exists in the scrabble dictionary
+// TODO: show word also in Dutch and Greek
+// TODO: lazy load the Word Detail List Sections so they are loaded as you scroll, most are out of view anyways
+// TODO: add feature to favourite words
 struct ContentView: View {
 
     @StateObject private var model = DataMuseViewModel()

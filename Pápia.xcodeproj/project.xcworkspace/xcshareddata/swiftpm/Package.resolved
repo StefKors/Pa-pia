@@ -1,5 +1,5 @@
 {
-  "originHash" : "a05ea1a14d943e449d39478d113875a20cefe8a6ad97222d4e02f5920647c493",
+  "originHash" : "5d79e9b69ae40be9c392732ae7ca5e25993509e18f8f1071c151cd7473055414",
   "pins" : [
     {
       "identity" : "get",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "74dba201ebe42e9c15c1db6ee1cc893025bbef94",
         "version" : "2.2.0"
+      }
+    },
+    {
+      "identity" : "scrollsegmentedcontrol",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:JLoewy/ScrollSegmentedControl.git",
+      "state" : {
+        "revision" : "d2cf6f846620a60ef57cb2257629dbe08777445d",
+        "version" : "2.1.0"
       }
     }
   ],

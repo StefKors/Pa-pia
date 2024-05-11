@@ -247,5 +247,33 @@ require that the results are spelled similarly to this string of characters, or 
         ),
     ]
 
+    let relatedScopes = [
+        SearchScope(
+            queryParam: "rel_jja",
+            label: "Related: Nouns",
+            description: "Popular nouns modified by the given adjective, per Google Books Ngrams"
+        ),
+        SearchScope(
+            queryParam: "rel_jjb",
+            label: "Related: Adjectives",
+            description: "Popular adjectives used to modify the given noun, per Google Books Ngrams"
+        ),
+        SearchScope(
+            queryParam: "rel_syn",
+            label: "Related: Synoyms",
+            description: "Synonyms (words contained within the same WordNet synset)"
+        ),
+        SearchScope(
+            queryParam: "rel_ant",
+            label: "Related: Antonyms",
+            description: "Antonyms (per WordNet)"
+        ),
+        SearchScope(
+            queryParam: "rel_hom",
+            label: "Related: Homophones",
+            description: "Homophones (sound-alike words)"
+        ),
+    ]
+
 }
 

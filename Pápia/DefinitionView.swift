@@ -51,56 +51,48 @@ struct DefinitionView: View {
     }
 
     var body: some View {
-        GroupBox {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    if def.isNoun {
-                        Text("noun")
-                            .padding(.horizontal, 4)
-                            .background(.background.blendMode(.multiply).opacity(0.6), in: RoundedRectangle(cornerRadius: 4))
-                    }
-
-                    if def.isVerb {
-                        Text("verb")
-                            .padding(.horizontal, 4)
-                            .background(.background.blendMode(.multiply).opacity(0.6), in: RoundedRectangle(cornerRadius: 4))
-                    }
-
-                    if def.isAdjective {
-                        Text("adjective")
-                            .padding(.horizontal, 4)
-                            .background(.background.blendMode(.multiply).opacity(0.6), in: RoundedRectangle(cornerRadius: 4))
-                    }
-                    Spacer()
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                if def.isNoun {
+                    Text("noun")
+                        .padding(.horizontal, 4)
+                        .background(.background.blendMode(.multiply).opacity(0.6), in: RoundedRectangle(cornerRadius: 4))
                 }
-                .frame(alignment: .leading)
-                .font(.footnote)
 
-                DisclosureGroup {
-                    VStack(alignment: .leading, spacing: 12) {
-                        ForEach(others, id: \.self) { definition in
-                            Divider()
-
-                            Text(definition)
-                                .multilineTextAlignment(.leading)
-                        }
-                    }
-                } label: {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text(first)
-                            .multilineTextAlignment(.leading)
-                    }
+                if def.isVerb {
+                    Text("verb")
+                        .padding(.horizontal, 4)
+                        .background(.background.blendMode(.multiply).opacity(0.6), in: RoundedRectangle(cornerRadius: 4))
                 }
-                .disclosureGroupStyle(MyDisclosureStyle())
+
+                if def.isAdjective {
+                    Text("adjective")
+                        .padding(.horizontal, 4)
+                        .background(.background.blendMode(.multiply).opacity(0.6), in: RoundedRectangle(cornerRadius: 4))
+                }
+                Spacer()
             }
-            .lineLimit(nil)
-            .font(.body)
-            .italic()
+            .frame(alignment: .leading)
+            .font(.footnote)
+
+            Divider()
+
+            VStack(alignment: .leading, spacing: 12) {
+                Text(first)
+                    .multilineTextAlignment(.leading)
+
+                ForEach(others, id: \.self) { definition in
+                    Divider()
+
+                    Text(definition)
+                        .multilineTextAlignment(.leading)
+                }
+            }
+            .foregroundStyle(.primary)
         }
-        .foregroundStyle(.secondary)
+        .lineLimit(nil)
+        .font(.body)
     }
-
-
 }
 
 #Preview {

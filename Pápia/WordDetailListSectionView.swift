@@ -15,14 +15,44 @@ struct NavigationButtonStyle: ButtonStyle {
             .padding(.horizontal, 12)
             .padding(.vertical, 4)
             .background(.tint, in: Capsule())
-
+        
         //            .background(configuration.isPressed ? Color.blue : Color.pink)
     }
 }
 
 struct WordDetailListSectionView: View {
-    let info: WordDetailInformation
+    let scope: DataMuseViewModel.SearchScope
+    let word: DataMuseWord
 
+    @State private var info: WordDetailInformation?
+
+    @EnvironmentObject private var model: DataMuseViewModel
+
+    var body: some View {
+        Group {
+            if let info {
+                WordDetailSectionView(info: info)
+            } else {
+                WordDetailSectionView(info: .preview)
+                    .redacted(reason: .placeholder)
+            }
+        }
+        .task(id: scope) {
+            let words = await model.fetch(scope: scope, searchText: word.word)
+            withAnimation(.smooth) {
+                self.info = WordDetailInformation(scope: scope, words: words)
+            }
+        }
+    }
+}
+
+#Preview {
+    WordDetailListSectionView(scope: .preview, word: .preview)
+}
+
+
+struct WordDetailSectionView: View {
+    let info: WordDetailInformation
     private var markdownText: LocalizedStringKey {
         "\(info.scope.description)"
     }
@@ -42,50 +72,33 @@ struct WordDetailListSectionView: View {
                     }
                 }
 
-
-            VStack {
-                Button {
-                    withAnimation {
-                        isExpanded.toggle()
-                    }
-                } label: {
-                    HStack(alignment: .lastTextBaseline) {
-                        VStack {
-                            WrappingHStack(alignment: .topLeading) {
-                                ForEach(info.words) { word in
-                                    NavigationLink {
-                                        WordDetailView(word: word)
-                                    } label: {
-                                        WordView(label: word.word)
-                                    }
-                                    .buttonStyle(NavigationButtonStyle())
-                                    .id(word)
-                                    //                    Button {
-                                    //                        state.selection = word // macOS
-                                    //                        state.navigationPath.append(word) // iOS
-                                    //                    } label: {
-                                    //                        WordView(label: word.word)
-                                    //                    }
-
-                                }
+            HStack(alignment: .lastTextBaseline) {
+                VStack {
+                    WrappingHStack(alignment: .topLeading) {
+                        ForEach(info.words) { word in
+                            NavigationLink {
+                                WordDetailView(word: word)
+                            } label: {
+                                WordView(label: word.word)
                             }
-                            .fixedSize(horizontal: false, vertical: true)
+                            .buttonStyle(NavigationButtonStyle())
+                            .id(word)
+                            //                    Button {
+                            //                        state.selection = word // macOS
+                            //                        state.navigationPath.append(word) // iOS
+                            //                    } label: {
+                            //                        WordView(label: word.word)
+                            //                    }
+
                         }
-                        .frame(maxHeight: isExpanded ? .infinity : 200)
-                        Spacer()
-                        Text(isExpanded ? "hide" : "show")
-                            .foregroundColor(.accentColor)
-                            .font(.caption.lowercaseSmallCaps())
-                            .animation(nil, value: isExpanded)
                     }
-                    .contentShape(Rectangle())
+                    //                            .fixedSize(horizontal: false, vertical: true)
                 }
-                .buttonStyle(.plain)
             }
         }
     }
 }
 
 #Preview {
-    WordDetailListSectionView(info: .preview)
+    WordDetailSectionView(info: .preview)
 }
