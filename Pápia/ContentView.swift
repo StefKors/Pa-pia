@@ -50,7 +50,7 @@ struct ContentView: View {
         NavigationSplitView {
             List(model.searchResults, selection: $state.selection) { word in
                 NavigationLink(value: word) {
-                    WordView(label: word.word)
+                    WordView(word: word)
                 }
             }
             .searchable(text: $model.searchText, placement: .sidebar, prompt: "Find words...")
@@ -79,7 +79,7 @@ struct ContentView: View {
                 NavigationLink {
                     WordDetailView(word: word)
                 } label: {
-                    WordView(label: word.word)
+                    WordView(word: word)
                 }
             }
             .searchable(text: $model.searchText, placement: .sidebar, prompt: "Find words...")

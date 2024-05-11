@@ -11,8 +11,41 @@ struct DataMuseWord: Identifiable, Codable, Hashable {
     let word: String
     let score: Int
 
+    var isWordle: Bool = false
+
     var id: String {
         self.word + "-" + self.score.description
+    }
+
+    init(word: String, score: Int) {
+        self.word = word
+        self.score = score
+    }
+
+    init(word: String, score: Int, isWordle: Bool) {
+        self.word = word
+        self.score = score
+        self.isWordle = isWordle
+    }
+
+    enum CodingKeys: CodingKey {
+        case word
+        case score
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container: KeyedDecodingContainer<DataMuseWord.CodingKeys> = try decoder.container(keyedBy: DataMuseWord.CodingKeys.self)
+
+        self.word = try container.decode(String.self, forKey: DataMuseWord.CodingKeys.word)
+        self.score = try container.decode(Int.self, forKey: DataMuseWord.CodingKeys.score)
+
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container: KeyedEncodingContainer<DataMuseWord.CodingKeys> = encoder.container(keyedBy: DataMuseWord.CodingKeys.self)
+
+        try container.encode(self.word, forKey: DataMuseWord.CodingKeys.word)
+        try container.encode(self.score, forKey: DataMuseWord.CodingKeys.score)
     }
 }
 

@@ -8,12 +8,29 @@
 import SwiftUI
 
 struct WordView: View {
-    let label: String
+    let word: DataMuseWord
+
     var body: some View {
-        Text(label.capitalized)
+        HStack {
+            Text(word.word.capitalized)
+            Spacer()
+            if word.isWordle {
+                Image(.wordle)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
+            }
+
+//            if word.isWordle {
+//                Image(.scrabble)
+//                    .resizable()
+//                    .aspectRatio(contentMode: .fit)
+//                    .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
+//            }
+        }
     }
 }
 
 #Preview {
-    WordView(label: "Apple")
+    WordView(word: .preview)
 }

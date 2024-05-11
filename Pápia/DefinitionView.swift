@@ -51,47 +51,49 @@ struct DefinitionView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                if def.isNoun {
-                    Text("noun")
-                        .padding(.horizontal, 4)
-                        .background(.background.blendMode(.multiply).opacity(0.6), in: RoundedRectangle(cornerRadius: 4))
-                }
-
-                if def.isVerb {
-                    Text("verb")
-                        .padding(.horizontal, 4)
-                        .background(.background.blendMode(.multiply).opacity(0.6), in: RoundedRectangle(cornerRadius: 4))
-                }
-
-                if def.isAdjective {
-                    Text("adjective")
-                        .padding(.horizontal, 4)
-                        .background(.background.blendMode(.multiply).opacity(0.6), in: RoundedRectangle(cornerRadius: 4))
-                }
-                Spacer()
-            }
-            .frame(alignment: .leading)
-            .font(.footnote)
-
-            Divider()
-
+        GroupBox {
             VStack(alignment: .leading, spacing: 12) {
-                Text(first)
-                    .multilineTextAlignment(.leading)
-
-                ForEach(others, id: \.self) { definition in
-                    Divider()
-
-                    Text(definition)
-                        .multilineTextAlignment(.leading)
+                HStack {
+                    if def.isNoun {
+                        Text("noun")
+                            .padding(.horizontal, 4)
+                            .background(.background.blendMode(.multiply).opacity(0.6), in: RoundedRectangle(cornerRadius: 4))
+                    }
+                    
+                    if def.isVerb {
+                        Text("verb")
+                            .padding(.horizontal, 4)
+                            .background(.background.blendMode(.multiply).opacity(0.6), in: RoundedRectangle(cornerRadius: 4))
+                    }
+                    
+                    if def.isAdjective {
+                        Text("adjective")
+                            .padding(.horizontal, 4)
+                            .background(.background.blendMode(.multiply).opacity(0.6), in: RoundedRectangle(cornerRadius: 4))
+                    }
+                    Spacer()
                 }
+                .frame(alignment: .leading)
+                .font(.footnote)
+                
+                Divider()
+                
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(first)
+                        .multilineTextAlignment(.leading)
+                    
+                    ForEach(others, id: \.self) { definition in
+                        Divider()
+                        
+                        Text(definition)
+                            .multilineTextAlignment(.leading)
+                    }
+                }
+                .foregroundStyle(.primary)
             }
-            .foregroundStyle(.primary)
+            .lineLimit(nil)
+            .font(.body)
         }
-        .lineLimit(nil)
-        .font(.body)
     }
 }
 

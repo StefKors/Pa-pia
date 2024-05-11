@@ -79,7 +79,7 @@ struct WordDetailSectionView: View {
                             NavigationLink {
                                 WordDetailView(word: word)
                             } label: {
-                                WordView(label: word.word)
+                                Text(word.word.capitalized)
                             }
                             .buttonStyle(NavigationButtonStyle())
                             .id(word)

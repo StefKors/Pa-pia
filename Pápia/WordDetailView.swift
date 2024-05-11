@@ -105,10 +105,42 @@ struct WordDetailView: View {
     @State private var results: [WordDetailInformation] = []
     @State private var definitions: [DataMuseDefinition] = []
 
+    @Environment(\.dismiss) private var dismiss
+
     @State private var selectedScope: DataMuseViewModel.SearchScope? = nil
 
     var body: some View {
         VStack(spacing: 0) {
+            HStack {
+                Image(systemName: "chevron.left")
+                    .bold()
+                    .font(.title3)
+
+                Text(word.word.capitalized)
+                    .font(.title)
+                    .bold()
+                if word.isWordle {
+                    Image(.wordle)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
+                }
+//
+//                if word.isWordle {
+//                    Image(.scrabble)
+//                        .resizable()
+//                        .aspectRatio(contentMode: .fit)
+//                        .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
+//                }
+
+                Spacer()
+            }
+                .scenePadding(.horizontal)
+                .onTapGesture {
+                    dismiss()
+                }
+
+
             ScrollView(.horizontal) {
                 HStack {
                     PillTag(label: "Definition", isSelected: selectedScope == nil)
@@ -147,6 +179,9 @@ struct WordDetailView: View {
             }
             .scrollBounceBehavior(.basedOnSize)
         }
+        .navigationTitle(word.word)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .navigationBar)
         .task(id: word) {
             self.definitions = await model.definitions(search: word.word)
         }
