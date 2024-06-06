@@ -1,5 +1,5 @@
 {
-  "originHash" : "5d79e9b69ae40be9c392732ae7ca5e25993509e18f8f1071c151cd7473055414",
+  "originHash" : "ac4e75c7ac6da2f18261e5e0dea89cdd6d58b32db594d7a1b35c2cdcc0d7939e",
   "pins" : [
     {
       "identity" : "get",
@@ -11,12 +11,12 @@
       }
     },
     {
-      "identity" : "scrollsegmentedcontrol",
+      "identity" : "glur",
       "kind" : "remoteSourceControl",
-      "location" : "git@github.com:JLoewy/ScrollSegmentedControl.git",
+      "location" : "git@github.com:joogps/Glur.git",
       "state" : {
-        "revision" : "d2cf6f846620a60ef57cb2257629dbe08777445d",
-        "version" : "2.1.0"
+        "revision" : "9e00ff79da318f2c78b749b1027e54a9d4de2e33",
+        "version" : "1.0.4"
       }
     }
   ],

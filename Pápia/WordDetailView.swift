@@ -60,8 +60,6 @@ struct WordDetailView: View {
 
 #else
 
-import ScrollSegmentControl
-
 struct PillTag: View {
     let label: String
     let isSelected: Bool

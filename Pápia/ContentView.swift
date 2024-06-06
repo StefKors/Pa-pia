@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 import Get
-
+import Glur
 
 struct iOSContentViewAdjustmentsView: ViewModifier {
     let searchResultsCount: Int
@@ -73,17 +73,105 @@ struct ContentView: View {
         )
     }
 
+    var showClearButton: Bool {
+        !model.searchText.isEmpty
+    }
+
+    var showCancelButton: Bool {
+        showClearButton || searchIsFocused
+    }
+
+    var backgroundColor: Color {
+#if os(macOS)
+        Color(nsColor: NSColor.windowBackgroundColor)
+#else
+        Color(uiColor: UIColor.secondarySystemBackground)
+#endif
+    }
+
+    @FocusState private var searchIsFocused: Bool
+
     var iOSContentView: some View {
         NavigationView {
-            List(model.searchResults) { word in
-                NavigationLink {
-                    WordDetailView(word: word)
-                } label: {
-                    WordView(word: word)
+            VStack(spacing: 0) {
+                VStack {
+                    HStack {
+                        HStack {
+                            Image(systemName: "magnifyingglass")
+                                .imageScale(.medium)
+                                .foregroundStyle(.tertiary)
+
+                            if #available(iOS 17.0, *) {
+                                TextField("Find words...", text: $model.searchText)
+                                    .focused($searchIsFocused)
+                                    .searchToolbar()
+                                    .environmentObject(model)
+                                    .defaultFocus($searchIsFocused, true)
+                            } else {
+                                TextField("Find words...", text: $model.searchText)
+                                    .focused($searchIsFocused)
+                                    .searchToolbar()
+                                    .environmentObject(model)
+                            }
+
+                            if showClearButton {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(Color.secondary)
+                                    .onTapGesture {
+                                        withAnimation(.smooth(duration: 0.3)) {
+                                            self.model.searchText = ""
+                                        }
+                                    }
+                                    .transition(.scale(scale: 0.7).combined(with: .opacity))
+                            }
+
+                        }
+                        .padding(6)
+                        .background(.quinary, in: RoundedRectangle(cornerRadius: 6))
+
+                        if showCancelButton {
+                            Text("Cancel")
+                                .onTapGesture {
+                                    withAnimation(.smooth(duration: 0.3)) {
+                                        searchIsFocused.toggle()
+                                    }
+                                }
+                                .transition(.move(edge: .trailing).combined(with: .opacity))
+                                .foregroundStyle(.tint)
+                        }
+                    }
+
+                    .font(.body)
+                    .animation(.smooth(duration: 0.3), value: showClearButton)
+                    .animation(.smooth(duration: 0.3), value: showCancelButton)
+
+                    Picker("Search Scope", selection: $model.searchScope) {
+                        ForEach(model.globalSearchScopes) { scope in
+                            Text(scope.label)
+                                .tag(scope)
+                        }
+                    }.pickerStyle(.segmented)
+                }
+                .scenePadding(.horizontal)
+
+                List(model.searchResults) { word in
+                    NavigationLink {
+                        WordDetailView(word: word)
+                    } label: {
+                        WordView(word: word)
+                    }
+                }
+                .overlay(alignment: .top) {
+                    LinearGradient(stops: [
+                        .init(color: backgroundColor.opacity(0.8), location: 0.5),
+                        .init(color: .clear, location: 0.8)
+                    ], startPoint: .top, endPoint: .bottom)
+                        .frame(height: 60)
+                        .glur(radius: 32.0, offset: 0.3, interpolation: 0.5)
                 }
             }
-            .searchable(text: $model.searchText, placement: .sidebar, prompt: "Find words...")
             .scrollDismissesKeyboard(.immediately)
+            .background(Color(uiColor: UIColor.secondarySystemBackground))
         }
         .modifier(
             iOSContentViewAdjustmentsView(
@@ -93,7 +181,6 @@ struct ContentView: View {
         )
     }
 
-    
     var body: some View {
         VStack {
 #if os(macOS)
@@ -103,12 +190,6 @@ struct ContentView: View {
 #endif
         }
         .environmentObject(state)
-        .searchScopes($model.searchScope, activation: .onSearchPresentation) {
-            ForEach(model.globalSearchScopes) { scope in
-                Text(scope.label)
-                    .tag(scope)
-            }
-        }
         .task(id: model.searchText) {
             self.model.searchResults = await self.model.fetch(scope: self.model.searchScope, searchText: self.model.searchText)
         }

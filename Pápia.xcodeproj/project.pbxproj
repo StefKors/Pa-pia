@@ -10,6 +10,9 @@
 		8A2B5D3A2BEF642B004A68E7 /* readme.md in Resources */ = {isa = PBXBuildFile; fileRef = 8A2B5D362BEF642B004A68E7 /* readme.md */; };
 		8A2B5D3B2BEF642B004A68E7 /* wordle-La.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8A2B5D372BEF642B004A68E7 /* wordle-La.txt */; };
 		8A2B5D3C2BEF642B004A68E7 /* wordle-Ta.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8A2B5D382BEF642B004A68E7 /* wordle-Ta.txt */; };
+		8A675EB52C11D3B90018B028 /* SearchToolbarButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A675EB42C11D3B90018B028 /* SearchToolbarButtons.swift */; };
+		8A675EB72C11D9870018B028 /* KeyboardKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A675EB62C11D9860018B028 /* KeyboardKey.swift */; };
+		8A675EBA2C11E13C0018B028 /* Glur in Frameworks */ = {isa = PBXBuildFile; productRef = 8A675EB92C11E13C0018B028 /* Glur */; };
 		8A8016372BE0D764005DEE89 /* WordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8016362BE0D764005DEE89 /* WordView.swift */; };
 		8A8016392BE0DB38005DEE89 /* SearchSuggestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8016382BE0DB38005DEE89 /* SearchSuggestionsView.swift */; };
 		8A80163B2BE0DBD2005DEE89 /* SearchContentUnavailableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A80163A2BE0DBD2005DEE89 /* SearchContentUnavailableView.swift */; };
@@ -34,7 +37,6 @@
 		8AA903B92BDFB84C00D553A9 /* ProgressIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA903B82BDFB84C00D553A9 /* ProgressIcon.swift */; };
 		8AA903BB2BDFB89200D553A9 /* WordDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA903BA2BDFB89200D553A9 /* WordDetailView.swift */; };
 		8AA903BD2BDFBA9D00D553A9 /* WrappingHStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA903BC2BDFBA9D00D553A9 /* WrappingHStack.swift */; };
-		8AFAE19B2BEB89B20030541E /* ScrollSegmentControl in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 8AFAE19A2BEB89B20030541E /* ScrollSegmentControl */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +60,8 @@
 		8A2B5D362BEF642B004A68E7 /* readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = readme.md; sourceTree = "<group>"; };
 		8A2B5D372BEF642B004A68E7 /* wordle-La.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "wordle-La.txt"; sourceTree = "<group>"; };
 		8A2B5D382BEF642B004A68E7 /* wordle-Ta.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "wordle-Ta.txt"; sourceTree = "<group>"; };
+		8A675EB42C11D3B90018B028 /* SearchToolbarButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchToolbarButtons.swift; sourceTree = "<group>"; };
+		8A675EB62C11D9860018B028 /* KeyboardKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardKey.swift; sourceTree = "<group>"; };
 		8A8016362BE0D764005DEE89 /* WordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordView.swift; sourceTree = "<group>"; };
 		8A8016382BE0DB38005DEE89 /* SearchSuggestionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSuggestionsView.swift; sourceTree = "<group>"; };
 		8A80163A2BE0DBD2005DEE89 /* SearchContentUnavailableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchContentUnavailableView.swift; sourceTree = "<group>"; };
@@ -91,8 +95,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8A675EBA2C11E13C0018B028 /* Glur in Frameworks */,
 				8AA903AB2BDF993500D553A9 /* Get in Frameworks */,
-				8AFAE19B2BEB89B20030541E /* ScrollSegmentControl in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -153,6 +157,7 @@
 				8A2B5D392BEF642B004A68E7 /* wordle */,
 				8AA9037B2BDF940C00D553A9 /* Pa_piaApp.swift */,
 				8AA9037D2BDF940C00D553A9 /* ContentView.swift */,
+				8A675EB42C11D3B90018B028 /* SearchToolbarButtons.swift */,
 				8A80163C2BE0E655005DEE89 /* LargeNavigationBarTitleDisplayMode.swift */,
 				8A80163A2BE0DBD2005DEE89 /* SearchContentUnavailableView.swift */,
 				8A8016382BE0DB38005DEE89 /* SearchSuggestionsView.swift */,
@@ -161,6 +166,7 @@
 				8A93E2192BE38FD700E151AF /* DefinitionView.swift */,
 				8A80163E2BE0E9AF005DEE89 /* WordDetailListSectionView.swift */,
 				8AA903BC2BDFBA9D00D553A9 /* WrappingHStack.swift */,
+				8A675EB62C11D9860018B028 /* KeyboardKey.swift */,
 				8AA903B82BDFB84C00D553A9 /* ProgressIcon.swift */,
 				8AA903B62BDFB83C00D553A9 /* SearchProgress.swift */,
 				8AA903B42BDFAFE200D553A9 /* IndeterminateProgressView.swift */,
@@ -224,7 +230,7 @@
 			name = "Pápia";
 			packageProductDependencies = (
 				8AA903AA2BDF993500D553A9 /* Get */,
-				8AFAE19A2BEB89B20030541E /* ScrollSegmentControl */,
+				8A675EB92C11E13C0018B028 /* Glur */,
 			);
 			productName = "Pápia";
 			productReference = 8AA903782BDF940C00D553A9 /* Pápia.app */;
@@ -306,7 +312,7 @@
 			mainGroup = 8AA9036F2BDF940C00D553A9;
 			packageReferences = (
 				8AA903A82BDF982700D553A9 /* XCRemoteSwiftPackageReference "Get" */,
-				8AFAE1992BEB89B20030541E /* XCRemoteSwiftPackageReference "ScrollSegmentedControl" */,
+				8A675EB82C11DFF00018B028 /* XCRemoteSwiftPackageReference "Glur" */,
 			);
 			productRefGroup = 8AA903792BDF940C00D553A9 /* Products */;
 			projectDirPath = "";
@@ -368,6 +374,8 @@
 				8AA903BB2BDFB89200D553A9 /* WordDetailView.swift in Sources */,
 				8AA903B72BDFB83C00D553A9 /* SearchProgress.swift in Sources */,
 				8A8016372BE0D764005DEE89 /* WordView.swift in Sources */,
+				8A675EB52C11D3B90018B028 /* SearchToolbarButtons.swift in Sources */,
+				8A675EB72C11D9870018B028 /* KeyboardKey.swift in Sources */,
 				8AA903B52BDFAFE200D553A9 /* IndeterminateProgressView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -731,6 +739,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		8A675EB82C11DFF00018B028 /* XCRemoteSwiftPackageReference "Glur" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "git@github.com:joogps/Glur.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.4;
+			};
+		};
 		8AA903A82BDF982700D553A9 /* XCRemoteSwiftPackageReference "Get" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kean/Get.git";
@@ -739,17 +755,14 @@
 				minimumVersion = 2.2.0;
 			};
 		};
-		8AFAE1992BEB89B20030541E /* XCRemoteSwiftPackageReference "ScrollSegmentedControl" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:JLoewy/ScrollSegmentedControl.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.1.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8A675EB92C11E13C0018B028 /* Glur */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8A675EB82C11DFF00018B028 /* XCRemoteSwiftPackageReference "Glur" */;
+			productName = Glur;
+		};
 		8AA903AA2BDF993500D553A9 /* Get */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8AA903A82BDF982700D553A9 /* XCRemoteSwiftPackageReference "Get" */;
@@ -764,11 +777,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8AA903A82BDF982700D553A9 /* XCRemoteSwiftPackageReference "Get" */;
 			productName = Get;
-		};
-		8AFAE19A2BEB89B20030541E /* ScrollSegmentControl */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8AFAE1992BEB89B20030541E /* XCRemoteSwiftPackageReference "ScrollSegmentedControl" */;
-			productName = ScrollSegmentControl;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
