@@ -153,6 +153,7 @@ struct ContentView: View {
                     }.pickerStyle(.segmented)
                 }
                 .scenePadding(.horizontal)
+                .scenePadding(.top)
 
                 List(model.searchResults) { word in
                     NavigationLink {
