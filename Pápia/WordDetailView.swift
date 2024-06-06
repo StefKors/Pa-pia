@@ -39,7 +39,7 @@ struct WordDetailView: View {
                 }
 
                 ForEach(results) { info in
-                    WordDetailListSectionView(info: info)
+                    WordDetailSectionView(info: info)
                 }
             }
             .scenePadding()

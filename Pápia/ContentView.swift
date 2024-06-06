@@ -172,7 +172,7 @@ struct ContentView: View {
                 }
             }
             .scrollDismissesKeyboard(.immediately)
-            .background(Color(uiColor: UIColor.secondarySystemBackground))
+            .background(backgroundColor)
         }
         .modifier(
             iOSContentViewAdjustmentsView(
