@@ -173,6 +173,13 @@ require that the results are spelled similarly to this string of characters, or 
             label: "Means like",
             description: "require that the results have a meaning related to this string value, which can be any word or sequence of words."
         )
+
+        /// used as 'none' value when the ui needs an value. Often used as the id for the definition view
+        static let none = SearchScope(
+            queryParam: "",
+            label: "empty for ui",
+            description: "used as 'none' value when the ui needs an value. Often used as the id for the definition view"
+        )
     }
 
     var globalSearchScopes: [SearchScope] {

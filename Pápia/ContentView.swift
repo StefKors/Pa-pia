@@ -169,6 +169,7 @@ struct ContentView: View {
                     ], startPoint: .top, endPoint: .bottom)
                         .frame(height: 60)
                         .glur(radius: 32.0, offset: 0.3, interpolation: 0.5)
+                        .allowsHitTesting(false)
                 }
             }
             .scrollDismissesKeyboard(.immediately)

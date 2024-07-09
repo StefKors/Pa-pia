@@ -123,59 +123,75 @@ struct WordDetailView: View {
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
                 }
-//
-//                if word.isWordle {
-//                    Image(.scrabble)
-//                        .resizable()
-//                        .aspectRatio(contentMode: .fit)
-//                        .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
-//                }
+                //
+                //                if word.isWordle {
+                //                    Image(.scrabble)
+                //                        .resizable()
+                //                        .aspectRatio(contentMode: .fit)
+                //                        .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
+                //                }
 
                 Spacer()
             }
-                .scenePadding(.horizontal)
-                .onTapGesture {
-                    dismiss()
-                }
+            .scenePadding(.horizontal)
+            .onTapGesture {
+                dismiss()
+            }
 
 
-            ScrollView(.horizontal) {
-                HStack {
-                    PillTag(label: "Definition", isSelected: selectedScope == nil)
-                        .onTapGesture {
-                            withAnimation(.snappy(duration: 0.1)) {
-                                selectedScope = nil
-                            }
-                        }
-                    ForEach(model.relatedScopes) { scope in
-                        PillTag(scope: scope, isSelected: selectedScope == scope)
+            ScrollViewReader { value in
+                ScrollView(.horizontal) {
+                    HStack {
+                        PillTag(label: "Definition", isSelected: selectedScope == nil)
                             .onTapGesture {
                                 withAnimation(.snappy(duration: 0.1)) {
-                                    selectedScope = scope
+                                    selectedScope = nil
                                 }
                             }
-                    }
-                }
-                .padding()
-            }
-            .scrollBounceBehavior(.basedOnSize)
-            .scrollIndicators(.hidden)
+                            .id(DataMuseViewModel.SearchScope.none)
 
-            ScrollView {
-                VStack {
-                    if selectedScope == nil {
-                        ForEach(definitions) { definition in
-                            DefinitionView(def: definition)
+                        ForEach(model.relatedScopes) { scope in
+                            PillTag(scope: scope, isSelected: selectedScope == scope)
+                                .onTapGesture {
+                                    withAnimation(.snappy(duration: 0.1)) {
+                                        selectedScope = scope
+                                    }
+                                }
+                                .id(scope)
                         }
-                    } else if let selectedScope {
-                        WordDetailListSectionView(scope: selectedScope, word: word)
-                            .id(selectedScope)
                     }
+                    .onChange(of: selectedScope, perform: { newValue in
+                        withAnimation(.snappy(duration: 0.1)) {
+                            if newValue == nil {
+                                value.scrollTo(DataMuseViewModel.SearchScope.none, anchor: .leading)
+                            } else {
+                                value.scrollTo(newValue, anchor: .leading)
+                            }
+                        }
+                    })
+                    .modifier(ScrollClipOptional(outside: false))
                 }
-                .environmentObject(model)
-                .scenePadding(.horizontal)
+                .modifier(ScrollClipOptional(outside: true))
+                .scrollBounceBehavior(.basedOnSize)
+                .scrollIndicators(.hidden)
             }
-            .scrollBounceBehavior(.basedOnSize)
+
+            if #available(iOS 17.0, *) {
+                ModernPagedWordDetailView(
+                    selectedScope: $selectedScope,
+                    definitions: definitions,
+                    word: word
+                )
+                .environmentObject(model)
+                .sensoryFeedback(.levelChange, trigger: selectedScope)
+            } else {
+                OldPagedWordDetailView(
+                    selectedScope: $selectedScope,
+                    definitions: definitions,
+                    word: word
+                )
+                .environmentObject(model)
+            }
         }
         .navigationTitle(word.word)
         .navigationBarTitleDisplayMode(.inline)
@@ -186,6 +202,165 @@ struct WordDetailView: View {
     }
 }
 
+
+
+struct OldPagedWordDetailView: View {
+    @Binding var selectedScope: DataMuseViewModel.SearchScope?
+    let definitions: [DataMuseDefinition]
+    let word: DataMuseWord
+
+    var body: some View {
+        ScrollView {
+            VStack {
+                if selectedScope == nil {
+                    ForEach(definitions) { definition in
+                        DefinitionView(def: definition)
+                    }
+                } else if let selectedScope {
+                    WordDetailListSectionView(scope: selectedScope, word: word)
+                        .id(selectedScope)
+                }
+            }
+            .scenePadding(.horizontal)
+        }
+        .scrollBounceBehavior(.basedOnSize)
+    }
+}
+
+#Preview {
+    OldPagedWordDetailView(selectedScope: .constant(.preview), definitions: [], word: .preview)
+}
+
+/// https://www.appcoda.com/scrollview-paging/
+
+@available(iOS 17.0, *)
+struct ModernPagedWordDetailView: View {
+    @Binding var selectedScope: DataMuseViewModel.SearchScope?
+    let definitions: [DataMuseDefinition]
+    let word: DataMuseWord
+
+    @EnvironmentObject private var model: DataMuseViewModel
+
+    @State var scrolledID: DataMuseViewModel.SearchScope?
+
+    var body: some View {
+        ScrollView(.horizontal) {
+            LazyHStack(spacing: 0) {
+                ScrollView(.vertical) {
+                    VStack {
+                        ForEach(definitions) { definition in
+                            DefinitionView(def: definition)
+                                .id(definition)
+                        }
+                    }
+                    .scenePadding(.horizontal)
+                }
+                .containerRelativeFrame(.horizontal)
+                .id(DataMuseViewModel.SearchScope.none)
+                .modifier(BookFlipScrollTransition())
+
+                ForEach(model.relatedScopes) { scope in
+                    ScrollView(.vertical) {
+                        VStack {
+                            WordDetailListSectionView(scope: scope, word: word)
+
+                        }
+                        .scenePadding(.horizontal)
+                    }
+                    .scrollBounceBehavior(.basedOnSize)
+                    .containerRelativeFrame(.horizontal)
+                    .id(scope)
+                    .modifier(BookFlipScrollTransition())
+                }
+            }
+            .scrollTargetLayout()
+        }
+        .scrollTargetBehavior(.paging)
+        .scrollPosition(id: $scrolledID)
+        /// Trigger update when swiping
+        .onChange(of: scrolledID) { oldValue, newValue in
+            if (newValue == DataMuseViewModel.SearchScope.none) {
+                withAnimation(.snappy) {
+                    selectedScope = nil
+                }
+            } else {
+                withAnimation(.snappy) {
+                    selectedScope = newValue
+                }
+            }
+        }
+        /// Trigger update when selecting different tab pill
+        .onChange(of: selectedScope) { oldValue, newValue in
+            if (newValue == nil) {
+                withAnimation(.snappy) {
+                    scrolledID = DataMuseViewModel.SearchScope.none
+                }
+            } else {
+                withAnimation(.snappy) {
+                    scrolledID = newValue
+                }
+            }
+        }
+    }
+}
+
+/// use both inside and outside of scroll view
+/// the fallback for ios16 adds inside padding
+/// whilte the ios 17 one should add outside padding
+struct ScrollClipOptional: ViewModifier {
+    let outside: Bool
+
+    func body(content: Content) -> some View {
+        if outside {
+            if #available(iOS 17.0, *) {
+                content
+                    .padding()
+                    .scrollClipDisabled()
+            } else {
+                content
+            }
+        } else {
+            if #available(iOS 17.0, *) {
+                content
+            } else {
+                content
+                    .padding()
+            }
+        }
+    }
+}
+
+
+struct BookFlipScrollTransition: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 17.0, *) {
+            content
+                .scrollTransition { content, phase in
+                    content
+                        .opacity(phase.isIdentity ? 1 : 0)
+                        .scaleEffect(phase.isIdentity ? 1 : 0.75)
+                        .blur(radius: phase.isIdentity ? 0 : 10)
+                }
+        } else {
+            content
+        }
+    }
+}
+
+#Preview {
+    Text("Hello, world!")
+        .modifier(BookFlipScrollTransition())
+}
+
+#Preview {
+    if #available(iOS 17.0, *) {
+        ModernPagedWordDetailView(selectedScope: .constant(.preview), definitions: [], word: .preview)
+            .environmentObject(DataMuseViewModel())
+    } else {
+        // Fallback on earlier versions
+        Text("see: OldPagedWordDetailView()")
+    }
+}
 #endif
 
 #Preview {

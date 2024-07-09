@@ -37,6 +37,7 @@
 		8AA903B92BDFB84C00D553A9 /* ProgressIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA903B82BDFB84C00D553A9 /* ProgressIcon.swift */; };
 		8AA903BB2BDFB89200D553A9 /* WordDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA903BA2BDFB89200D553A9 /* WordDetailView.swift */; };
 		8AA903BD2BDFBA9D00D553A9 /* WrappingHStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA903BC2BDFBA9D00D553A9 /* WrappingHStack.swift */; };
+		8ABBAB022C3D26470060215F /* UINavigationController+Papia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ABBAB012C3D263D0060215F /* UINavigationController+Papia.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +89,7 @@
 		8AA903B82BDFB84C00D553A9 /* ProgressIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressIcon.swift; sourceTree = "<group>"; };
 		8AA903BA2BDFB89200D553A9 /* WordDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordDetailView.swift; sourceTree = "<group>"; };
 		8AA903BC2BDFBA9D00D553A9 /* WrappingHStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WrappingHStack.swift; sourceTree = "<group>"; };
+		8ABBAB012C3D263D0060215F /* UINavigationController+Papia.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Papia.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -153,6 +155,7 @@
 		8AA9037A2BDF940C00D553A9 /* Pápia */ = {
 			isa = PBXGroup;
 			children = (
+				8ABBAB012C3D263D0060215F /* UINavigationController+Papia.swift */,
 				8A8016422BE1062E005DEE89 /* Pa-pia-Info.plist */,
 				8A2B5D392BEF642B004A68E7 /* wordle */,
 				8AA9037B2BDF940C00D553A9 /* Pa_piaApp.swift */,
@@ -365,6 +368,7 @@
 				8A93E21A2BE38FD700E151AF /* DefinitionView.swift in Sources */,
 				8AA9037E2BDF940C00D553A9 /* ContentView.swift in Sources */,
 				8A8016392BE0DB38005DEE89 /* SearchSuggestionsView.swift in Sources */,
+				8ABBAB022C3D26470060215F /* UINavigationController+Papia.swift in Sources */,
 				8AA903BD2BDFBA9D00D553A9 /* WrappingHStack.swift in Sources */,
 				8AA903B12BDFA07B00D553A9 /* DataMuseViewModel.swift in Sources */,
 				8A80163B2BE0DBD2005DEE89 /* SearchContentUnavailableView.swift in Sources */,
