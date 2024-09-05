@@ -10,7 +10,7 @@ import UIKit
 /// Fix swiftUI back navigation swipe gesture
 /// source: https://stackoverflow.com/questions/59921239/hide-navigation-bar-without-losing-swipe-back-gesture-in-swiftui
 
-extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
+extension UINavigationController: UIGestureRecognizerDelegate {
     override open func viewDidLoad() {
         super.viewDidLoad()
         interactivePopGestureRecognizer?.delegate = self
