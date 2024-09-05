@@ -183,7 +183,7 @@ struct WordDetailView: View {
                     word: word
                 )
                 .environmentObject(model)
-                .sensoryFeedback(.levelChange, trigger: selectedScope)
+                .sensoryFeedback(.impact, trigger: selectedScope)
             } else {
                 OldPagedWordDetailView(
                     selectedScope: $selectedScope,
@@ -253,9 +253,11 @@ struct ModernPagedWordDetailView: View {
                                 .id(definition)
                         }
                     }
-                    .scenePadding(.horizontal)
+//                    .scenePadding(.horizontal)
                 }
-                .containerRelativeFrame(.horizontal)
+                .ignoresSafeArea(.all, edges: .bottom)
+                .scrollBounceBehavior(.basedOnSize)
+                .containerRelativeFrame(.horizontal, count: 1, spacing: 8)
                 .id(DataMuseViewModel.SearchScope.none)
                 .modifier(BookFlipScrollTransition())
 
@@ -265,18 +267,25 @@ struct ModernPagedWordDetailView: View {
                             WordDetailListSectionView(scope: scope, word: word)
 
                         }
-                        .scenePadding(.horizontal)
+//                        .scenePadding(.horizontal)
                     }
+                    .ignoresSafeArea(.all, edges: .bottom)
                     .scrollBounceBehavior(.basedOnSize)
-                    .containerRelativeFrame(.horizontal)
+//                    .containerRelativeFrame(.horizontal)
+                    .containerRelativeFrame(.horizontal, count: 1, spacing: 8)
                     .id(scope)
                     .modifier(BookFlipScrollTransition())
                 }
             }
+            .ignoresSafeArea(.all, edges: .bottom)
             .scrollTargetLayout()
         }
+        .ignoresSafeArea(.all, edges: .bottom)
         .scrollTargetBehavior(.paging)
         .scrollPosition(id: $scrolledID)
+        .scrollBounceBehavior(.basedOnSize)
+        .scenePadding(.horizontal)
+        .scrollClipDisabled()
         /// Trigger update when swiping
         .onChange(of: scrolledID) { oldValue, newValue in
             if (newValue == DataMuseViewModel.SearchScope.none) {
