@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -38,6 +38,9 @@
 		8AA903BB2BDFB89200D553A9 /* WordDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA903BA2BDFB89200D553A9 /* WordDetailView.swift */; };
 		8AA903BD2BDFBA9D00D553A9 /* WrappingHStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA903BC2BDFBA9D00D553A9 /* WrappingHStack.swift */; };
 		8ABBAB022C3D26470060215F /* UINavigationController+Papia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ABBAB012C3D263D0060215F /* UINavigationController+Papia.swift */; };
+		8AC7B4932CB51A1C00CBD21C /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8AC7B4922CB51A1C00CBD21C /* WidgetKit.framework */; };
+		8AC7B4952CB51A1C00CBD21C /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8AC7B4942CB51A1C00CBD21C /* SwiftUI.framework */; };
+		8AC7B4A42CB51A1D00CBD21C /* ControlCenterButtonsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8AC7B4912CB51A1C00CBD21C /* ControlCenterButtonsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,7 +58,28 @@
 			remoteGlobalIDString = 8AA903772BDF940C00D553A9;
 			remoteInfo = "Pápia";
 		};
+		8AC7B4A22CB51A1D00CBD21C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8AA903702BDF940C00D553A9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8AC7B4902CB51A1C00CBD21C;
+			remoteInfo = ControlCenterButtonsExtension;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8AC7B4A52CB51A1D00CBD21C /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				8AC7B4A42CB51A1D00CBD21C /* ControlCenterButtonsExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		8A2B5D362BEF642B004A68E7 /* readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = readme.md; sourceTree = "<group>"; };
@@ -90,7 +114,24 @@
 		8AA903BA2BDFB89200D553A9 /* WordDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordDetailView.swift; sourceTree = "<group>"; };
 		8AA903BC2BDFBA9D00D553A9 /* WrappingHStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WrappingHStack.swift; sourceTree = "<group>"; };
 		8ABBAB012C3D263D0060215F /* UINavigationController+Papia.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Papia.swift"; sourceTree = "<group>"; };
+		8AC7B4912CB51A1C00CBD21C /* ControlCenterButtonsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ControlCenterButtonsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		8AC7B4922CB51A1C00CBD21C /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		8AC7B4942CB51A1C00CBD21C /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		8AC7B4A82CB51A1D00CBD21C /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 8AC7B4902CB51A1C00CBD21C /* ControlCenterButtonsExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		8AC7B4962CB51A1C00CBD21C /* ControlCenterButtons */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (8AC7B4A82CB51A1D00CBD21C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ControlCenterButtons; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		8AA903752BDF940C00D553A9 /* Frameworks */ = {
@@ -118,6 +159,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8AC7B48E2CB51A1C00CBD21C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8AC7B4952CB51A1C00CBD21C /* SwiftUI.framework in Frameworks */,
+				8AC7B4932CB51A1C00CBD21C /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -137,6 +187,7 @@
 				8AA9037A2BDF940C00D553A9 /* Pápia */,
 				8AA9038E2BDF940D00D553A9 /* PápiaTests */,
 				8AA903982BDF940D00D553A9 /* PápiaUITests */,
+				8AC7B4962CB51A1C00CBD21C /* ControlCenterButtons */,
 				8AA903792BDF940C00D553A9 /* Products */,
 				8AA903A92BDF993500D553A9 /* Frameworks */,
 			);
@@ -148,6 +199,7 @@
 				8AA903782BDF940C00D553A9 /* Pápia.app */,
 				8AA9038B2BDF940D00D553A9 /* PápiaTests.xctest */,
 				8AA903952BDF940D00D553A9 /* PápiaUITests.xctest */,
+				8AC7B4912CB51A1C00CBD21C /* ControlCenterButtonsExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -211,6 +263,8 @@
 		8AA903A92BDF993500D553A9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8AC7B4922CB51A1C00CBD21C /* WidgetKit.framework */,
+				8AC7B4942CB51A1C00CBD21C /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -225,10 +279,12 @@
 				8AA903742BDF940C00D553A9 /* Sources */,
 				8AA903752BDF940C00D553A9 /* Frameworks */,
 				8AA903762BDF940C00D553A9 /* Resources */,
+				8AC7B4A52CB51A1D00CBD21C /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				8AC7B4A32CB51A1D00CBD21C /* PBXTargetDependency */,
 			);
 			name = "Pápia";
 			packageProductDependencies = (
@@ -281,6 +337,28 @@
 			productReference = 8AA903952BDF940D00D553A9 /* PápiaUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		8AC7B4902CB51A1C00CBD21C /* ControlCenterButtonsExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8AC7B4A92CB51A1D00CBD21C /* Build configuration list for PBXNativeTarget "ControlCenterButtonsExtension" */;
+			buildPhases = (
+				8AC7B48D2CB51A1C00CBD21C /* Sources */,
+				8AC7B48E2CB51A1C00CBD21C /* Frameworks */,
+				8AC7B48F2CB51A1C00CBD21C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				8AC7B4962CB51A1C00CBD21C /* ControlCenterButtons */,
+			);
+			name = ControlCenterButtonsExtension;
+			packageProductDependencies = (
+			);
+			productName = ControlCenterButtonsExtension;
+			productReference = 8AC7B4912CB51A1C00CBD21C /* ControlCenterButtonsExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -288,7 +366,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1530;
+				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1530;
 				TargetAttributes = {
 					8AA903772BDF940C00D553A9 = {
@@ -301,6 +379,9 @@
 					8AA903942BDF940D00D553A9 = {
 						CreatedOnToolsVersion = 15.3;
 						TestTargetID = 8AA903772BDF940C00D553A9;
+					};
+					8AC7B4902CB51A1C00CBD21C = {
+						CreatedOnToolsVersion = 16.0;
 					};
 				};
 			};
@@ -324,6 +405,7 @@
 				8AA903772BDF940C00D553A9 /* Pápia */,
 				8AA9038A2BDF940D00D553A9 /* PápiaTests */,
 				8AA903942BDF940D00D553A9 /* PápiaUITests */,
+				8AC7B4902CB51A1C00CBD21C /* ControlCenterButtonsExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -349,6 +431,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		8AA903932BDF940D00D553A9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8AC7B48F2CB51A1C00CBD21C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -401,6 +490,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8AC7B48D2CB51A1C00CBD21C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -413,6 +509,11 @@
 			isa = PBXTargetDependency;
 			target = 8AA903772BDF940C00D553A9 /* Pápia */;
 			targetProxy = 8AA903962BDF940D00D553A9 /* PBXContainerItemProxy */;
+		};
+		8AC7B4A32CB51A1D00CBD21C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8AC7B4902CB51A1C00CBD21C /* ControlCenterButtonsExtension */;
+			targetProxy = 8AC7B4A22CB51A1D00CBD21C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -701,6 +802,65 @@
 			};
 			name = Release;
 		};
+		8AC7B4A62CB51A1D00CBD21C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = RT5BSWJB4U;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ControlCenterButtons/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ControlCenterButtons;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.stefkors.Pa-pia.ControlCenterButtons";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8AC7B4A72CB51A1D00CBD21C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = RT5BSWJB4U;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ControlCenterButtons/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ControlCenterButtons;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.stefkors.Pa-pia.ControlCenterButtons";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -736,6 +896,15 @@
 			buildConfigurations = (
 				8AA903A62BDF940D00D553A9 /* Debug */,
 				8AA903A72BDF940D00D553A9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8AC7B4A92CB51A1D00CBD21C /* Build configuration list for PBXNativeTarget "ControlCenterButtonsExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8AC7B4A62CB51A1D00CBD21C /* Debug */,
+				8AC7B4A72CB51A1D00CBD21C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
