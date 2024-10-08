@@ -7,14 +7,108 @@
 
 import SwiftUI
 
+// Conform to `PrimitiveButtonStyle` for custom interaction behaviour
+
+struct SupportsLongPress: PrimitiveButtonStyle {
+
+    /// An action to execute on long press
+    let longPressAction: () -> ()
+
+    /// Whether the button is being pressed
+    @State var isPressed: Bool = false
+
+    func makeBody(configuration: Configuration) -> some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 5.6)
+                .padding(2)
+                .frame(width: 28, height: 25.2, alignment: .center)
+                .background(Color(red: 0.21, green: 0.42, blue: 0.2))
+                .cornerRadius(5.6)
+
+            VStack(alignment: .center, spacing: 2.8) {
+                configuration.label
+                    .font(Font.system(size: 14, weight: .semibold, design: .rounded))
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.white)
+            }
+            .padding(2)
+            .frame(width: 28, height: 25.2, alignment: .center)
+            .background(Color(red: 0.35, green: 0.67, blue: 0.34))
+            .cornerRadius(5.6)
+            .offset(y: self.isPressed ? 0 : -2)
+            .onTapGesture {
+                // Run the "action" as specified
+                // when declaring the button
+                configuration.trigger()
+            }
+            .onLongPressGesture(
+                perform: {
+                    // Run the action specified
+                    // when using this style
+                    self.longPressAction()
+                },
+                onPressingChanged: { pressing in
+                    // Use "pressing" to infer whether the button
+                    // is being pressed
+                    self.isPressed = pressing
+                }
+            )
+        }
+    }
+}
+
+/// A modifier that applies the `SupportsLongPress` style to buttons
+struct SupportsLongPressModifier: ViewModifier {
+    let longPressAction: () -> ()
+    func body(content: Content) -> some View {
+        content.buttonStyle(SupportsLongPress(longPressAction: self.longPressAction))
+    }
+}
+
+/// Extend the View protocol for a SwiftUI-like shorthand version
+extension View {
+    func supportsLongPress(longPressAction: @escaping () -> ()) -> some View {
+        modifier(SupportsLongPressModifier(longPressAction: longPressAction))
+    }
+}
+
+
 struct ToolbarButtonComponent: View {
     let label: String
+
     @EnvironmentObject private var model: DataMuseViewModel
+    @State private var isLongPressed: Bool = false
+
     var body: some View {
-        Button(label) {
-            model.searchText += label
+        Button(
+            action: {
+                print("You've tapped me!")
+            },
+            label: {
+                Text(label)
+            }
+        )
+        .supportsLongPress {
+            isLongPressed.toggle()
         }
-        .buttonStyle(ToolbarButton())
+        .overlay(alignment: .bottomLeading, content: {
+            if isLongPressed {
+                Text("Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)")
+                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(4)
+                    .frame(width: 200)
+                    .font(.footnote)
+                    .padding(8)
+                    .background {
+                        RoundedRectangle(cornerRadius: 6)
+                            .fill(.background)
+                    }
+                    .shadow(color: .black.opacity(0.1), radius: 6, x: 0, y: 6)
+                    .offset(y: -50)
+                    .transition(.opacity.combined(with: .scale).combined(with: .move(edge: .bottom)).animation(.snappy(duration: 0.1)))
+            }
+        })
+        .animation(.snappy, value: isLongPressed)
     }
 }
 
