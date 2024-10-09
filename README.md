@@ -1,9 +1,9 @@
 <p align="center">
-  <img src="Space/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png" height="128">
-  <h1 align="center">Space</h1>
+  <img src="Pápia/Assets.xcassets/AppIcon.appiconset/mac1024.png" height="128">
+  <h1 align="center">Pápia</h1>
 </p>
 
-[Space](https://github.com/StefKors/space) is a canvas file explorer experiment for MacOS.
+[Pápia](https://github.com/StefKors/Pa-pia) is a word search app, named after confusingly named greek ducks/geese.
 
 #### Supported Platforms
 <p align="left">
@@ -16,13 +16,13 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="Images/ios-active.svg">
   <source media="(prefers-color-scheme: light)" srcset="Images/ios.svg">
-  <img alt="macos" src="Images/ios.svg" height="24">
+  <img alt="macos" src="Images/ios-active.svg" height="24">
 </picture>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="Images/ipados-active.svg">
   <source media="(prefers-color-scheme: light)" srcset="Images/ipados.svg">
-  <img alt="macos" src="Images/ipados.svg" height="24">
+  <img alt="macos" src="Images/ipados-active.svg" height="24">
 </picture>
 
 <picture>
@@ -46,5 +46,5 @@ Built by [Stef Kors](https://stefkors.com)
 
 -------
 
-<img alt="Screenshot of Space" src="Images/Screenshot-1.png">
+<img alt="Screenshot of Papia" src="Images/Screenshot-1.png">
 
