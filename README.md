@@ -40,11 +40,12 @@
 
 -------
 
-
-Built by [Stef Kors](https://stefkors.com)
-
+<img alt="Screenshot of Papia" src="Images/Screenshot-1.png">
 
 -------
 
-<img alt="Screenshot of Papia" src="Images/Screenshot-1.png">
+Built by [Stef Kors](https://stefkors.com)
+
+-------
+
 
