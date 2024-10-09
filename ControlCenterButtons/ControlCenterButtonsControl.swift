@@ -9,46 +9,90 @@ import AppIntents
 import SwiftUI
 import WidgetKit
 
+
+struct AppLaunchConfiguration: ControlConfigurationIntent {
+    static var title: LocalizedStringResource = "Launch App"
+
+    @Parameter(title: "Target")
+    var target: LaunchAppEnum?
+}
+
+
 struct ControlCenterButtonsControl: ControlWidget {
+    static let kind = "ControlCenterButtonsControlWidget"
+
     var body: some ControlWidgetConfiguration {
-        StaticControlConfiguration(
-            kind: "com.stefkors.Pa-pia.ControlCenterButtons",
-            provider: Provider()
-        ) { value in
-            ControlWidgetToggle(
-                "Start Timer",
-                isOn: value,
-                action: StartTimerIntent()
-            ) { isRunning in
-                Label(isRunning ? "On" : "Off", systemImage: "timer")
+        AppIntentControlConfiguration(
+            kind: Self.kind,
+            intent: AppLaunchConfiguration.self
+        ) { configuration in
+            ControlWidgetButton(action: configuration) {
+                Label(configuration.target?.rawValue ?? "open", systemImage: "bird.fill")
+//                Image(systemName: configuration.target.glyph)
+//                Text(configuration.target.name)
             }
         }
-        .displayName("Timer")
-        .description("A an example control that runs a timer.")
     }
 }
 
-extension ControlCenterButtonsControl {
-    struct Provider: ControlValueProvider {
-        var previewValue: Bool {
-            false
-        }
-
-        func currentValue() async throws -> Bool {
-            let isRunning = true // Check if the timer is running
-            return isRunning
-        }
+struct OpenPageShortcut: AppShortcutsProvider {
+    static var appShortcuts: [AppShortcut] {
+        AppShortcut(
+            intent: OpenPage(),
+            phrases: [
+                "Open page in \(.applicationName)",
+                "Show page in \(.applicationName)"
+            ],
+            shortTitle: "Open page",
+            systemImageName: "pin"
+        )
     }
 }
 
-struct StartTimerIntent: SetValueIntent {
-    static let title: LocalizedStringResource = "Start a timer"
+//struct TrailConditionsWidget: Widget {
+//    static let kind = "TrailConditionsWidget"
+//
+//
+//    var body: some WidgetConfiguration {
+//        AppIntentConfiguration(
+//            kind: Self.kind,
+//            intent: AppLaunchConfiguration.self,
+//            provider: OpenPageShortcut()
+//        ) { _ in
+//            Label("Search Pápia...", systemImage: "bird.fill")
+//        }
+//    }
+//}
 
-    @Parameter(title: "Timer is running")
-    var value: Bool
+//struct ControlCenterButtonsControl: ControlWidget {
+//    var body: some ControlWidgetConfiguration {
+//
+//        AppIntentControlConfiguration(
+//            kind: "launchPapia",
+//            intent: AppLaunchConfiguration.self
+//        ) { configuration in
+//            ControlWidgetButton(action: LaunchAppIntent()) {
+//                Label("Search Pápia...", systemImage: "bird.fill")
+//            }
+//        }
+//        .displayName("Launch Pápia with AppIntent")
+//        .description("Quick Lookup with Pápia")
+//
+//    }
+//}
 
-    func perform() async throws -> some IntentResult {
-        // Start / stop the timer based on `value`.
-        return .result()
-    }
-}
+
+//
+//extension ControlCenterButtonsControl {
+//    struct Provider: ControlValueProvider {
+//        var previewValue: Bool {
+//            false
+//        }
+//
+//        func currentValue() async throws -> Bool {
+//
+//            return isRunning
+//        }
+//    }
+//}
+//
