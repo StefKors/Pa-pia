@@ -14,27 +14,27 @@
 </picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="Images/ios-active.svg">
-  <source media="(prefers-color-scheme: light)" srcset="Images/ios.svg">
-  <img alt="macos" src="Images/ios-active.svg" height="24">
+  <source media="(prefers-color-scheme: dark)" srcset="Images/ios.svg">
+  <source media="(prefers-color-scheme: light)" srcset="Images/ios-active.svg">
+  <img alt="ios" src="Images/ios-active.svg" height="24">
 </picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="Images/ipados-active.svg">
-  <source media="(prefers-color-scheme: light)" srcset="Images/ipados.svg">
-  <img alt="macos" src="Images/ipados-active.svg" height="24">
+  <source media="(prefers-color-scheme: dark)" srcset="Images/ipados.svg">
+  <source media="(prefers-color-scheme: light)" srcset="Images/ipados-active.svg">
+  <img alt="ipados" src="Images/ipados-active.svg" height="24">
 </picture>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="Images/tvos-active.svg">
   <source media="(prefers-color-scheme: light)" srcset="Images/tvos.svg">
-  <img alt="macos" src="Images/tvos.svg" height="24">
+  <img alt="tvos" src="Images/tvos.svg" height="24">
 </picture>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="Images/watchos-active.svg">
   <source media="(prefers-color-scheme: light)" srcset="Images/watchos.svg">
-  <img alt="macos" src="Images/watchos.svg" height="24">
+  <img alt="watchos" src="Images/watchos.svg" height="24">
 </picture>
 </p>
 
