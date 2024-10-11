@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 import Get
 import Glur
+import AppIntents
 
 struct iOSContentViewAdjustmentsView: ViewModifier {
     let searchResultsCount: Int
@@ -32,6 +33,7 @@ class InterfaceState: ObservableObject {
     @Published var selection: DataMuseWord?  // Nothing selected by default.
     @Published var navigationPath: NavigationPath = NavigationPath()
 }
+
 
 // TODO: add search progress @Environment(\.isSearching) private var isSearching
 // TODO: add indicator if the word exists in the wordle dictionary
@@ -155,11 +157,13 @@ struct ContentView: View {
                 .scenePadding(.horizontal)
                 .scenePadding(.top)
 
-                List(model.searchResults) { word in
-                    NavigationLink {
-                        WordDetailView(word: word)
-                    } label: {
-                        WordView(word: word)
+                List {
+                    ForEach(model.searchResults) { word in
+                        NavigationLink {
+                            WordDetailView(word: word)
+                        } label: {
+                            WordView(word: word)
+                        }
                     }
                 }
                 .overlay(alignment: .top) {

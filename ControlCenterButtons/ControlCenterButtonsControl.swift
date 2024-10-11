@@ -18,36 +18,33 @@ struct AppLaunchConfiguration: ControlConfigurationIntent {
 }
 
 
+
 struct ControlCenterButtonsControl: ControlWidget {
     static let kind = "ControlCenterButtonsControlWidget"
 
     var body: some ControlWidgetConfiguration {
-        AppIntentControlConfiguration(
-            kind: Self.kind,
-            intent: AppLaunchConfiguration.self
-        ) { configuration in
-            ControlWidgetButton(action: configuration) {
-                Label(configuration.target?.rawValue ?? "open", systemImage: "bird.fill")
-//                Image(systemName: configuration.target.glyph)
-//                Text(configuration.target.name)
+        StaticControlConfiguration(
+            kind: "com.stefkors.Pa-pia.performActionButton"
+        ) {
+            ControlWidgetButton(action: OpenPage(target: .init(default: .home))) {
+                Label("Launch Papia", systemImage: "bird")
             }
         }
+        .displayName("Perform Action")
+        .description("An example control that performs an action.")
+//    }
+//        AppIntentControlConfiguration(
+//            kind: Self.kind,
+//            intent: AppLaunchConfiguration.self
+//        ) { configuration in
+//            ControlWidgetButton(action: OpenPage()) {
+//                Label(configuration.target?.rawValue ?? "open", systemImage: "bird.fill")
+//            }
+//        }
     }
 }
 
-struct OpenPageShortcut: AppShortcutsProvider {
-    static var appShortcuts: [AppShortcut] {
-        AppShortcut(
-            intent: OpenPage(),
-            phrases: [
-                "Open page in \(.applicationName)",
-                "Show page in \(.applicationName)"
-            ],
-            shortTitle: "Open page",
-            systemImageName: "pin"
-        )
-    }
-}
+
 
 //struct TrailConditionsWidget: Widget {
 //    static let kind = "TrailConditionsWidget"

@@ -13,6 +13,5 @@ struct ControlCenterButtonsBundle: WidgetBundle {
     var body: some Widget {
         ControlCenterButtons()
         ControlCenterButtonsControl()
-        ControlCenterButtonsLiveActivity()
     }
 }

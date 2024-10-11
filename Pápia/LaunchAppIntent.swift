@@ -8,7 +8,7 @@
 import AppIntents
 
 struct OpenPage: AppIntent, OpenIntent {
-    static let title: LocalizedStringResource = "Open Page"
+    static let title: LocalizedStringResource = "Open Papia"
 
 
     @Parameter(title: "Target")
@@ -18,11 +18,26 @@ struct OpenPage: AppIntent, OpenIntent {
     func perform() async throws -> some IntentResult {
         //        NavigationModel.shared.navigate(to: target)
         
-        return .result(opensIntent: OpenPage())
+//        return .result(opensIntent: OpenPage())
+        return .result(actionButtonIntent: OpenPage(target: .init(default: .home)))
     }
 
     static var parameterSummary: some ParameterSummary {
         Summary("Open Page...") // \(\.$trail)
+    }
+}
+
+struct OpenPageShortcut: AppShortcutsProvider {
+    static var appShortcuts: [AppShortcut] {
+        AppShortcut(
+            intent: OpenPage(),
+            phrases: [
+                "Open page in \(.applicationName)",
+                "Show page in \(.applicationName)"
+            ],
+            shortTitle: "Open page",
+            systemImageName: "pin"
+        )
     }
 }
 

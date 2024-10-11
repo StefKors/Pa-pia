@@ -46,7 +46,6 @@ require that the results are spelled similarly to this string of characters, or 
     }
 
     func fetch(scope: SearchScope, searchText: String) async -> [DataMuseWord] {
-//        return await query("/words", scope: scope, search: searchText)
         let list = await query("/words", scope: scope, search: searchText)
         return (try? await addWordleInfo(list: list)) ?? list
     }
@@ -63,8 +62,6 @@ require that the results are spelled similarly to this string of characters, or 
         var wordleOptions = list.map { $0.word }.filter { $0.count == 5 }
 
         var wordleMatches: [String] = []
-
-        print(wordleOptions)
 
         for try await line in bytes.lines {
             // todo: case insentisive compare thingy
@@ -136,7 +133,7 @@ require that the results are spelled similarly to this string of characters, or 
             result = try await client.send(
                 Request(
                     path: path,
-                    query: [(scope.queryParam, search)]
+                    query: [("max", "1000"), (scope.queryParam, search)]
                 )
             ).value
         } catch {
