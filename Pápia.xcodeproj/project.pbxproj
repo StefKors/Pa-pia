@@ -40,7 +40,7 @@
 		8ABBAB022C3D26470060215F /* UINavigationController+Papia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ABBAB012C3D263D0060215F /* UINavigationController+Papia.swift */; };
 		8AC7B4932CB51A1C00CBD21C /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8AC7B4922CB51A1C00CBD21C /* WidgetKit.framework */; };
 		8AC7B4952CB51A1C00CBD21C /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8AC7B4942CB51A1C00CBD21C /* SwiftUI.framework */; };
-		8AC7B4A42CB51A1D00CBD21C /* ControlCenterButtonsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8AC7B4912CB51A1C00CBD21C /* ControlCenterButtonsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		8AC7B4A42CB51A1D00CBD21C /* ControlCenterButtonsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8AC7B4912CB51A1C00CBD21C /* ControlCenterButtonsExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		8AC7B4AB2CB5250000CBD21C /* LaunchAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC7B4AA2CB5250000CBD21C /* LaunchAppIntent.swift */; };
 		8AC7B4AC2CB5256D00CBD21C /* LaunchAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC7B4AA2CB5250000CBD21C /* LaunchAppIntent.swift */; };
 /* End PBXBuildFile section */
@@ -518,6 +518,7 @@
 		};
 		8AC7B4A32CB51A1D00CBD21C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = 8AC7B4902CB51A1C00CBD21C /* ControlCenterButtonsExtension */;
 			targetProxy = 8AC7B4A22CB51A1D00CBD21C /* PBXContainerItemProxy */;
 		};
@@ -666,7 +667,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.stefkors.Pa-pia";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -706,7 +707,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.stefkors.Pa-pia";
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -30,8 +30,9 @@ struct iOSContentViewAdjustmentsView: ViewModifier {
 }
 
 class InterfaceState: ObservableObject {
-    @Published var selection: DataMuseWord?  // Nothing selected by default.
-    @Published var navigationPath: NavigationPath = NavigationPath()
+    // Nothing selected by default.
+    @Published var selection: DataMuseWord?
+    @Published var navigation: [DataMuseWord] = []
 }
 
 
@@ -51,15 +52,45 @@ struct ContentView: View {
     var macOSContentView: some View {
         NavigationSplitView {
             List(model.searchResults, selection: $state.selection) { word in
-                NavigationLink(value: word) {
-                    WordView(word: word)
-                }
+                WordView(word: word)
+                    .tag(word)
             }
             .searchable(text: $model.searchText, placement: .sidebar, prompt: "Find words...")
+            .onChange(of: state.selection) { oldValue, newValue in
+                if let newValue {
+                    state.navigation = [newValue]
+                }
+            }
         } detail: {
-            if let word = state.selection {
-                WordDetailView(word: word)
-                    .id(state.selection)
+            if let word = state.navigation.last {
+                VStack(spacing: 0) {
+                    HStack(spacing: 4) {
+                        ForEach(Array(state.navigation.enumerated()), id: \.offset) { index, nav in
+                            if index != 0 {
+                                Divider()
+                                    .frame(height: 12)
+                            }
+                            Button {
+                                if let index = state.navigation.firstIndex(of: nav) {
+                                    state.navigation = Array(state.navigation[...index])
+                                }
+                            } label: {
+                                Text(nav.word.capitalized)
+                            }
+                            .buttonStyle(.accessoryBar)
+                            .id(nav)
+                        }
+                        Spacer()
+                    }
+                    .padding(8)
+
+                    Divider()
+
+                    WordDetailView(word: word)
+                        .id(state.selection)
+                }
+
+
             } else {
                 SearchContentUnavailableView(
                     searchResultsCount: model.searchResults.count,
@@ -67,6 +98,7 @@ struct ContentView: View {
                 )
             }
         }
+        .environmentObject(state)
         .modifier(
             iOSContentViewAdjustmentsView(
                 searchResultsCount: model.searchResults.count,
@@ -171,9 +203,9 @@ struct ContentView: View {
                         .init(color: backgroundColor.opacity(0.8), location: 0.5),
                         .init(color: .clear, location: 0.8)
                     ], startPoint: .top, endPoint: .bottom)
-                        .frame(height: 60)
-                        .glur(radius: 32.0, offset: 0.3, interpolation: 0.5)
-                        .allowsHitTesting(false)
+                    .frame(height: 60)
+                    .glur(radius: 32.0, offset: 0.3, interpolation: 0.5)
+                    .allowsHitTesting(false)
                 }
             }
             .scrollDismissesKeyboard(.immediately)

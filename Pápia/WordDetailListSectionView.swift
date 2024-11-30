@@ -76,19 +76,27 @@ struct WordDetailSectionView: View {
                 VStack {
                     WrappingHStack(alignment: .topLeading) {
                         ForEach(info.words) { word in
+                            #if os(iOS)
                             NavigationLink {
                                 WordDetailView(word: word)
+                                    .task(id: word) {
+                                        state.navigation.append(word.id)
+                                    }
                             } label: {
                                 Text(word.word.capitalized)
                             }
                             .buttonStyle(NavigationButtonStyle())
                             .id(word)
-                            //                    Button {
-                            //                        state.selection = word // macOS
-                            //                        state.navigationPath.append(word) // iOS
-                            //                    } label: {
-                            //                        WordView(label: word.word)
-                            //                    }
+                            #else
+                            Button {
+                                state.navigation.append(word) // iOS
+//                                state.selection = word
+                            } label: {
+                                Text(word.word.capitalized)
+                            }
+                            .buttonStyle(NavigationButtonStyle())
+                            .id(word)
+                            #endif
 
                         }
                     }

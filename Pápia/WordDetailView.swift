@@ -31,7 +31,10 @@ struct WordDetailView: View {
     @State private var results: [WordDetailInformation] = []
     @State private var definitions: [DataMuseDefinition] = []
 
+    @EnvironmentObject private var state: InterfaceState
+
     var body: some View {
+
         ScrollView {
             VStack(alignment: .leading) {
                 ForEach(definitions) { definition in
@@ -253,7 +256,7 @@ struct ModernPagedWordDetailView: View {
                                 .id(definition)
                         }
                     }
-//                    .scenePadding(.horizontal)
+                    //                    .scenePadding(.horizontal)
                 }
                 .ignoresSafeArea(.all, edges: .bottom)
                 .scrollBounceBehavior(.basedOnSize)
@@ -267,11 +270,11 @@ struct ModernPagedWordDetailView: View {
                             WordDetailListSectionView(scope: scope, word: word)
 
                         }
-//                        .scenePadding(.horizontal)
+                        //                        .scenePadding(.horizontal)
                     }
                     .ignoresSafeArea(.all, edges: .bottom)
                     .scrollBounceBehavior(.basedOnSize)
-//                    .containerRelativeFrame(.horizontal)
+                    //                    .containerRelativeFrame(.horizontal)
                     .containerRelativeFrame(.horizontal, count: 1, spacing: 8)
                     .id(scope)
                     .modifier(BookFlipScrollTransition())

@@ -14,12 +14,10 @@ struct OpenPage: AppIntent, OpenIntent {
     @Parameter(title: "Target")
     var target: LaunchAppEnum
 
+    static var openAppWhenRun: Bool = true
 
     func perform() async throws -> some IntentResult {
-        //        NavigationModel.shared.navigate(to: target)
-        
-//        return .result(opensIntent: OpenPage())
-        return .result(actionButtonIntent: OpenPage(target: .init(default: .home)))
+        return .result(opensIntent: OpenPage(target: .init(default: .home)))
     }
 
     static var parameterSummary: some ParameterSummary {
