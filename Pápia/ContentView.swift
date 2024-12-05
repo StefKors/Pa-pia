@@ -50,6 +50,7 @@ struct ContentView: View {
     @StateObject var state = InterfaceState()
 
     var macOSContentView: some View {
+#if os(macOS)
         NavigationSplitView {
             List(model.searchResults, selection: $state.selection) { word in
                 WordView(word: word)
@@ -105,6 +106,9 @@ struct ContentView: View {
                 searchText: model.searchText
             )
         )
+#else
+      EmptyView()
+#endif
     }
 
     var showClearButton: Bool {

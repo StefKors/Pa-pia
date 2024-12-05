@@ -80,7 +80,7 @@ struct WordDetailSectionView: View {
                             NavigationLink {
                                 WordDetailView(word: word)
                                     .task(id: word) {
-                                        state.navigation.append(word.id)
+                                        state.navigation.append(word)
                                     }
                             } label: {
                                 Text(word.word.capitalized)
