@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A2643AA2D061CB700CE7447 /* FullSizePapiaIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2643A92D061CB700CE7447 /* FullSizePapiaIcon.swift */; };
 		8A2B5D3A2BEF642B004A68E7 /* readme.md in Resources */ = {isa = PBXBuildFile; fileRef = 8A2B5D362BEF642B004A68E7 /* readme.md */; };
 		8A2B5D3B2BEF642B004A68E7 /* wordle-La.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8A2B5D372BEF642B004A68E7 /* wordle-La.txt */; };
 		8A2B5D3C2BEF642B004A68E7 /* wordle-Ta.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8A2B5D382BEF642B004A68E7 /* wordle-Ta.txt */; };
@@ -84,6 +85,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8A2643A92D061CB700CE7447 /* FullSizePapiaIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullSizePapiaIcon.swift; sourceTree = "<group>"; };
 		8A2B5D362BEF642B004A68E7 /* readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = readme.md; sourceTree = "<group>"; };
 		8A2B5D372BEF642B004A68E7 /* wordle-La.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "wordle-La.txt"; sourceTree = "<group>"; };
 		8A2B5D382BEF642B004A68E7 /* wordle-Ta.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "wordle-Ta.txt"; sourceTree = "<group>"; };
@@ -210,6 +212,7 @@
 		8AA9037A2BDF940C00D553A9 /* Pápia */ = {
 			isa = PBXGroup;
 			children = (
+				8A2643A92D061CB700CE7447 /* FullSizePapiaIcon.swift */,
 				8ABBAB012C3D263D0060215F /* UINavigationController+Papia.swift */,
 				8A8016422BE1062E005DEE89 /* Pa-pia-Info.plist */,
 				8A2B5D392BEF642B004A68E7 /* wordle */,
@@ -463,6 +466,7 @@
 				8A8016392BE0DB38005DEE89 /* SearchSuggestionsView.swift in Sources */,
 				8ABBAB022C3D26470060215F /* UINavigationController+Papia.swift in Sources */,
 				8AA903BD2BDFBA9D00D553A9 /* WrappingHStack.swift in Sources */,
+				8A2643AA2D061CB700CE7447 /* FullSizePapiaIcon.swift in Sources */,
 				8AA903B12BDFA07B00D553A9 /* DataMuseViewModel.swift in Sources */,
 				8A80163B2BE0DBD2005DEE89 /* SearchContentUnavailableView.swift in Sources */,
 				8AC7B4AC2CB5256D00CBD21C /* LaunchAppIntent.swift in Sources */,

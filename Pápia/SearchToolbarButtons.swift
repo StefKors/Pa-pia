@@ -75,6 +75,7 @@ extension View {
 
 struct ToolbarButtonComponent: View {
     let label: String
+    let explainer: String
 
     @EnvironmentObject private var model: DataMuseViewModel
     @State private var isLongPressed: Bool = false
@@ -89,26 +90,44 @@ struct ToolbarButtonComponent: View {
             }
         )
         .supportsLongPress {
-            isLongPressed.toggle()
-        }
-        .overlay(alignment: .bottomLeading, content: {
-            if isLongPressed {
-                Text("Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)")
-                    .fixedSize(horizontal: false, vertical: true)
-                    .lineLimit(4)
-                    .frame(width: 200)
-                    .font(.footnote)
-                    .padding(8)
-                    .background {
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(.background)
-                    }
-                    .shadow(color: .black.opacity(0.1), radius: 6, x: 0, y: 6)
-                    .offset(y: -50)
-                    .transition(.opacity.combined(with: .scale).combined(with: .move(edge: .bottom)).animation(.snappy(duration: 0.1)))
+            withAnimation(.snappy, {
+                isLongPressed.toggle()
+            })
+            if isLongPressed == true {
+                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(10)) {
+                    withAnimation(.snappy, {
+                        isLongPressed = false
+                    })
+                }
             }
+        }
+        .popover(isPresented: $isLongPressed, content: {
+            Text(explainer)
+//                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(4)
+                .frame(width: 200)
+                .font(.footnote)
+                .padding(8)
+                .presentationCompactAdaptation(.popover)
         })
-        .animation(.snappy, value: isLongPressed)
+
+        //        .overlay(alignment: .bottomLeading, content: {
+        //                Text(explainer)
+        //                    .fixedSize(horizontal: false, vertical: true)
+        //                    .lineLimit(4)
+        //                    .frame(width: 200)
+        //                    .font(.footnote)
+        //                    .padding(8)
+        //                    .background {
+        //                        RoundedRectangle(cornerRadius: 6)
+        //                            .fill(.background)
+        //                    }
+        //                    .shadow(color: .black.opacity(0.1), radius: 6, x: 0, y: 6)
+        //                    .offset(y: isLongPressed ? -50 : 0)
+        //                    .opacity(isLongPressed ? 1 : 0)
+        //                    .scaleEffect(isLongPressed ? 1 : 0.8)
+        ////                    .transition(.opacity.combined(with: .scale).combined(with: .move(edge: .bottom)).animation(.snappy(duration: 0.1)))
+        //        })
     }
 }
 
@@ -139,14 +158,38 @@ struct SearchToolbar: ViewModifier {
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
                     HStack {
-                        ToolbarButtonComponent(label: "?")
-                        ToolbarButtonComponent(label: "*")
-                        ToolbarButtonComponent(label: "@")
-                        ToolbarButtonComponent(label: ",")
-                        ToolbarButtonComponent(label: "//")
-                        ToolbarButtonComponent(label: "-")
-                        ToolbarButtonComponent(label: "+")
-                        ToolbarButtonComponent(label: ":")
+                        ToolbarButtonComponent(
+                            label: "?",
+                            explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
+                        )
+                        ToolbarButtonComponent(
+                            label: "*",
+                            explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
+                        )
+                        ToolbarButtonComponent(
+                            label: "@",
+                            explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
+                        )
+                        ToolbarButtonComponent(
+                            label: ",",
+                            explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
+                        )
+                        ToolbarButtonComponent(
+                            label: "//",
+                            explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
+                        )
+                        ToolbarButtonComponent(
+                            label: "-",
+                            explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
+                        )
+                        ToolbarButtonComponent(
+                            label: "+",
+                            explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
+                        )
+                        ToolbarButtonComponent(
+                            label: ":",
+                            explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
+                        )
                     }
                 }
             }
@@ -174,36 +217,9 @@ struct ToolbarButton: ButtonStyle {
             .cornerRadius(5.6)
             .offset(y: configuration.isPressed ? 0 : -2)
         }
-
-
     }
 }
 
-struct FullSizePapiaIcon: View {
-    var body: some View {
-        HStack(alignment: .top, spacing: 10) {
-            VStack(alignment: .center, spacing: 10) {
-                Text("w")
-                    .font(Font.system(size: 64, weight: .semibold, design: .rounded))
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.white)
-            }
-            .padding(0)
-            .frame(width: 100, height: 90, alignment: .center)
-            .background(Color(red: 0.35, green: 0.67, blue: 0.34))
-            .cornerRadius(20)
-        }
-        .padding(.horizontal, 0)
-        .padding(.top, 0)
-        .padding(.bottom, 10)
-        .background(Color(red: 0.21, green: 0.42, blue: 0.2))
-        .cornerRadius(20)
-    }
-}
-
-#Preview {
-    FullSizePapiaIcon()
-}
 
 
 #Preview {

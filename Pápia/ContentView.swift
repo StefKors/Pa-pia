@@ -14,7 +14,7 @@ import AppIntents
 struct iOSContentViewAdjustmentsView: ViewModifier {
     let searchResultsCount: Int
     let searchText: String
-
+    let searchIsFocused: FocusState<Bool>.Binding
     func body(content: Content) -> some View {
 #if os(macOS)
         content
@@ -23,7 +23,8 @@ struct iOSContentViewAdjustmentsView: ViewModifier {
             .navigationBarTitleDisplayMode(.large)
             .searchContentUnavailableView(
                 searchResultsCount: searchResultsCount,
-                searchText: searchText
+                searchText: searchText,
+                searchIsFocused: searchIsFocused
             )
 #endif
     }
@@ -211,16 +212,17 @@ struct ContentView: View {
                     .glur(radius: 32.0, offset: 0.3, interpolation: 0.5)
                     .allowsHitTesting(false)
                 }
+                .modifier(
+                    iOSContentViewAdjustmentsView(
+                        searchResultsCount: model.searchResults.count,
+                        searchText: model.searchText,
+                        searchIsFocused: $searchIsFocused
+                    )
+                )
             }
             .scrollDismissesKeyboard(.immediately)
             .background(backgroundColor)
         }
-        .modifier(
-            iOSContentViewAdjustmentsView(
-                searchResultsCount: model.searchResults.count,
-                searchText: model.searchText
-            )
-        )
     }
 
     var body: some View {
