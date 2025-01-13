@@ -116,7 +116,6 @@ struct SearchContentUnavailableView: View {
                     }
                 }
                 .contentShape(.interaction, Rectangle(), eoFill: .init())
-                .border(.red)
                 .gesture(pullToSearch, name: "PullToSearch", isEnabled: true)
                 .offset(y: translation.height)
                 .sensoryFeedback(trigger: translation) { old, new in
