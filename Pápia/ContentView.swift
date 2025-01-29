@@ -11,6 +11,31 @@ import Get
 import Glur
 import AppIntents
 
+@propertyWrapper
+public struct CodableAppStorage<Value: Codable>: DynamicProperty {
+    @AppStorage
+    private var value: Data
+
+    private let decoder = JSONDecoder()
+    private let encoder = JSONEncoder()
+
+    public init(wrappedValue: Value, _ key: String, store: UserDefaults? = nil) {
+        _value = .init(wrappedValue: try! encoder.encode(wrappedValue), key, store: store)
+    }
+
+    public var wrappedValue: Value {
+        get { try! decoder.decode(Value.self, from: value) }
+        nonmutating set { value = try! encoder.encode(newValue) }
+    }
+
+    public var projectedValue: Binding<Value> {
+        Binding(
+            get: { wrappedValue },
+            set: { wrappedValue = $0 }
+        )
+    }
+}
+
 struct iOSContentViewAdjustmentsView: ViewModifier {
     let searchResultsCount: Int
     let searchText: String
@@ -33,7 +58,15 @@ struct iOSContentViewAdjustmentsView: ViewModifier {
 class InterfaceState: ObservableObject {
     // Nothing selected by default.
     @Published var selection: DataMuseWord?
-    @Published var navigation: [DataMuseWord] = []
+    @CodableAppStorage("search-history") var searchHistory: [String] = []
+    @Published var navigationHistory: [DataMuseWord] = []
+    @Published var navigation: [DataMuseWord] = [] {
+        didSet {
+            if let latest = navigation.last {
+                navigationHistory.append(latest)
+            }
+        }
+    }
 }
 
 
@@ -50,6 +83,16 @@ struct ContentView: View {
 
     @StateObject var state = InterfaceState()
 
+    @FocusState private var searchFocused: Bool
+
+    var filteredSearchHistory: [String] {
+        if model.searchText.isEmpty {
+            return state.searchHistory
+        }
+
+        return state.searchHistory.filter { $0.contains(model.searchText) }
+    }
+
     var macOSContentView: some View {
 #if os(macOS)
         NavigationSplitView {
@@ -57,7 +100,6 @@ struct ContentView: View {
                 WordView(word: word)
                     .tag(word)
             }
-            .searchable(text: $model.searchText, placement: .sidebar, prompt: "Find words...")
             .onChange(of: state.selection) { oldValue, newValue in
                 if let newValue {
                     state.navigation = [newValue]
@@ -91,24 +133,49 @@ struct ContentView: View {
                     WordDetailView(word: word)
                         .id(state.selection)
                 }
-
-
             } else {
                 SearchContentUnavailableView(
                     searchResultsCount: model.searchResults.count,
-                    searchText: model.searchText
+                    searchText: model.searchText,
+                    searchIsFocused: $searchIsFocused
                 )
+            }
+        }
+        .searchable(text: $model.searchText, placement: .toolbar, prompt: "Find words...")
+        .searchSuggestions {
+            ForEach(filteredSearchHistory, id: \.self) { suggestion in
+                HighlightedText(
+                    text: suggestion,
+                    highlightedText: model.searchText,
+                    shapeStyle: .tint.opacity(0.4)
+                )
+                    .searchCompletion(suggestion)
+            }
+        }
+        .onSubmit(of: .search, {
+            var newHistory = Set(state.searchHistory)
+            newHistory.insert(model.searchText)
+            state.searchHistory = Array(newHistory)
+        })
+        .searchFocused($searchFocused)
+        .task {
+            searchFocused = true
+        }
+        .onChange(of: model.searchText) { oldValue, newValue in
+            if newValue.isEmpty {
+                state.navigation = []
             }
         }
         .environmentObject(state)
         .modifier(
             iOSContentViewAdjustmentsView(
                 searchResultsCount: model.searchResults.count,
-                searchText: model.searchText
+                searchText: model.searchText,
+                searchIsFocused: $searchIsFocused
             )
         )
 #else
-      EmptyView()
+        EmptyView()
 #endif
     }
 
