@@ -81,53 +81,46 @@ struct ToolbarButtonComponent: View {
     @State private var isLongPressed: Bool = false
 
     var body: some View {
-        Button(
-            action: {
-                print("You've tapped me!")
-            },
-            label: {
-                Text(label)
-            }
-        )
-        .supportsLongPress {
-            withAnimation(.snappy, {
-                isLongPressed.toggle()
-            })
-            if isLongPressed == true {
-                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(10)) {
-                    withAnimation(.snappy, {
-                        isLongPressed = false
-                    })
+//        GeometryReader { proxy in
+            Button(
+                action: {
+                    self.model.searchText.append(self.label)
+                },
+                label: {
+                    Text(label)
                 }
-            }
-        }
-        .popover(isPresented: $isLongPressed, content: {
-            Text(explainer)
-//                .fixedSize(horizontal: false, vertical: true)
-                .lineLimit(4)
-                .frame(width: 200)
-                .font(.footnote)
-                .padding(8)
-                .presentationCompactAdaptation(.popover)
-        })
+            )
+            .help(explainer)
+//            .popover(isPresented: $isLongPressed, attachmentAnchor: .rect(.rect(proxy.frame(in: .global))), content: {
+//                Text(explainer)
+//                //                .fixedSize(horizontal: false, vertical: true)
+//                    .lineLimit(4)
+//                    .frame(width: 200)
+//                    .font(.footnote)
+//                    .padding(8)
+//                    .presentationCompactAdaptation(.popover)
+//            })
+//        }
+//        .frame(width: 28, height: 26)
+//        .supportsLongPress {
+//            withAnimation(.snappy, {
+//                isLongPressed.toggle()
+//            })
+//            if isLongPressed == true {
+//                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(10)) {
+//                    withAnimation(.snappy, {
+//                        isLongPressed = false
+//                    })
+//                }
+//            }
+//        }
+//        .overlay(alignment: .bottom) {
+//            VStack {
+//                Text("The question mark (?) matches exactly one letter. That means that you can use it as a placeholder for a single letter or symbol. The query l?b?n?n,  for example, will find the word \"Lebanon\".")
+//            }
+//            .frame(height: 60, alignment: .bottomLeading)
+//        }
 
-        //        .overlay(alignment: .bottomLeading, content: {
-        //                Text(explainer)
-        //                    .fixedSize(horizontal: false, vertical: true)
-        //                    .lineLimit(4)
-        //                    .frame(width: 200)
-        //                    .font(.footnote)
-        //                    .padding(8)
-        //                    .background {
-        //                        RoundedRectangle(cornerRadius: 6)
-        //                            .fill(.background)
-        //                    }
-        //                    .shadow(color: .black.opacity(0.1), radius: 6, x: 0, y: 6)
-        //                    .offset(y: isLongPressed ? -50 : 0)
-        //                    .opacity(isLongPressed ? 1 : 0)
-        //                    .scaleEffect(isLongPressed ? 1 : 0.8)
-        ////                    .transition(.opacity.combined(with: .scale).combined(with: .move(edge: .bottom)).animation(.snappy(duration: 0.1)))
-        //        })
     }
 }
 
@@ -160,19 +153,25 @@ struct SearchToolbar: ViewModifier {
                     HStack {
                         ToolbarButtonComponent(
                             label: "?",
-                            explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
+                            explainer: "The question mark (?) matches exactly one letter. That means that you can use it as a placeholder for a single letter or symbol. The query l?b?n?n,  for example, will find the word \"Lebanon\"."
                         )
                         ToolbarButtonComponent(
                             label: "*",
-                            explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
+                            explainer: """
+                                The asterisk (*) matches any number of letters. An asterisk can match zero letters, too.
+                                """
                         )
                         ToolbarButtonComponent(
                             label: "@",
-                            explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
+                            explainer: """
+                                The at-sign (@) matches any English vowel (including "y"). For example, the query abo@t finds the word "about" but not "abort".
+                                """
                         )
                         ToolbarButtonComponent(
                             label: ",",
-                            explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
+                            explainer: """
+                                The comma (,) lets you combine multiple patterns into one. For example, the query ?????,*y* finds 5-letter words that contain a "y" somewhere, such as "happy" and "rhyme".
+                                """
                         )
                         ToolbarButtonComponent(
                             label: "//",
@@ -180,15 +179,15 @@ struct SearchToolbar: ViewModifier {
                         )
                         ToolbarButtonComponent(
                             label: "-",
-                            explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
+                            explainer: """
+                                A minus sign (-) followed by some letters at the end of a pattern means "exclude these letters".
+                                """
                         )
                         ToolbarButtonComponent(
                             label: "+",
-                            explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
-                        )
-                        ToolbarButtonComponent(
-                            label: ":",
-                            explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
+                            explainer: """
+                                A plus sign (+) followed by some letters at the end of a pattern means "restrict to these letters".
+                                """
                         )
                     }
                 }
