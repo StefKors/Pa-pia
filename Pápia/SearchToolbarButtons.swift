@@ -10,13 +10,13 @@ import SwiftUI
 // Conform to `PrimitiveButtonStyle` for custom interaction behaviour
 
 struct SupportsLongPress: PrimitiveButtonStyle {
-
+    
     /// An action to execute on long press
     let longPressAction: () -> ()
-
+    
     /// Whether the button is being pressed
     @State var isPressed: Bool = false
-
+    
     func makeBody(configuration: Configuration) -> some View {
         ZStack {
             RoundedRectangle(cornerRadius: 5.6)
@@ -24,7 +24,7 @@ struct SupportsLongPress: PrimitiveButtonStyle {
                 .frame(width: 28, height: 25.2, alignment: .center)
                 .background(Color(red: 0.21, green: 0.42, blue: 0.2))
                 .cornerRadius(5.6)
-
+            
             VStack(alignment: .center, spacing: 2.8) {
                 configuration.label
                     .font(Font.system(size: 14, weight: .semibold, design: .rounded))
@@ -74,10 +74,9 @@ extension View {
 
 struct PrimaryButtonModifier: ViewModifier {
     func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, *), #available(macOS 26.0, *) {
             content
                 .buttonStyle(.glass)
-//                .buttonStyle(.glass)
         } else {
             content
                 .buttonStyle(.borderedProminent)
@@ -88,7 +87,7 @@ struct PrimaryButtonModifier: ViewModifier {
 struct GlassContainerModifier: ViewModifier {
     let spacing: CGFloat
     func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, *), #available(macOS 26.0, *) {
             GlassEffectContainer(spacing: spacing) {
                 content
             }
@@ -103,27 +102,26 @@ struct ToolbarButtonComponent: View {
     let label: String
     let shortexplainer: String
     let explainer: String
-
+    
     @EnvironmentObject private var model: DataMuseViewModel
     @State private var isLongPressed: Bool = false
-
+    
     var body: some View {
-//        GeometryReader { proxy in
-            Button(
-                action: {
-                    self.model.searchText.append(self.label)
-                },
-                label: {
-                        Text(label) + Text(" ") +
-                        Text(shortexplainer)
-                            .foregroundStyle(.secondary)
-
-                }
-            )
-            .help(explainer)
-            .font(.caption)
-            .modifier(PrimaryButtonModifier())
-            .fixedSize()
+        Button(
+            action: {
+                self.model.searchText.append(self.label)
+            },
+            label: {
+                Text(label) + Text(" ") +
+                Text(shortexplainer)
+                    .foregroundStyle(.secondary)
+                
+            }
+        )
+        .help(explainer)
+        .font(.caption)
+        .modifier(PrimaryButtonModifier())
+        .fixedSize()
     }
 }
 
@@ -157,7 +155,7 @@ struct ToolbarButtonsGroup: View {
                 )
             }
             .modifier(GlassContainerModifier(spacing: 18))
-
+            
             HStack(spacing: 4) {
                 ToolbarButtonComponent(
                     label: ",",
@@ -192,7 +190,7 @@ struct ToolbarButtonsGroup: View {
 
 #Preview {
     ToolbarButtonsGroup()
-    .scenePadding()
+        .scenePadding()
 }
 
 // The asterisk (*) matches any number of letters. That means that you can use it as a placeholder for any part of a word or phrase. For example, if you enter blueb* you'll get all the terms that start with "blueb"; if you enter *bird you'll get all the terms that end with "bird"; if you enter *lueb* you'll get all the terms that contain the sequence "lueb", and so forth. An asterisk can match zero letters, too.
@@ -216,7 +214,7 @@ struct ToolbarButtonsGroup: View {
 
 struct SearchToolbar: ViewModifier {
     @EnvironmentObject private var model: DataMuseViewModel
-
+    
     func body(content: Content) -> some View {
         content
             .toolbar {
@@ -235,7 +233,7 @@ struct ToolbarButton: ButtonStyle {
                 .frame(width: 28, height: 25.2, alignment: .center)
                 .background(Color(red: 0.21, green: 0.42, blue: 0.2))
                 .cornerRadius(5.6)
-
+            
             VStack(alignment: .center, spacing: 2.8) {
                 configuration.label
                     .font(Font.system(size: 14, weight: .semibold, design: .rounded))

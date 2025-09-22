@@ -70,7 +70,7 @@ class InterfaceState: ObservableObject {
 
 struct GlassEffectModifier: ViewModifier {
     func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, *), #available(macOS 26.0, *) {
             content
                 .glassEffect()
         } else {
@@ -83,7 +83,7 @@ struct GlassEffectModifier: ViewModifier {
 
 struct ScrollEdgeEffectModifier: ViewModifier {
     func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, *), #available(macOS 26.0, *) {
             content
                 .scrollEdgeEffectStyle(.soft, for: .top)
                 .scrollEdgeEffectStyle(.hard, for: .bottom)
@@ -228,6 +228,7 @@ struct ContentView: View {
     @FocusState private var searchIsFocused: Bool
 
     var iOSContentView: some View {
+#if os(iOS)
         NavigationView {
             VStack(spacing: 0) {
                 List {
@@ -305,7 +306,7 @@ struct ContentView: View {
 
                     ToolbarButtonsGroup()
 
-                    if #available(iOS 26.0, *) {
+                    if #available(iOS 26.0, *), #available(macOS 26.0, *) {
 
                     } else {
                         Picker("Search Scope", selection: $model.searchScope) {
@@ -322,7 +323,7 @@ struct ContentView: View {
                 .scenePadding(.vertical)
             }
             .overlay(alignment: .bottom) {
-                if #available(iOS 26.0, *) {
+                if #available(iOS 26.0, *), #available(macOS 26.0, *) {
                     Picker("Search Scope", selection: $model.searchScope) {
                         ForEach(model.globalSearchScopes) { scope in
                             Text(scope.label)
@@ -335,6 +336,9 @@ struct ContentView: View {
                 }
             }
         }
+#else
+        EmptyView()
+#endif
     }
 
     var body: some View {
