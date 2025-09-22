@@ -8,7 +8,6 @@
 import SwiftUI
 import SwiftData
 import Get
-import AppIntents
 
 @propertyWrapper
 public struct CodableAppStorage<Value: Codable>: DynamicProperty {
