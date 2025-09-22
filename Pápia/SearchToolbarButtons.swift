@@ -72,9 +72,36 @@ extension View {
     }
 }
 
+struct PrimaryButtonModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            content
+                .buttonStyle(.glass)
+//                .buttonStyle(.glass)
+        } else {
+            content
+                .buttonStyle(.borderedProminent)
+        }
+    }
+}
+
+struct GlassContainerModifier: ViewModifier {
+    let spacing: CGFloat
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            GlassEffectContainer(spacing: spacing) {
+                content
+            }
+        } else {
+            content
+        }
+    }
+}
+
 
 struct ToolbarButtonComponent: View {
     let label: String
+    let shortexplainer: String
     let explainer: String
 
     @EnvironmentObject private var model: DataMuseViewModel
@@ -87,41 +114,85 @@ struct ToolbarButtonComponent: View {
                     self.model.searchText.append(self.label)
                 },
                 label: {
-                    Text(label)
+                        Text(label) + Text(" ") +
+                        Text(shortexplainer)
+                            .foregroundStyle(.secondary)
+
                 }
             )
             .help(explainer)
-//            .popover(isPresented: $isLongPressed, attachmentAnchor: .rect(.rect(proxy.frame(in: .global))), content: {
-//                Text(explainer)
-//                //                .fixedSize(horizontal: false, vertical: true)
-//                    .lineLimit(4)
-//                    .frame(width: 200)
-//                    .font(.footnote)
-//                    .padding(8)
-//                    .presentationCompactAdaptation(.popover)
-//            })
-//        }
-//        .frame(width: 28, height: 26)
-//        .supportsLongPress {
-//            withAnimation(.snappy, {
-//                isLongPressed.toggle()
-//            })
-//            if isLongPressed == true {
-//                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(10)) {
-//                    withAnimation(.snappy, {
-//                        isLongPressed = false
-//                    })
-//                }
-//            }
-//        }
-//        .overlay(alignment: .bottom) {
-//            VStack {
-//                Text("The question mark (?) matches exactly one letter. That means that you can use it as a placeholder for a single letter or symbol. The query l?b?n?n,  for example, will find the word \"Lebanon\".")
-//            }
-//            .frame(height: 60, alignment: .bottomLeading)
-//        }
-
+            .font(.caption)
+            .modifier(PrimaryButtonModifier())
+            .fixedSize()
     }
+}
+
+struct ToolbarButtonsGroup: View {
+    var body: some View {
+        VStack(spacing: 4) {
+            HStack(spacing: 4) {
+                ToolbarButtonComponent(
+                    label: "?",
+                    shortexplainer: "any",
+                    explainer: "The question mark (?) matches exactly one letter. That means that you can use it as a placeholder for a single letter or symbol. The query l?b?n?n,  for example, will find the word \"Lebanon\"."
+                )
+                ToolbarButtonComponent(
+                    label: "*",
+                    shortexplainer: "many",
+                    explainer: """
+                                The asterisk (*) matches any number of letters. An asterisk can match zero letters, too.
+                                """
+                )
+                ToolbarButtonComponent(
+                    label: "@",
+                    shortexplainer: "any vowel",
+                    explainer: """
+                                The at-sign (@) matches any English vowel (including "y"). For example, the query abo@t finds the word "about" but not "abort".
+                                """
+                )
+                ToolbarButtonComponent(
+                    label: "//",
+                    shortexplainer: "unscramble",
+                    explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
+                )
+            }
+            .modifier(GlassContainerModifier(spacing: 18))
+
+            HStack(spacing: 4) {
+                ToolbarButtonComponent(
+                    label: ",",
+                    shortexplainer: "combine",
+                    explainer: """
+                                The comma (,) lets you combine multiple patterns into one. For example, the query ?????,*y* finds 5-letter words that contain a "y" somewhere, such as "happy" and "rhyme".
+                                """
+                )
+                ToolbarButtonComponent(
+                    label: "-",
+                    shortexplainer: "exclude",
+                    explainer: """
+                                A minus sign (-) followed by some letters at the end of a pattern means "exclude these letters".
+                                """
+                )
+                ToolbarButtonComponent(
+                    label: "+",
+                    shortexplainer: "restrict",
+                    explainer: """
+                                A plus sign (+) followed by some letters at the end of a pattern means "restrict to these letters".
+                                """
+                )
+            }
+            .modifier(GlassContainerModifier(spacing: 18))
+        }
+    }
+}
+
+#Preview {
+    ToolbarButtonsGroup()
+}
+
+#Preview {
+    ToolbarButtonsGroup()
+    .scenePadding()
 }
 
 // The asterisk (*) matches any number of letters. That means that you can use it as a placeholder for any part of a word or phrase. For example, if you enter blueb* you'll get all the terms that start with "blueb"; if you enter *bird you'll get all the terms that end with "bird"; if you enter *lueb* you'll get all the terms that contain the sequence "lueb", and so forth. An asterisk can match zero letters, too.
@@ -150,46 +221,7 @@ struct SearchToolbar: ViewModifier {
         content
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
-                    HStack {
-                        ToolbarButtonComponent(
-                            label: "?",
-                            explainer: "The question mark (?) matches exactly one letter. That means that you can use it as a placeholder for a single letter or symbol. The query l?b?n?n,  for example, will find the word \"Lebanon\"."
-                        )
-                        ToolbarButtonComponent(
-                            label: "*",
-                            explainer: """
-                                The asterisk (*) matches any number of letters. An asterisk can match zero letters, too.
-                                """
-                        )
-                        ToolbarButtonComponent(
-                            label: "@",
-                            explainer: """
-                                The at-sign (@) matches any English vowel (including "y"). For example, the query abo@t finds the word "about" but not "abort".
-                                """
-                        )
-                        ToolbarButtonComponent(
-                            label: ",",
-                            explainer: """
-                                The comma (,) lets you combine multiple patterns into one. For example, the query ?????,*y* finds 5-letter words that contain a "y" somewhere, such as "happy" and "rhyme".
-                                """
-                        )
-                        ToolbarButtonComponent(
-                            label: "//",
-                            explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
-                        )
-                        ToolbarButtonComponent(
-                            label: "-",
-                            explainer: """
-                                A minus sign (-) followed by some letters at the end of a pattern means "exclude these letters".
-                                """
-                        )
-                        ToolbarButtonComponent(
-                            label: "+",
-                            explainer: """
-                                A plus sign (+) followed by some letters at the end of a pattern means "restrict to these letters".
-                                """
-                        )
-                    }
+                    ToolbarButtonsGroup()
                 }
             }
     }

@@ -8,7 +8,6 @@
 import SwiftUI
 import SwiftData
 import Get
-import Glur
 import AppIntents
 
 @propertyWrapper
@@ -67,6 +66,37 @@ class InterfaceState: ObservableObject {
             }
         }
     }
+}
+
+struct GlassEffectModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            content
+                .glassEffect()
+        } else {
+            content
+                .background(.quinary, in: Capsule(style: .continuous))
+        }
+    }
+}
+
+
+struct ScrollEdgeEffectModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            content
+                .scrollEdgeEffectStyle(.soft, for: .top)
+                .scrollEdgeEffectStyle(.hard, for: .bottom)
+        } else {
+            content
+        }
+    }
+}
+
+#Preview {
+    Text("Hello, world!")
+        .padding()
+        .modifier(GlassEffectModifier())
 }
 
 
@@ -200,6 +230,29 @@ struct ContentView: View {
     var iOSContentView: some View {
         NavigationView {
             VStack(spacing: 0) {
+                List {
+                    ForEach(model.searchResults) { word in
+                        NavigationLink {
+                            WordDetailView(word: word)
+                        } label: {
+                            WordView(word: word)
+                        }
+                    }
+                }
+
+                .contentMargins(.vertical, 140, for: .scrollContent)
+                .modifier(
+                    iOSContentViewAdjustmentsView(
+                        searchResultsCount: model.searchResults.count,
+                        searchText: model.searchText,
+                        searchIsFocused: $searchIsFocused
+                    )
+                )
+                .modifier(ScrollEdgeEffectModifier())
+            }
+            .scrollDismissesKeyboard(.immediately)
+            .background(backgroundColor)
+            .overlay(alignment: .top) {
                 VStack {
                     HStack {
                         HStack {
@@ -210,13 +263,13 @@ struct ContentView: View {
                             if #available(iOS 17.0, *) {
                                 TextField("Find words...", text: $model.searchText)
                                     .focused($searchIsFocused)
-                                    .searchToolbar()
+                                //                                    .searchToolbar()
                                     .environmentObject(model)
                                     .defaultFocus($searchIsFocused, true)
                             } else {
                                 TextField("Find words...", text: $model.searchText)
                                     .focused($searchIsFocused)
-                                    .searchToolbar()
+                                //                                    .searchToolbar()
                                     .environmentObject(model)
                             }
 
@@ -233,7 +286,7 @@ struct ContentView: View {
 
                         }
                         .padding(6)
-                        .background(.quinary, in: RoundedRectangle(cornerRadius: 6))
+                        .modifier(GlassEffectModifier())
 
                         if showCancelButton {
                             Text("Cancel")
@@ -246,49 +299,41 @@ struct ContentView: View {
                                 .foregroundStyle(.tint)
                         }
                     }
-
                     .font(.body)
                     .animation(.smooth(duration: 0.3), value: showClearButton)
                     .animation(.smooth(duration: 0.3), value: showCancelButton)
 
+                    ToolbarButtonsGroup()
+
+                    if #available(iOS 26.0, *) {
+
+                    } else {
+                        Picker("Search Scope", selection: $model.searchScope) {
+                            ForEach(model.globalSearchScopes) { scope in
+                                Text(scope.label)
+                                    .tag(scope)
+                            }
+                        }.pickerStyle(.segmented)
+                    }
+
+
+                }
+                .scenePadding(.horizontal)
+                .scenePadding(.vertical)
+            }
+            .overlay(alignment: .bottom) {
+                if #available(iOS 26.0, *) {
                     Picker("Search Scope", selection: $model.searchScope) {
                         ForEach(model.globalSearchScopes) { scope in
                             Text(scope.label)
                                 .tag(scope)
                         }
-                    }.pickerStyle(.segmented)
-                }
-                .scenePadding(.horizontal)
-                .scenePadding(.top)
-
-                List {
-                    ForEach(model.searchResults) { word in
-                        NavigationLink {
-                            WordDetailView(word: word)
-                        } label: {
-                            WordView(word: word)
-                        }
                     }
+                    .pickerStyle(.segmented)
+                    .glassEffect()
+                    .scenePadding()
                 }
-                .overlay(alignment: .top) {
-                    LinearGradient(stops: [
-                        .init(color: backgroundColor.opacity(0.8), location: 0.5),
-                        .init(color: .clear, location: 0.8)
-                    ], startPoint: .top, endPoint: .bottom)
-                    .frame(height: 60)
-                    .glur(radius: 32.0, offset: 0.3, interpolation: 0.5)
-                    .allowsHitTesting(false)
-                }
-                .modifier(
-                    iOSContentViewAdjustmentsView(
-                        searchResultsCount: model.searchResults.count,
-                        searchText: model.searchText,
-                        searchIsFocused: $searchIsFocused
-                    )
-                )
             }
-            .scrollDismissesKeyboard(.immediately)
-            .background(backgroundColor)
         }
     }
 
