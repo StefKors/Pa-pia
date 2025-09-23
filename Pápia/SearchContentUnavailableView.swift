@@ -9,12 +9,13 @@ import SwiftUI
 import SwiftData
 
 extension View {
-    func searchContentUnavailableView(searchResultsCount: Int, searchText: String, searchIsFocused: FocusState<Bool>.Binding) -> some View {
+    func searchContentUnavailableView(searchResultsCount: Int, searchText: String, searchIsFocused: FocusState<Bool>.Binding, searchHistoryItems: [DataMuseWord]) -> some View {
         modifier(
             SearchContentUnavailableViewModifier(
                 searchResultsCount: searchResultsCount,
                 searchText: searchText,
-                searchIsFocused: searchIsFocused
+                searchIsFocused: searchIsFocused,
+                searchHistoryItems: searchHistoryItems
             )
         )
     }
@@ -24,6 +25,7 @@ struct SearchContentUnavailableViewModifier: ViewModifier {
     let searchResultsCount: Int
     let searchText: String
     let searchIsFocused: FocusState<Bool>.Binding
+    let searchHistoryItems: [DataMuseWord]
 
     func body(content: Content) -> some View {
         content
@@ -31,7 +33,8 @@ struct SearchContentUnavailableViewModifier: ViewModifier {
                 SearchContentUnavailableView(
                     searchResultsCount: searchResultsCount,
                     searchText: searchText,
-                    searchIsFocused: searchIsFocused
+                    searchIsFocused: searchIsFocused,
+                    searchHistoryItems: searchHistoryItems
                 )
             }
     }
@@ -43,6 +46,7 @@ struct SearchContentUnavailableView: View {
     let searchResultsCount: Int
     let searchText: String
     let searchIsFocused: FocusState<Bool>.Binding
+    let searchHistoryItems: [DataMuseWord]
 
     @State private var isDragging = false
     @State private var ignoreDragging = false
@@ -94,19 +98,26 @@ struct SearchContentUnavailableView: View {
                         } description: {
                             Text("Start your search, then filter your query")
                         } actions: {
-                            //                    WrappingHStack {
-                            //                        ForEach(searchHistoryItems) { item in
-                            //                            Button {
-                            //                                /// todo: open
-                            //                            } label: {
-                            //                                WordView(label: item.word.word)
-                            //                            }
-                            //                            .foregroundStyle(.primary)
-                            //                            .padding(.horizontal, 12)
-                            //                            .padding(.vertical, 4)
-                            //                            .background(.tint, in: Capsule())
-                            //                        }
-                            //                    }
+                            WrappingHStack(alignment: .center) {
+                                ForEach(searchHistoryItems, id: \.self) { item in
+                                    NavigationLink(value: item) {
+                                        WordView(word: item)
+                                            .foregroundStyle(.white)
+                                    }
+//                                    Button {
+//                                        /// todo: open
+//
+//                                    } label: {
+//                                        WordView(word: item)
+//                                            .foregroundStyle(.white)
+//                                    }
+                                    .buttonStyle(NavigationButtonStyle())
+//                                    .foregroundStyle(.primary)
+//                                    .padding(.horizontal, 12)
+//                                    .padding(.vertical, 4)
+//                                    .background(.tint, in: Capsule())
+                                }
+                            }
                         }
                     } else {
                         VStack {

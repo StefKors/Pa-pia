@@ -63,44 +63,50 @@ struct WordDetailSectionView: View {
 
     var body: some View {
         GroupBox(info.scope.label) {
-            Text(markdownText)
-                .lineLimit(expandDescription ? 1000 : 2)
-                .foregroundStyle(.secondary)
-                .onTapGesture {
-                    withAnimation(.smooth) {
-                        expandDescription.toggle()
-                    }
-                }
+            VStack(alignment: .leading) {
 
-            HStack(alignment: .lastTextBaseline) {
-                VStack {
-                    WrappingHStack(alignment: .topLeading) {
-                        ForEach(info.words) { word in
-                            #if os(iOS)
-                            NavigationLink {
-                                WordDetailView(word: word)
-                                    .task(id: word) {
-                                        state.navigation.append(word)
-                                    }
-                            } label: {
-                                Text(word.word.capitalized)
-                            }
-                            .buttonStyle(NavigationButtonStyle())
-                            .id(word)
-                            #else
-                            Button {
-                                state.navigation.append(word) // iOS
-//                                state.selection = word
-                            } label: {
-                                Text(word.word.capitalized)
-                            }
-                            .buttonStyle(NavigationButtonStyle())
-                            .id(word)
-                            #endif
-
+                Text(markdownText)
+                    .lineLimit(expandDescription ? 1000 : 2)
+                    .foregroundStyle(.secondary)
+                    .onTapGesture {
+                        withAnimation(.smooth) {
+                            expandDescription.toggle()
                         }
                     }
-                    //                            .fixedSize(horizontal: false, vertical: true)
+
+                HStack(alignment: .lastTextBaseline) {
+                    VStack {
+                        WrappingHStack(alignment: .topLeading) {
+                            ForEach(info.words) { word in
+#if os(iOS)
+                                NavigationLink(value: word) {
+                                    WordView(word: word)
+                                }
+                                .id(word)
+                                //                            NavigationLink {
+                                //                                WordDetailView(word: word)
+                                //                                    .task(id: word) {
+                                //                                        state.navigation.append(word)
+                                //                                    }
+                                //                            } label: {
+                                //                                Text(word.word.capitalized)
+                                //                            }
+
+#else
+                                Button {
+                                    state.navigation.append(word) // iOS
+                                                                  //                                state.selection = word
+                                } label: {
+                                    Text(word.word.capitalized)
+                                }
+                                .buttonStyle(NavigationButtonStyle())
+                                .id(word)
+#endif
+
+                            }
+                        }
+                        //                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
             }
         }

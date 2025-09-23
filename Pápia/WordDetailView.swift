@@ -120,6 +120,7 @@ struct WordDetailView: View {
                 Text(word.word.capitalized)
                     .font(.title)
                     .bold()
+
                 if word.isWordle {
                     Image(.wordle)
                         .resizable()
@@ -174,6 +175,7 @@ struct WordDetailView: View {
                     })
                     .modifier(ScrollClipOptional(outside: false))
                 }
+                .modifier(ScrollEdgeEffectModifier())
                 .modifier(ScrollClipOptional(outside: true))
                 .scrollBounceBehavior(.basedOnSize)
                 .scrollIndicators(.hidden)

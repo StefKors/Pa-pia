@@ -9,55 +9,12 @@ import SwiftUI
 import SwiftData
 import Get
 
-@propertyWrapper
-public struct CodableAppStorage<Value: Codable>: DynamicProperty {
-    @AppStorage
-    private var value: Data
-
-    private let decoder = JSONDecoder()
-    private let encoder = JSONEncoder()
-
-    public init(wrappedValue: Value, _ key: String, store: UserDefaults? = nil) {
-        _value = .init(wrappedValue: try! encoder.encode(wrappedValue), key, store: store)
-    }
-
-    public var wrappedValue: Value {
-        get { try! decoder.decode(Value.self, from: value) }
-        nonmutating set { value = try! encoder.encode(newValue) }
-    }
-
-    public var projectedValue: Binding<Value> {
-        Binding(
-            get: { wrappedValue },
-            set: { wrappedValue = $0 }
-        )
-    }
-}
-
-struct iOSContentViewAdjustmentsView: ViewModifier {
-    let searchResultsCount: Int
-    let searchText: String
-    let searchIsFocused: FocusState<Bool>.Binding
-    func body(content: Content) -> some View {
-#if os(macOS)
-        content
-#else
-        content
-            .navigationBarTitleDisplayMode(.large)
-            .searchContentUnavailableView(
-                searchResultsCount: searchResultsCount,
-                searchText: searchText,
-                searchIsFocused: searchIsFocused
-            )
-#endif
-    }
-}
-
 class InterfaceState: ObservableObject {
     // Nothing selected by default.
     @Published var selection: DataMuseWord?
-    @CodableAppStorage("search-history") var searchHistory: [String] = []
-    @Published var navigationHistory: [DataMuseWord] = []
+    @CodableAppStorage("search-history") var searchHistory: [DataMuseWord] = []
+    @CodableAppStorage("navigation-history") var navigationHistory: [DataMuseWord] = []
+
     @Published var navigation: [DataMuseWord] = [] {
         didSet {
             if let latest = navigation.last {
@@ -66,38 +23,6 @@ class InterfaceState: ObservableObject {
         }
     }
 }
-
-struct GlassEffectModifier: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 26.0, *), #available(macOS 26.0, *) {
-            content
-                .glassEffect()
-        } else {
-            content
-                .background(.quinary, in: Capsule(style: .continuous))
-        }
-    }
-}
-
-
-struct ScrollEdgeEffectModifier: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 26.0, *), #available(macOS 26.0, *) {
-            content
-                .scrollEdgeEffectStyle(.soft, for: .top)
-                .scrollEdgeEffectStyle(.hard, for: .bottom)
-        } else {
-            content
-        }
-    }
-}
-
-#Preview {
-    Text("Hello, world!")
-        .padding()
-        .modifier(GlassEffectModifier())
-}
-
 
 // TODO: add search progress @Environment(\.isSearching) private var isSearching
 // TODO: add indicator if the word exists in the wordle dictionary
@@ -110,16 +35,17 @@ struct ContentView: View {
 
     @StateObject private var model = DataMuseViewModel()
 
-    @StateObject var state = InterfaceState()
+    @StateObject private var state = InterfaceState()
 
     @FocusState private var searchFocused: Bool
 
-    var filteredSearchHistory: [String] {
+    /// For macOS search suggestions
+    private var filteredSearchHistory: [String] {
         if model.searchText.isEmpty {
-            return state.searchHistory
+            return state.searchHistory.map { $0.word }
         }
 
-        return state.searchHistory.filter { $0.contains(model.searchText) }
+        return state.searchHistory.filter { $0.word.contains(model.searchText) }.map { $0.word }
     }
 
     var macOSContentView: some View {
@@ -200,7 +126,8 @@ struct ContentView: View {
             iOSContentViewAdjustmentsView(
                 searchResultsCount: model.searchResults.count,
                 searchText: model.searchText,
-                searchIsFocused: $searchIsFocused
+                searchIsFocused: $searchIsFocused,
+                searchHistoryItems: state.searchHistory
             )
         )
 #else
@@ -228,24 +155,26 @@ struct ContentView: View {
 
     var iOSContentView: some View {
 #if os(iOS)
-        NavigationView {
+        NavigationStack(path: $state.navigation) {
             VStack(spacing: 0) {
                 List {
                     ForEach(model.searchResults) { word in
-                        NavigationLink {
-                            WordDetailView(word: word)
-                        } label: {
+                        NavigationLink(value: word) {
                             WordView(word: word)
                         }
                     }
                 }
+                .navigationDestination(for: DataMuseWord.self, destination: { word in
+                    WordDetailView(word: word)
+                })
 
                 .contentMargins(.vertical, 140, for: .scrollContent)
                 .modifier(
                     iOSContentViewAdjustmentsView(
                         searchResultsCount: model.searchResults.count,
                         searchText: model.searchText,
-                        searchIsFocused: $searchIsFocused
+                        searchIsFocused: $searchIsFocused,
+                        searchHistoryItems: state.navigationHistory
                     )
                 )
                 .modifier(ScrollEdgeEffectModifier())
@@ -293,14 +222,21 @@ struct ContentView: View {
                         }
 
                         if showCancelButton {
-                            Text("Cancel")
+                            Text(searchIsFocused ? "Cancel" : "Clear")
                                 .onTapGesture {
-                                    withAnimation(.smooth(duration: 0.3)) {
-                                        searchIsFocused.toggle()
+                                    if searchIsFocused {
+                                        withAnimation(.smooth(duration: 0.3)) {
+                                            searchIsFocused = false
+                                        }
+                                    } else {
+                                        withAnimation(.smooth(duration: 0.3)) {
+                                            self.model.searchText = ""
+                                        }
                                     }
                                 }
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
                                 .foregroundStyle(.tint)
+                                .animation(.smooth(duration: 0.3), value: searchIsFocused)
                         }
                     }
                     .font(.body)
@@ -310,7 +246,8 @@ struct ContentView: View {
                     ToolbarButtonsGroup()
 
                     if #available(iOS 26.0, *), #available(macOS 26.0, *) {
-
+                        // Content in bottom overlay
+                        EmptyView()
                     } else {
                         Picker("Search Scope", selection: $model.searchScope) {
                             ForEach(model.globalSearchScopes) { scope in

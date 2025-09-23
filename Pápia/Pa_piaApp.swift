@@ -7,13 +7,8 @@
 
 import SwiftUI
 
-class Demo {
-    var text: String = "Hello, World!"
-}
-
 @main
 struct Pa_piaApp: App {
-
     var body: some Scene {
         WindowGroup {
             ContentView()
