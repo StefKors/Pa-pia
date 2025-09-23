@@ -10,7 +10,7 @@ import SwiftUI
 class InterfaceState: ObservableObject {
     // Nothing selected by default.
     @Published var selection: DataMuseWord?
-    @CodableAppStorage("search-history") var searchHistory: [DataMuseWord] = []
+    @CodableAppStorage("search-history") var searchHistory: [String] = []
     @CodableAppStorage("navigation-history") var navigationHistory: [DataMuseWord] = []
 
     @Published var navigation: [DataMuseWord] = [] {

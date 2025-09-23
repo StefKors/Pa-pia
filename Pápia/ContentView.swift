@@ -26,10 +26,10 @@ struct ContentView: View {
     /// For macOS search suggestions
     private var filteredSearchHistory: [String] {
         if model.searchText.isEmpty {
-            return state.searchHistory.map { $0.word }
+            return state.searchHistory
         }
 
-        return state.searchHistory.filter { $0.word.contains(model.searchText) }.map { $0.word }
+        return state.searchHistory.filter { $0.contains(model.searchText) }
     }
 
     private var macOSContentView: some View {
@@ -76,7 +76,8 @@ struct ContentView: View {
                 SearchContentUnavailableView(
                     searchResultsCount: model.searchResults.count,
                     searchText: model.searchText,
-                    searchIsFocused: $searchIsFocused
+                    searchIsFocused: $searchIsFocused,
+                    searchHistoryItems: []
                 )
             }
         }
@@ -111,7 +112,7 @@ struct ContentView: View {
                 searchResultsCount: model.searchResults.count,
                 searchText: model.searchText,
                 searchIsFocused: $searchIsFocused,
-                searchHistoryItems: state.searchHistory
+                searchHistoryItems: []
             )
         )
 #else
