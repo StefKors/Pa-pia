@@ -263,13 +263,11 @@ struct ContentView: View {
                             if #available(iOS 17.0, *) {
                                 TextField("Find words...", text: $model.searchText)
                                     .focused($searchIsFocused)
-                                //                                    .searchToolbar()
                                     .environmentObject(model)
                                     .defaultFocus($searchIsFocused, true)
                             } else {
                                 TextField("Find words...", text: $model.searchText)
                                     .focused($searchIsFocused)
-                                //                                    .searchToolbar()
                                     .environmentObject(model)
                             }
 
@@ -287,6 +285,12 @@ struct ContentView: View {
                         }
                         .padding(6)
                         .modifier(GlassEffectModifier())
+                        .onAppear {
+                            searchIsFocused = true
+                        }
+                        .task {
+                            searchIsFocused = true
+                        }
 
                         if showCancelButton {
                             Text("Cancel")
@@ -334,6 +338,7 @@ struct ContentView: View {
                     .scenePadding()
                 }
             }
+            .environmentObject(model)
         }
 #else
         EmptyView()
