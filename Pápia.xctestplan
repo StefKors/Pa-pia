@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "F39E9A91-690C-4EF8-A305-ABB998155763",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Pápia.xcodeproj",
+      "identifier" : "8AA903772BDF940C00D553A9",
+      "name" : "Pápia"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Pápia.xcodeproj",
+        "identifier" : "8AA903942BDF940D00D553A9",
+        "name" : "PápiaUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

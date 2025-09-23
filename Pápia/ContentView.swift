@@ -147,6 +147,7 @@ struct ContentView: View {
                         NavigationLink(value: word) {
                             WordView(word: word)
                         }
+                        .accessibilityLabel("word-list-word-view")
                     }
                 }
                 .scrollBounceBehavior(.basedOnSize)
@@ -180,26 +181,33 @@ struct ContentView: View {
                                     .focused($searchIsFocused)
                                     .environmentObject(model)
                                     .defaultFocus($searchIsFocused, true)
+                                    .accessibilityLabel("search-input")
                             } else {
                                 TextField("Find words...", text: $model.searchText)
                                     .focused($searchIsFocused)
                                     .environmentObject(model)
+                                    .accessibilityLabel("search-input")
                             }
-
-                            if showClearButton {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(Color.secondary)
-                                    .onTapGesture {
-                                        withAnimation(.smooth(duration: 0.3)) {
-                                            self.model.searchText = ""
-                                        }
-                                    }
-                                    .transition(.scale(scale: 0.7).combined(with: .opacity))
-                            }
-
                         }
                         .padding(6)
                         .modifier(GlassEffectModifier())
+                        .overlay(alignment: .trailing, content: {
+                            if showClearButton {
+                                Button {
+                                    self.model.searchText = ""
+                                    //                                    withAnimation(.smooth(duration: 0.3)) {
+                                    //                                    }
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(Color.secondary)
+                                        .padding(6)
+                                        .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                                .layoutPriority(1)
+                                .transition(.scale(scale: 0.7).combined(with: .opacity))
+                            }
+                        })
                         .onAppear {
                             searchIsFocused = true
                         }

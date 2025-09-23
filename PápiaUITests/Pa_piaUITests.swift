@@ -23,11 +23,60 @@ final class Pa_piaUITests: XCTestCase {
     }
 
     func testExample() throws {
-        // UI tests must launch the application that they test.
         let app = XCUIApplication()
-        app.launch()
+        app.activate()
+        let element = app.buttons["? any"].firstMatch
+        element.tap()
+        element.tap()
+        element.tap()
+        element.tap()
+        element.tap()
 
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        // confirm button result
+        XCTAssertEqual(app.textFields["search-input"].firstMatch.value as? String, "?????", "Expected search input to contain \"?????\"")
+
+        // navigate to word detail
+        app.buttons.matching(identifier: "word-list-word-view").firstMatch.tap()
+
+        // navigate back
+        app.staticTexts["navigation-back-button"].firstMatch.tap()
+
+        // clear input
+        let element2 = app.buttons["xmark.circle.fill"].firstMatch
+        element2.tap()
+        XCTAssertEqual(app.textFields["search-input"].firstMatch.value as? String, "", "Expected search input to be empty")
+
+
+    }
+
+    func testSearchAndNavigationPerformance() throws {
+        if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
+            // This measures how long it takes to launch your application.
+            measure() {
+                let app = XCUIApplication()
+                app.activate()
+                let element = app.buttons["? any"].firstMatch
+                element.tap()
+                element.tap()
+                element.tap()
+                element.tap()
+                element.tap()
+
+                // confirm button result
+                XCTAssertEqual(app.textFields["search-input"].firstMatch.value as? String, "?????", "Expected search input to contain \"?????\"")
+
+                // navigate to word detail
+                app.buttons.matching(identifier: "word-list-word-view").firstMatch.tap()
+
+                // navigate back
+                app.staticTexts["navigation-back-button"].firstMatch.tap()
+
+                // clear input
+                let element2 = app.buttons["xmark.circle.fill"].firstMatch
+                element2.tap()
+                XCTAssertEqual(app.textFields["search-input"].firstMatch.value as? String, "", "Expected search input to be empty")
+            }
+        }
     }
 
     func testLaunchPerformance() throws {

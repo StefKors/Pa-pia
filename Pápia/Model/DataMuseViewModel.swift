@@ -58,25 +58,46 @@ require that the results are spelled similarly to this string of characters, or 
 
     func addWordleInfo(list: [DataMuseWord]) async throws -> [DataMuseWord] {
         print("start")
-        let (bytes, _) = try await URLSession.shared.bytes(from: Bundle.main.url(forResource: "wordle-La", withExtension: "txt")!)
-        var wordleOptions = list.map { $0.word }.filter { $0.count == 5 }
 
-        var wordleMatches: [String] = []
+        guard !list.isEmpty else {
+            print("finish")
+            return list
+        }
+
+        guard let url = Bundle.main.url(forResource: "wordle-La", withExtension: "txt") else {
+            print("finish")
+            return list
+        }
+
+        // Cache candidate words in a set so membership checks and removals are O(1).
+        var remainingWordleCandidates = Set(list.lazy.filter { $0.word.count == 5 }.map { $0.word })
+
+        // If there are no candidates we can skip the file streaming entirely.
+        guard !remainingWordleCandidates.isEmpty else {
+            print("finish")
+            return list
+        }
+
+        var wordleMatches: Set<String> = []
+        let (bytes, _) = try await URLSession.shared.bytes(from: url)
 
         for try await line in bytes.lines {
             // todo: case insentisive compare thingy
-            let isMatch = wordleOptions.contains(line)
-            if (isMatch) {
-                wordleMatches.append(line)
-            }
+            if remainingWordleCandidates.remove(line) != nil {
+                wordleMatches.insert(line)
 
-            wordleOptions.removeAll(where: { $0 == line})
-            if wordleOptions.isEmpty {
-                break
+                if remainingWordleCandidates.isEmpty {
+                    break
+                }
             }
         }
 
-        let result = list.map { word in
+        guard !wordleMatches.isEmpty else {
+            print("finish")
+            return list
+        }
+
+        let result = list.map { word -> DataMuseWord in
             if wordleMatches.contains(word.word) {
                 return DataMuseWord(word: word.word, score: word.score, isWordle: true)
             }
@@ -314,4 +335,3 @@ require that the results are spelled similarly to this string of characters, or 
     ]
 
 }
-

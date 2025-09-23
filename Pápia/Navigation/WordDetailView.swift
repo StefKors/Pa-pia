@@ -112,35 +112,38 @@ struct WordDetailView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Image(systemName: "chevron.left")
-                    .bold()
-                    .font(.title3)
-
-                Text(word.word.capitalized)
-                    .font(.title)
-                    .bold()
-
-                if word.isWordle {
-                    Image(.wordle)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
-                }
-                //
-                //                if word.isWordle {
-                //                    Image(.scrabble)
-                //                        .resizable()
-                //                        .aspectRatio(contentMode: .fit)
-                //                        .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
-                //                }
-
-                Spacer()
-            }
-            .scenePadding(.horizontal)
-            .onTapGesture {
+            Button {
                 dismiss()
+            } label: {
+                HStack {
+                    Image(systemName: "chevron.left")
+                        .bold()
+                        .font(.title3)
+
+                    Text(word.word.capitalized)
+                        .font(.title)
+                        .bold()
+
+                    if word.isWordle {
+                        Image(.wordle)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
+                    }
+                    //
+                    //                if word.isWordle {
+                    //                    Image(.scrabble)
+                    //                        .resizable()
+                    //                        .aspectRatio(contentMode: .fit)
+                    //                        .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
+                    //                }
+
+                    Spacer()
+                }
+                .scenePadding(.horizontal)
+                .accessibilityLabel("navigation-back-button")
             }
+            .buttonStyle(.plain)
 
 
             ScrollViewReader { value in
