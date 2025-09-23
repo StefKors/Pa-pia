@@ -7,33 +7,6 @@
 
 import SwiftUI
 
-struct MyDisclosureStyle: DisclosureGroupStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        VStack {
-            Button {
-                withAnimation {
-                    configuration.isExpanded.toggle()
-                }
-            } label: {
-                HStack(alignment: .lastTextBaseline) {
-                    configuration.label
-                    Spacer()
-                    Text(configuration.isExpanded ? "hide" : "show")
-                        .foregroundColor(.accentColor)
-                        .font(.caption.lowercaseSmallCaps())
-                        .animation(nil, value: configuration.isExpanded)
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            if configuration.isExpanded {
-                configuration.content
-            }
-        }
-    }
-}
-
-
 // https://api.datamuse.com/words?ml=tree&qe=ml&md=dp&max=1
 struct DefinitionView: View {
     let def: DataMuseDefinition

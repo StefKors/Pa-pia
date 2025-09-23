@@ -80,32 +80,22 @@ struct WordDetailSectionView: View {
                             ForEach(info.words) { word in
 #if os(iOS)
                                 NavigationLink(value: word) {
-                                    WordView(word: word)
+                                    Text(word.word.capitalized)
                                 }
                                 .id(word)
-                                //                            NavigationLink {
-                                //                                WordDetailView(word: word)
-                                //                                    .task(id: word) {
-                                //                                        state.navigation.append(word)
-                                //                                    }
-                                //                            } label: {
-                                //                                Text(word.word.capitalized)
-                                //                            }
+                                .buttonStyle(NavigationButtonStyle())
 
 #else
                                 Button {
                                     state.navigation.append(word) // iOS
-                                                                  //                                state.selection = word
                                 } label: {
                                     Text(word.word.capitalized)
                                 }
                                 .buttonStyle(NavigationButtonStyle())
                                 .id(word)
 #endif
-
                             }
                         }
-                        //                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
             }

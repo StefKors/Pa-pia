@@ -63,7 +63,7 @@ struct WordDetailView: View {
 
 #else
 
-struct PillTag: View {
+struct NavigationPillTag: View {
     let label: String
     let isSelected: Bool
 
@@ -89,10 +89,10 @@ struct PillTag: View {
 
 #Preview {
     HStack {
-        PillTag(scope: .preview, isSelected: true)
-        PillTag(scope: .preview, isSelected: false)
-        PillTag(scope: .preview, isSelected: false)
-        PillTag(scope: .preview, isSelected: false)
+        NavigationPillTag(scope: .preview, isSelected: true)
+        NavigationPillTag(scope: .preview, isSelected: false)
+        NavigationPillTag(scope: .preview, isSelected: false)
+        NavigationPillTag(scope: .preview, isSelected: false)
     }
     .scenePadding()
 }
@@ -146,7 +146,7 @@ struct WordDetailView: View {
             ScrollViewReader { value in
                 ScrollView(.horizontal) {
                     HStack {
-                        PillTag(label: "Definition", isSelected: selectedScope == nil)
+                        NavigationPillTag(label: "Definition", isSelected: selectedScope == nil)
                             .onTapGesture {
                                 withAnimation(.snappy(duration: 0.1)) {
                                     selectedScope = nil
@@ -155,7 +155,7 @@ struct WordDetailView: View {
                             .id(DataMuseViewModel.SearchScope.none)
 
                         ForEach(model.relatedScopes) { scope in
-                            PillTag(scope: scope, isSelected: selectedScope == scope)
+                            NavigationPillTag(scope: scope, isSelected: selectedScope == scope)
                                 .onTapGesture {
                                     withAnimation(.snappy(duration: 0.1)) {
                                         selectedScope = scope
@@ -164,7 +164,7 @@ struct WordDetailView: View {
                                 .id(scope)
                         }
                     }
-                    .onChange(of: selectedScope, perform: { newValue in
+                    .onChange(of: selectedScope, initial: false, { oldValue, newValue in
                         withAnimation(.snappy(duration: 0.1)) {
                             if newValue == nil {
                                 value.scrollTo(DataMuseViewModel.SearchScope.none, anchor: .leading)
@@ -270,13 +270,10 @@ struct ModernPagedWordDetailView: View {
                     ScrollView(.vertical) {
                         VStack {
                             WordDetailListSectionView(scope: scope, word: word)
-
                         }
-                        //                        .scenePadding(.horizontal)
                     }
                     .ignoresSafeArea(.all, edges: .bottom)
                     .scrollBounceBehavior(.basedOnSize)
-                    //                    .containerRelativeFrame(.horizontal)
                     .containerRelativeFrame(.horizontal, count: 1, spacing: 8)
                     .id(scope)
                     .modifier(BookFlipScrollTransition())

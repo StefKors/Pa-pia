@@ -9,21 +9,6 @@ import SwiftUI
 import SwiftData
 import Get
 
-class InterfaceState: ObservableObject {
-    // Nothing selected by default.
-    @Published var selection: DataMuseWord?
-    @CodableAppStorage("search-history") var searchHistory: [DataMuseWord] = []
-    @CodableAppStorage("navigation-history") var navigationHistory: [DataMuseWord] = []
-
-    @Published var navigation: [DataMuseWord] = [] {
-        didSet {
-            if let latest = navigation.last {
-                navigationHistory.append(latest)
-            }
-        }
-    }
-}
-
 // TODO: add search progress @Environment(\.isSearching) private var isSearching
 // TODO: add indicator if the word exists in the wordle dictionary
 // TODO: add buttons to insert wild card character for complex searches
@@ -32,11 +17,10 @@ class InterfaceState: ObservableObject {
 // TODO: lazy load the Word Detail List Sections so they are loaded as you scroll, most are out of view anyways
 // TODO: add feature to favourite words
 struct ContentView: View {
-
     @StateObject private var model = DataMuseViewModel()
-
     @StateObject private var state = InterfaceState()
 
+    // macOS Search Focus
     @FocusState private var searchFocused: Bool
 
     /// For macOS search suggestions
@@ -48,7 +32,7 @@ struct ContentView: View {
         return state.searchHistory.filter { $0.word.contains(model.searchText) }.map { $0.word }
     }
 
-    var macOSContentView: some View {
+    private var macOSContentView: some View {
 #if os(macOS)
         NavigationSplitView {
             List(model.searchResults, selection: $state.selection) { word in
@@ -135,15 +119,15 @@ struct ContentView: View {
 #endif
     }
 
-    var showClearButton: Bool {
+    private var showClearButton: Bool {
         !model.searchText.isEmpty
     }
 
-    var showCancelButton: Bool {
+    private var showCancelButton: Bool {
         showClearButton || searchIsFocused
     }
 
-    var backgroundColor: Color {
+    private var backgroundColor: Color {
 #if os(macOS)
         Color(nsColor: NSColor.windowBackgroundColor)
 #else
@@ -151,9 +135,10 @@ struct ContentView: View {
 #endif
     }
 
+    // iOS search focus
     @FocusState private var searchIsFocused: Bool
 
-    var iOSContentView: some View {
+    private var iOSContentView: some View {
 #if os(iOS)
         NavigationStack(path: $state.navigation) {
             VStack(spacing: 0) {
@@ -164,6 +149,7 @@ struct ContentView: View {
                         }
                     }
                 }
+                .scrollBounceBehavior(.basedOnSize)
                 .navigationDestination(for: DataMuseWord.self, destination: { word in
                     WordDetailView(word: word)
                 })
@@ -245,34 +231,36 @@ struct ContentView: View {
 
                     ToolbarButtonsGroup()
 
-                    if #available(iOS 26.0, *), #available(macOS 26.0, *) {
-                        // Content in bottom overlay
-                        EmptyView()
-                    } else {
-                        Picker("Search Scope", selection: $model.searchScope) {
-                            ForEach(model.globalSearchScopes) { scope in
-                                Text(scope.label)
-                                    .tag(scope)
-                            }
-                        }.pickerStyle(.segmented)
+                    if !model.searchResults.isEmpty {
+                        if #available(iOS 26.0, *), #available(macOS 26.0, *) {
+                            // Content in bottom overlay
+                            EmptyView()
+                        } else {
+                            Picker("Search Scope", selection: $model.searchScope) {
+                                ForEach(model.globalSearchScopes) { scope in
+                                    Text(scope.label)
+                                        .tag(scope)
+                                }
+                            }.pickerStyle(.segmented)
+                        }
                     }
-
-
                 }
                 .scenePadding(.horizontal)
                 .scenePadding(.vertical)
             }
             .overlay(alignment: .bottom) {
-                if #available(iOS 26.0, *), #available(macOS 26.0, *) {
-                    Picker("Search Scope", selection: $model.searchScope) {
-                        ForEach(model.globalSearchScopes) { scope in
-                            Text(scope.label)
-                                .tag(scope)
+                if !model.searchResults.isEmpty {
+                    if #available(iOS 26.0, *), #available(macOS 26.0, *) {
+                        Picker("Search Scope", selection: $model.searchScope) {
+                            ForEach(model.globalSearchScopes) { scope in
+                                Text(scope.label)
+                                    .tag(scope)
+                            }
                         }
+                        .pickerStyle(.segmented)
+                        .glassEffect()
+                        .scenePadding()
                     }
-                    .pickerStyle(.segmented)
-                    .glassEffect()
-                    .scenePadding()
                 }
             }
             .environmentObject(model)
@@ -292,9 +280,18 @@ struct ContentView: View {
         }
         .environmentObject(state)
         .task(id: model.searchText) {
+            if model.searchText.isEmpty {
+                self.model.searchResults = []
+                return
+            }
+
             self.model.searchResults = await self.model.fetch(scope: self.model.searchScope, searchText: self.model.searchText)
         }
         .task(id: model.searchScope) {
+            if model.searchText.isEmpty {
+                self.model.searchResults = []
+                return
+            }
             self.model.searchResults = await self.model.fetch(scope: self.model.searchScope, searchText: self.model.searchText)
         }
     }

@@ -99,23 +99,12 @@ struct SearchContentUnavailableView: View {
                             Text("Start your search, then filter your query")
                         } actions: {
                             WrappingHStack(alignment: .center) {
-                                ForEach(searchHistoryItems, id: \.self) { item in
-                                    NavigationLink(value: item) {
-                                        WordView(word: item)
-                                            .foregroundStyle(.white)
+                                ForEach(searchHistoryItems, id: \.self) { word in
+                                    NavigationLink(value: word) {
+                                        Text(word.word.capitalized)
                                     }
-//                                    Button {
-//                                        /// todo: open
-//
-//                                    } label: {
-//                                        WordView(word: item)
-//                                            .foregroundStyle(.white)
-//                                    }
+                                    .id(word)
                                     .buttonStyle(NavigationButtonStyle())
-//                                    .foregroundStyle(.primary)
-//                                    .padding(.horizontal, 12)
-//                                    .padding(.vertical, 4)
-//                                    .background(.tint, in: Capsule())
                                 }
                             }
                         }
