@@ -35,6 +35,7 @@
 		8AB28DD32DB512730089CA2A /* Collection+AppStorage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB28DD22DB512730089CA2A /* Collection+AppStorage+Extension.swift */; };
 		8ABBAB022C3D26470060215F /* UINavigationController+Papia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ABBAB012C3D263D0060215F /* UINavigationController+Papia.swift */; };
 		8AC220C62D4A431E001F76C4 /* HighlightAttribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC220C52D4A431E001F76C4 /* HighlightAttribute.swift */; };
+		8AFC064E2E843F6D00C246DA /* papia.icon in Resources */ = {isa = PBXBuildFile; fileRef = 8AFC064D2E843F6D00C246DA /* papia.icon */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -100,6 +101,7 @@
 		8AC220C52D4A431E001F76C4 /* HighlightAttribute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightAttribute.swift; sourceTree = "<group>"; };
 		8AC7B4922CB51A1C00CBD21C /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		8AC7B4942CB51A1C00CBD21C /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		8AFC064D2E843F6D00C246DA /* papia.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = papia.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -164,6 +166,7 @@
 		8AA9037A2BDF940C00D553A9 /* Pápia */ = {
 			isa = PBXGroup;
 			children = (
+				8AFC064D2E843F6D00C246DA /* papia.icon */,
 				8A7F17F22E82A6F90094CD3F /* Model */,
 				8A7F17F12E829E340094CD3F /* Navigation */,
 				8A7F17DC2E8295EE0094CD3F /* iOSContentViewAdjustmentsView.swift */,
@@ -336,6 +339,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8AFC064E2E843F6D00C246DA /* papia.icon in Resources */,
 				8AA903822BDF940D00D553A9 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -541,7 +545,7 @@
 		8AA903A02BDF940D00D553A9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Beta";
+				ASSETCATALOG_COMPILER_APPICON_NAME = papia;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Pápia/Pa_pia.entitlements";
 				CODE_SIGN_STYLE = Automatic;
@@ -586,7 +590,7 @@
 		8AA903A12BDF940D00D553A9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = papia;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Pápia/Pa_pia.entitlements";
 				CODE_SIGN_STYLE = Automatic;

@@ -1,0 +1,40 @@
+{
+  "fill" : {
+    "automatic-gradient" : "display-p3:0.39404,0.55371,0.18469,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "fill" : {
+            "solid" : "extended-gray:1.00000,0.69944"
+          },
+          "glass" : true,
+          "image-name" : "🦆_ duck (U+1F986) - emojiall.svg",
+          "name" : "🦆_ duck (U+1F986) - emojiall",
+          "position" : {
+            "scale" : 22,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}
