@@ -8,6 +8,7 @@
 import Foundation
 import Get
 import Observation
+import SwiftUI
 
 let memoryCapacity = 1024 * 1024 * 1024 // 1 GB
 let diskCapacity = 2 * 1024 * 1024 * 1024 // 2 GB
@@ -17,6 +18,7 @@ let diskCapacity = 2 * 1024 * 1024 * 1024 // 2 GB
 /// get defintions: https://api.datamuse.com/words?ml=tree&qe=ml&md=dp&max=1
 class DataMuseViewModel: ObservableObject {
     @Published var searchText: String = ""
+    @Published var searchTextSelection: TextSelection? = nil
     /// TODO: don't hardcode?
     @Published var searchScope: SearchScope = SearchScope(
         queryParam: "sp",

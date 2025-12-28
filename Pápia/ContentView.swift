@@ -19,6 +19,7 @@ import Get
 struct ContentView: View {
     @StateObject private var model = DataMuseViewModel()
     @StateObject private var state = InterfaceState()
+    @State private var showSettings: Bool = false
 
     // macOS Search Focus
     @FocusState private var searchFocused: Bool
@@ -115,6 +116,28 @@ struct ContentView: View {
                 searchHistoryItems: []
             )
         )
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    showSettings = true
+                } label: {
+                    Image(systemName: "gearshape")
+                }
+                .help("Settings")
+            }
+        }
+        .sheet(isPresented: $showSettings) {
+            NavigationStack {
+                SettingsView()
+                    .navigationTitle("Settings")
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Done") { showSettings = false }
+                        }
+                    }
+            }
+            .frame(minWidth: 420, minHeight: 300)
+        }
 #else
         EmptyView()
 #endif
@@ -171,75 +194,6 @@ struct ContentView: View {
             .background(backgroundColor)
             .overlay(alignment: .top) {
                 VStack {
-                    HStack {
-                        HStack {
-                            Image(systemName: "magnifyingglass")
-                                .imageScale(.medium)
-                                .foregroundStyle(.tertiary)
-
-                            if #available(iOS 17.0, *) {
-                                TextField("Find words...", text: $model.searchText)
-                                    .focused($searchIsFocused)
-                                    .environmentObject(model)
-                                    .defaultFocus($searchIsFocused, true)
-                                    .accessibilityLabel("search-input")
-                            } else {
-                                TextField("Find words...", text: $model.searchText)
-                                    .focused($searchIsFocused)
-                                    .environmentObject(model)
-                                    .accessibilityLabel("search-input")
-                            }
-                        }
-                        .padding(6)
-                        .modifier(GlassEffectModifier())
-                        .overlay(alignment: .trailing, content: {
-                            if showClearButton {
-                                Button {
-                                    self.model.searchText = ""
-                                    //                                    withAnimation(.smooth(duration: 0.3)) {
-                                    //                                    }
-                                } label: {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundColor(Color.secondary)
-                                        .padding(6)
-                                        .contentShape(Rectangle())
-                                }
-                                .buttonStyle(.plain)
-                                .layoutPriority(1)
-                                .transition(.scale(scale: 0.7).combined(with: .opacity))
-                            }
-                        })
-                        .onAppear {
-                            searchIsFocused = true
-                        }
-                        .task {
-                            searchIsFocused = true
-                        }
-
-                        if showCancelButton {
-                            Text(searchIsFocused ? "Cancel" : "Clear")
-                                .onTapGesture {
-                                    if searchIsFocused {
-                                        withAnimation(.smooth(duration: 0.3)) {
-                                            searchIsFocused = false
-                                        }
-                                    } else {
-                                        withAnimation(.smooth(duration: 0.3)) {
-                                            self.model.searchText = ""
-                                        }
-                                    }
-                                }
-                                .transition(.move(edge: .trailing).combined(with: .opacity))
-                                .foregroundStyle(.tint)
-                                .animation(.smooth(duration: 0.3), value: searchIsFocused)
-                        }
-                    }
-                    .font(.body)
-                    .animation(.smooth(duration: 0.3), value: showClearButton)
-                    .animation(.smooth(duration: 0.3), value: showCancelButton)
-
-                    ToolbarButtonsGroup()
-
                     if !model.searchResults.isEmpty {
                         if #available(iOS 26.0, *), #available(macOS 26.0, *) {
                             // Content in bottom overlay
@@ -273,7 +227,60 @@ struct ContentView: View {
                 }
             }
             .environmentObject(model)
+            .overlay(alignment: .bottom) {
+                VStack(alignment: .trailing) {
+                    ToolbarButtonsGroup()
+                        .environmentObject(model)
+
+                    HStack {
+                        GlassEffectContainer {
+                            HStack {
+                                Image(systemName: "magnifyingglass")
+                                    .imageScale(.medium)
+                                    .foregroundStyle(.tertiary)
+                                TextField("Find words...", text: $model.searchText, selection: $model.searchTextSelection)
+                                    .focused($searchIsFocused)
+                                    .environmentObject(model)
+                                    .defaultFocus($searchIsFocused, true)
+                                    .accessibilityLabel("search-input")
+                            }
+                            //                    .padding(.horizontal, 6)
+
+                            .padding()
+                        }
+                        .glassEffect(.regular, in: .capsule(style: .continuous))
+
+                        if showClearButton {
+                            GlassEffectContainer {
+                                Button {
+                                    self.model.searchText = ""
+                                } label: {
+                                    Image(systemName: "xmark")
+                                        .foregroundColor(Color.secondary)
+                                        .imageScale(.medium)
+                                        .padding()
+                                }
+                                .layoutPriority(1)
+                                .transition(.scale(scale: 0.7).combined(with: .opacity))
+                            }
+                            .glassEffect(.regular, in: .capsule(style: .continuous))
+
+                        }
+                    }
+                }
+                .padding(.horizontal)
+            }
+//            .searchable(text: $model.searchText, placement: .navigationBarDrawer)
+//            .searchToolbarBehavior(.automatic)
+//            Button {
+//                showSettings = true
+//            } label: {
+//                Image(systemName: "gearshape")
+//            }
+//            .accessibilityLabel("open-settings")
+
         }
+        .animation(.snappy(duration: 0.16), value: showClearButton)
 #else
         EmptyView()
 #endif
@@ -288,6 +295,17 @@ struct ContentView: View {
 #endif
         }
         .environmentObject(state)
+        .sheet(isPresented: $showSettings) {
+            NavigationStack {
+                SettingsView()
+                    .navigationTitle("Settings")
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Done") { showSettings = false }
+                        }
+                    }
+            }
+        }
         .task(id: model.searchText) {
             if model.searchText.isEmpty {
                 self.model.searchResults = []

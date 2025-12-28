@@ -28,56 +28,65 @@ import SwiftUI
 
 struct ToolbarButtonsGroup: View {
     var body: some View {
-        VStack(spacing: 4) {
-            HStack(spacing: 4) {
-                ToolbarButtonComponent(
-                    label: "?",
-                    shortexplainer: "any",
-                    explainer: "The question mark (?) matches exactly one letter. That means that you can use it as a placeholder for a single letter or symbol. The query l?b?n?n,  for example, will find the word \"Lebanon\"."
-                )
+        HStack(alignment: .bottom, spacing: 4) {
+            VStack(alignment: .leading, spacing: 4) {
                 ToolbarButtonComponent(
                     label: "*",
                     shortexplainer: "many",
                     explainer: """
                                 The asterisk (*) matches any number of letters. An asterisk can match zero letters, too.
-                                """
+                                """,
+                    alignment: .leading
                 )
                 ToolbarButtonComponent(
                     label: "@",
                     shortexplainer: "any vowel",
                     explainer: """
                                 The at-sign (@) matches any English vowel (including "y"). For example, the query abo@t finds the word "about" but not "abort".
-                                """
+                                """,
+                    alignment: .leading
                 )
                 ToolbarButtonComponent(
-                    label: "//",
-                    shortexplainer: "unscramble",
-                    explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
+                    label: "?",
+                    shortexplainer: "any letter",
+                    explainer: "The question mark (?) matches exactly one letter. That means that you can use it as a placeholder for a single letter or symbol. The query l?b?n?n,  for example, will find the word \"Lebanon\".",
+                    alignment: .leading
                 )
             }
             .modifier(GlassContainerModifier(spacing: 18))
-            
-            HStack(spacing: 4) {
+
+            Spacer()
+
+            VStack(alignment: .trailing, spacing: 4) {
                 ToolbarButtonComponent(
                     label: ",",
                     shortexplainer: "combine",
                     explainer: """
                                 The comma (,) lets you combine multiple patterns into one. For example, the query ?????,*y* finds 5-letter words that contain a "y" somewhere, such as "happy" and "rhyme".
-                                """
+                                """,
+                    alignment: .trailing
                 )
                 ToolbarButtonComponent(
                     label: "-",
                     shortexplainer: "exclude",
                     explainer: """
                                 A minus sign (-) followed by some letters at the end of a pattern means "exclude these letters".
-                                """
+                                """,
+                    alignment: .trailing
                 )
                 ToolbarButtonComponent(
                     label: "+",
                     shortexplainer: "restrict",
                     explainer: """
                                 A plus sign (+) followed by some letters at the end of a pattern means "restrict to these letters".
-                                """
+                                """,
+                    alignment: .trailing
+                )
+                ToolbarButtonComponent(
+                    label: "//",
+                    shortexplainer: "unscramble",
+                    explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)",
+                    alignment: .trailing
                 )
             }
             .modifier(GlassContainerModifier(spacing: 18))
