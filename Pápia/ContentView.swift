@@ -192,19 +192,11 @@ struct ContentView: View {
                         searchHistoryItems: state.navigationHistory
                     )
                 )
+                .contentMargins(.top, 40, for: .scrollContent)
                 .contentMargins(.bottom, 200, for: .scrollContent)
                 .modifier(ScrollEdgeEffectModifier())
-            }
-            .scrollDismissesKeyboard(.immediately)
-            .background(backgroundColor)
-            .environmentObject(model)
-            .overlay(alignment: .bottom) {
-                VStack(alignment: .trailing) {
-                    ToolbarButtonsGroup()
-                        .environmentObject(model)
-
-                    HStack {
-                        Picker("Search Scope", selection: $model.searchScope) {
+                .overlay(alignment: .top) {
+                                Picker("Search Scope", selection: $model.searchScope) {
                             ForEach(model.globalSearchScopes) { scope in
                                 Text(scope.label)
                                     .font(.callout)
@@ -213,15 +205,15 @@ struct ContentView: View {
                         }
                         .pickerStyle(.segmented)
                         .glassEffect()
-//
-//                        Button {
-//                            showSettings = true
-//                        } label: {
-//                            Image(systemName: "gearshape")
-//                        }
-//                        .accessibilityLabel("open-settings")
-//                        .font(.callout)
-                    }
+                }
+            }
+            .scrollDismissesKeyboard(.immediately)
+            .background(backgroundColor)
+            .environmentObject(model)
+            .overlay(alignment: .bottom) {
+                VStack(alignment: .trailing) {
+                    ToolbarButtonsGroup()
+                        .environmentObject(model)
 
                     HStack {
                         GlassEffectContainer {
@@ -292,7 +284,7 @@ struct ContentView: View {
                     }
             }
         }
-        .task(id: model.searchText) {
+        .task(id: model.searchText, priority: .userInitiated) {
             if model.searchText.isEmpty {
                 self.model.searchResults = []
                 return
@@ -300,13 +292,15 @@ struct ContentView: View {
 
             self.model.searchResults = await self.model.fetch(scope: self.model.searchScope, searchText: self.model.searchText)
         }
-        .task(id: model.searchScope) {
+        .onChange(of: model.searchScope, initial: false, { oldValue, newValue in
             if model.searchText.isEmpty {
                 self.model.searchResults = []
                 return
             }
-            self.model.searchResults = await self.model.fetch(scope: self.model.searchScope, searchText: self.model.searchText)
-        }
+            Task(priority: .userInitiated) {
+                self.model.searchResults = await self.model.fetch(scope: newValue, searchText: self.model.searchText)
+            }
+        })
     }
 }
 

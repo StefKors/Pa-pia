@@ -37,7 +37,7 @@ struct WordDetailListSectionView: View {
                     .redacted(reason: .placeholder)
             }
         }
-        .task(id: scope) {
+        .task(id: scope, priority: .userInitiated) {
             let words = await model.fetch(scope: scope, searchText: word.word)
             withAnimation(.smooth) {
                 self.info = WordDetailInformation(scope: scope, words: words)

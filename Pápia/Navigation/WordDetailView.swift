@@ -48,7 +48,7 @@ struct WordDetailView: View {
             .scenePadding()
         }
         .navigationTitle(word.word.capitalized)
-        .task(id: word) {
+        .task(id: word, priority: .userInitiated) {
             self.results = []
             for scope in model.relatedScopes {
                 let words = await model.fetch(scope: scope, searchText: word.word)
