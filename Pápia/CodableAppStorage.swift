@@ -14,17 +14,12 @@ public struct CodableAppStorage<Value: Codable>: DynamicProperty {
 
     private let decoder = JSONDecoder()
     private let encoder = JSONEncoder()
-    private var key: String
 
     public init(wrappedValue: Value, _ key: String, store: UserDefaults? = nil) {
-        self.key = key
-
         do {
             let initialValue = try encoder.encode(wrappedValue)
-            print("CODABLE \(key) init wrappedValue: \(wrappedValue)")
             self._value = AppStorage(wrappedValue: initialValue, key, store: store)
         } catch {
-            print("CODABLE \(key) ERROR: \(error.localizedDescription) | fallback to empty data")
             self._value = AppStorage(wrappedValue: Data(), key, store: store)
         }
     }
@@ -32,21 +27,15 @@ public struct CodableAppStorage<Value: Codable>: DynamicProperty {
     public var wrappedValue: Value {
         get {
             do {
-                let result = try decoder.decode(Value.self, from: value)
-                print("CODABLE \(key) wrappedValue: \(result)")
-                return result
+                return try decoder.decode(Value.self, from: value)
             } catch {
-                print("CODABLE \(key) ERROR: \(error.localizedDescription) | fallback to force unwrap")
                 return try! decoder.decode(Value.self, from: value)
             }
         }
         nonmutating set {
             do {
-                let result = try encoder.encode(newValue)
-                print("CODABLE \(key) setting: \(newValue)")
-                value = result
+                value = try encoder.encode(newValue)
             } catch {
-                print("CODABLE \(key) ERROR: \(error.localizedDescription) | fallback to force unwrap")
                 value = try! encoder.encode(newValue)
             }
         }

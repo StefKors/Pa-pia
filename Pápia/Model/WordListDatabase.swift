@@ -7,6 +7,9 @@
 
 import Foundation
 import GRDB
+import os
+
+private let logger = Logger(subsystem: "com.stefkors.Papia", category: "WordListDatabase")
 
 /// A singleton database manager for word list lookups using SQLite
 actor WordListDatabase {
@@ -110,7 +113,7 @@ actor WordListDatabase {
         
         if fileManager.fileExists(atPath: dbURL.path) && existingVersion == currentVersion {
             // Database exists and is up to date
-            print("WordListDatabase: Using existing database")
+            logger.info("Using existing database")
             return try DatabaseQueue(path: dbURL.path)
         }
         
@@ -119,7 +122,7 @@ actor WordListDatabase {
             try fileManager.removeItem(at: dbURL)
         }
         
-        print("WordListDatabase: Creating new database...")
+        logger.info("Creating new database...")
         let dbQueue = try DatabaseQueue(path: dbURL.path)
         
         try await dbQueue.write { db in
@@ -144,7 +147,7 @@ actor WordListDatabase {
         // Save version
         try String(currentVersion).write(to: versionURL, atomically: true, encoding: .utf8)
         
-        print("WordListDatabase: Database created successfully")
+        logger.info("Database created successfully")
         return dbQueue
     }
     
@@ -163,7 +166,6 @@ actor WordListDatabase {
                     wordFlags[word] = flags
                 }
             }
-            print("WordListDatabase: Loaded wordle words")
         }
         
         // Load Scrabble words (sowpods)
@@ -177,7 +179,6 @@ actor WordListDatabase {
                     wordFlags[word] = flags
                 }
             }
-            print("WordListDatabase: Loaded scrabble words")
         }
         
         // Load Bongo common words
@@ -191,12 +192,9 @@ actor WordListDatabase {
                     wordFlags[word] = flags
                 }
             }
-            print("WordListDatabase: Loaded bongo common words")
         }
         
         // Batch insert all words
-        print("WordListDatabase: Inserting \(wordFlags.count) unique words...")
-        
         try await dbQueue.write { db in
             // Use a prepared statement for efficiency
             let insertSQL = "INSERT INTO words (word, isWordle, isScrabble, isCommonBongo) VALUES (?, ?, ?, ?)"
@@ -208,8 +206,6 @@ actor WordListDatabase {
                 )
             }
         }
-        
-        print("WordListDatabase: All words inserted")
     }
 }
 

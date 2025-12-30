@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+import os
+
+private let logger = Logger(subsystem: "com.stefkors.Papia", category: "App")
 
 @main
 struct Pa_piaApp: App {
@@ -15,7 +18,7 @@ struct Pa_piaApp: App {
             do {
                 try await WordListDatabase.shared.initialize()
             } catch {
-                print("Failed to initialize WordListDatabase: \(error)")
+                logger.error("Failed to initialize WordListDatabase: \(error)")
             }
         }
     }

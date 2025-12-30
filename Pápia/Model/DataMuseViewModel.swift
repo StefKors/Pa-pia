@@ -9,6 +9,9 @@ import Foundation
 import Get
 import Observation
 import SwiftUI
+import os
+
+private let logger = Logger(subsystem: "com.stefkors.Papia", category: "DataMuse")
 
 let memoryCapacity = 1024 * 1024 * 1024 // 1 GB
 let diskCapacity = 2 * 1024 * 1024 * 1024 // 2 GB
@@ -94,7 +97,6 @@ require that the results are spelled similarly to this string of characters, or 
             return []
         }
 
-        print("Query Definition for:", search)
         var result: [DataMuseDefinition] = []
         do {
             result = try await client.send(
@@ -109,7 +111,7 @@ require that the results are spelled similarly to this string of characters, or 
                 )
             ).value
         } catch {
-            print(error.localizedDescription)
+            logger.error("Failed to fetch definitions: \(error.localizedDescription)")
         }
 
         return result
@@ -127,7 +129,6 @@ require that the results are spelled similarly to this string of characters, or 
             return []
         }
 
-        print("Query:", path, scope.queryParam, search)
         var result: [DataMuseWord] = []
         do {
             result = try await client.send(
@@ -137,7 +138,7 @@ require that the results are spelled similarly to this string of characters, or 
                 )
             ).value
         } catch {
-            print(error.localizedDescription)
+            logger.error("Query failed for \(path) with scope \(scope.queryParam): \(error.localizedDescription)")
         }
 
         return result

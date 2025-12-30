@@ -90,7 +90,7 @@ struct ContentView: View {
                     highlightedText: model.searchText,
                     shapeStyle: .tint.opacity(0.4)
                 )
-                    .searchCompletion(suggestion)
+                .searchCompletion(suggestion)
             }
         }
         .onSubmit(of: .search, {
@@ -180,6 +180,7 @@ struct ContentView: View {
                         .accessibilityLabel("word-list-word-view")
                     }
                 }
+                .scrollEdgeEffectStyle(.soft, for: .vertical)
                 .scrollBounceBehavior(.basedOnSize)
                 .navigationDestination(for: DataMuseWord.self, destination: { word in
                     WordDetailView(word: word)
@@ -192,19 +193,20 @@ struct ContentView: View {
                         searchHistoryItems: state.navigationHistory
                     )
                 )
-                .contentMargins(.top, 40, for: .scrollContent)
+                .padding(.top, 60)
+//                .contentMargins(.top, 60, for: .scrollContent)
                 .contentMargins(.bottom, 200, for: .scrollContent)
-                .modifier(ScrollEdgeEffectModifier())
                 .overlay(alignment: .top) {
-                        Picker("Search Scope", selection: $model.searchScope) {
-                            ForEach(model.globalSearchScopes) { scope in
-                                Text(scope.label)
-                                    .font(.callout)
-                                    .tag(scope)
-                            }
+                    Picker("Search Scope", selection: $model.searchScope) {
+                        ForEach(model.globalSearchScopes) { scope in
+                            Text(scope.label)
+                                .font(.callout)
+                                .tag(scope)
                         }
-                        .pickerStyle(.segmented)
-                        .glassEffect()
+                    }
+                    .pickerStyle(.segmented)
+                    .glassEffect()
+                    .scenePadding()
                 }
             }
             .scrollDismissesKeyboard(.immediately)
