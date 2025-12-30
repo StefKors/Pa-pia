@@ -193,8 +193,7 @@ struct ContentView: View {
                         searchHistoryItems: state.navigationHistory
                     )
                 )
-                .padding(.top, 60)
-//                .contentMargins(.top, 60, for: .scrollContent)
+                .contentMargins(.top, 60, for: .scrollContent)
                 .contentMargins(.bottom, 200, for: .scrollContent)
                 .overlay(alignment: .top) {
                     Picker("Search Scope", selection: $model.searchScope) {
