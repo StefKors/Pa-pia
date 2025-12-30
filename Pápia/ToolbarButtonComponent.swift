@@ -28,7 +28,6 @@ struct ToolbarButtonComponent: View {
             onTap: { insertLabel() },
             onLongPress: { onLongPress?(explainer) }
         )
-        .font(.callout)
         .modifier(PrimaryButtonModifier())
         .fixedSize()
         .help(explainer)
