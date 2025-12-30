@@ -45,7 +45,7 @@ struct ToolbarButtonsGroup: View {
             if let presentedExplainer {
                 Text(presentedExplainer)
                     .scenePadding()
-                    .glassEffect()
+                    .glassEffect(in: RoundedRectangle(cornerRadius: 18))
                     .modifier(GlassContainerModifier(spacing: 18))
                     .transition(.scale.combined(with: .opacity).combined(with: .blurReplace))
             }

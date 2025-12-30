@@ -77,7 +77,7 @@ struct PlatformButton: UIViewRepresentable {
         button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .callout)
         button.setContentHuggingPriority(.required, for: .horizontal)
         button.setContentHuggingPriority(.required, for: .vertical)
-        button.configuration = .clearGlass()
+        button.configuration = .glass()
 
         // Tap gesture - requires long press to fail first
         let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleTap))
