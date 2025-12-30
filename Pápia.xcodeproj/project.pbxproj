@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A4FB41B2F04626300FD1417 /* ci_post_clone.sh in Resources */ = {isa = PBXBuildFile; fileRef = 8A4FB4192F04626300FD1417 /* ci_post_clone.sh */; };
 		8A7F17F72E82AF1D0094CD3F /* Pápia.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 8A7F17F62E82AF1D0094CD3F /* Pápia.xctestplan */; };
 		8AA903AB2BDF993500D553A9 /* Get in Frameworks */ = {isa = PBXBuildFile; productRef = 8AA903AA2BDF993500D553A9 /* Get */; };
 		8AA903AD2BDF993A00D553A9 /* Get in Frameworks */ = {isa = PBXBuildFile; productRef = 8AA903AC2BDF993A00D553A9 /* Get */; };
@@ -45,6 +46,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8A4FB4192F04626300FD1417 /* ci_post_clone.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = ci_post_clone.sh; sourceTree = "<group>"; };
 		8A7F17F62E82AF1D0094CD3F /* Pápia.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Pápia.xctestplan"; sourceTree = "<group>"; };
 		8A8016422BE1062E005DEE89 /* Pa-pia-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Pa-pia-Info.plist"; sourceTree = SOURCE_ROOT; };
 		8AA903782BDF940C00D553A9 /* Pápia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pápia.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -101,9 +103,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8A4FB41A2F04626300FD1417 /* ci_scripts */ = {
+			isa = PBXGroup;
+			children = (
+				8A4FB4192F04626300FD1417 /* ci_post_clone.sh */,
+			);
+			path = ci_scripts;
+			sourceTree = "<group>";
+		};
 		8AA9036F2BDF940C00D553A9 = {
 			isa = PBXGroup;
 			children = (
+				8A4FB41A2F04626300FD1417 /* ci_scripts */,
 				8A7F17F62E82AF1D0094CD3F /* Pápia.xctestplan */,
 				8A8016422BE1062E005DEE89 /* Pa-pia-Info.plist */,
 				8A6C8E702E8A6B3500D6049C /* Pápia */,
@@ -261,6 +272,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8A4FB41B2F04626300FD1417 /* ci_post_clone.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
