@@ -23,12 +23,20 @@ struct ToolbarButtonComponent: View {
                     let indices = searchTextSelection.indices
                     switch indices {
                     case .selection(let range):
-                        // TODO: move selection correctly to after the newly inserted text
+                        // Calculate insertion position as integer offset before mutation
+                        let insertionOffset = self.model.searchText.distance(from: self.model.searchText.startIndex, to: range.lowerBound)
                         self.model.searchText.replaceSubrange(range, with: self.label)
-                        model.searchTextSelection = TextSelection(insertionPoint: range.upperBound)
+                        // Position cursor after the inserted text
+                        let newCursorOffset = insertionOffset + self.label.count
+                        let newCursorIndex = self.model.searchText.index(self.model.searchText.startIndex, offsetBy: newCursorOffset)
+                        model.searchTextSelection = TextSelection(insertionPoint: newCursorIndex)
                     case .multiSelection(let rangeSet):
                         if let range = rangeSet.ranges.last {
+                            let insertionOffset = self.model.searchText.distance(from: self.model.searchText.startIndex, to: range.lowerBound)
                             self.model.searchText.replaceSubrange(range, with: self.label)
+                            let newCursorOffset = insertionOffset + self.label.count
+                            let newCursorIndex = self.model.searchText.index(self.model.searchText.startIndex, offsetBy: newCursorOffset)
+                            model.searchTextSelection = TextSelection(insertionPoint: newCursorIndex)
                         }
                     @unknown default:
                         self.model.searchText += self.label
