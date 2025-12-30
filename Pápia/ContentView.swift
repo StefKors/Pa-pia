@@ -131,9 +131,15 @@ struct ContentView: View {
                 SettingsView()
                     .navigationTitle("Settings")
                     .toolbar {
+#if os(macOS)
+                        ToolbarItem {
+                            Button("Done") { showSettings = false }
+                        }
+#else
                         ToolbarItem(placement: .topBarTrailing) {
                             Button("Done") { showSettings = false }
                         }
+#endif
                     }
             }
             .frame(minWidth: 420, minHeight: 300)
@@ -178,8 +184,6 @@ struct ContentView: View {
                 .navigationDestination(for: DataMuseWord.self, destination: { word in
                     WordDetailView(word: word)
                 })
-
-                .contentMargins(.vertical, 140, for: .scrollContent)
                 .modifier(
                     iOSContentViewAdjustmentsView(
                         searchResultsCount: model.searchResults.count,
@@ -188,49 +192,36 @@ struct ContentView: View {
                         searchHistoryItems: state.navigationHistory
                     )
                 )
+                .contentMargins(.bottom, 200, for: .scrollContent)
                 .modifier(ScrollEdgeEffectModifier())
             }
             .scrollDismissesKeyboard(.immediately)
             .background(backgroundColor)
-            .overlay(alignment: .top) {
-                VStack {
-                    if !model.searchResults.isEmpty {
-                        if #available(iOS 26.0, *), #available(macOS 26.0, *) {
-                            // Content in bottom overlay
-                            EmptyView()
-                        } else {
-                            Picker("Search Scope", selection: $model.searchScope) {
-                                ForEach(model.globalSearchScopes) { scope in
-                                    Text(scope.label)
-                                        .tag(scope)
-                                }
-                            }.pickerStyle(.segmented)
-                        }
-                    }
-                }
-                .scenePadding(.horizontal)
-                .scenePadding(.vertical)
-            }
-            .overlay(alignment: .bottom) {
-                if !model.searchResults.isEmpty {
-                    if #available(iOS 26.0, *), #available(macOS 26.0, *) {
-                        Picker("Search Scope", selection: $model.searchScope) {
-                            ForEach(model.globalSearchScopes) { scope in
-                                Text(scope.label)
-                                    .tag(scope)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                        .glassEffect()
-                        .scenePadding()
-                    }
-                }
-            }
             .environmentObject(model)
             .overlay(alignment: .bottom) {
                 VStack(alignment: .trailing) {
                     ToolbarButtonsGroup()
                         .environmentObject(model)
+
+                    HStack {
+                        Picker("Search Scope", selection: $model.searchScope) {
+                            ForEach(model.globalSearchScopes) { scope in
+                                Text(scope.label)
+                                    .font(.callout)
+                                    .tag(scope)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .glassEffect()
+//
+//                        Button {
+//                            showSettings = true
+//                        } label: {
+//                            Image(systemName: "gearshape")
+//                        }
+//                        .accessibilityLabel("open-settings")
+//                        .font(.callout)
+                    }
 
                     HStack {
                         GlassEffectContainer {
@@ -244,8 +235,6 @@ struct ContentView: View {
                                     .defaultFocus($searchIsFocused, true)
                                     .accessibilityLabel("search-input")
                             }
-                            //                    .padding(.horizontal, 6)
-
                             .padding()
                         }
                         .glassEffect(.regular, in: .capsule(style: .continuous))
@@ -270,15 +259,6 @@ struct ContentView: View {
                 }
                 .padding(.horizontal)
             }
-//            .searchable(text: $model.searchText, placement: .navigationBarDrawer)
-//            .searchToolbarBehavior(.automatic)
-//            Button {
-//                showSettings = true
-//            } label: {
-//                Image(systemName: "gearshape")
-//            }
-//            .accessibilityLabel("open-settings")
-
         }
         .animation(.snappy(duration: 0.16), value: showClearButton)
 #else
@@ -300,9 +280,15 @@ struct ContentView: View {
                 SettingsView()
                     .navigationTitle("Settings")
                     .toolbar {
+#if os(macOS)
+                        ToolbarItem {
+                            Button("Done") { showSettings = false }
+                        }
+#else
                         ToolbarItem(placement: .topBarTrailing) {
                             Button("Done") { showSettings = false }
                         }
+#endif
                     }
             }
         }
