@@ -49,7 +49,7 @@ require that the results are spelled similarly to this string of characters, or 
 
     func fetch(scope: SearchScope, searchText: String) async -> [DataMuseWord] {
         let list = await query("/words", scope: scope, search: searchText)
-        return (try? await addWordInfo(list: list)) ?? list
+        return await addWordInfo(list: list)
     }
 
     func autocomplete() {
@@ -58,95 +58,32 @@ require that the results are spelled similarly to this string of characters, or 
         }
     }
 
-    func addWordInfo(list: [DataMuseWord]) async throws -> [DataMuseWord] {
+    func addWordInfo(list: [DataMuseWord]) async -> [DataMuseWord] {
         guard !list.isEmpty else {
             return list
         }
 
-        // Normalize all candidate words to lowercase for case-insensitive matching
-        let candidateWords = Set(list.map { $0.word.lowercased() })
-
-        // Load all word lists concurrently
-        async let wordleMatches = loadWordMatches(
-            resource: "wordle-La",
-            extension: "txt",
-            candidates: candidateWords.filter { $0.count == 5 }
-        )
-        async let scrabbleMatches = loadWordMatches(
-            resource: "sowpods",
-            extension: "txt",
-            candidates: candidateWords
-        )
-        async let bongoMatches = loadWordMatches(
-            resource: "bongo-commonWords",
-            extension: "txt",
-            candidates: candidateWords
-        )
-
-        let (wordle, scrabble, bongo) = await (
-            (try? wordleMatches) ?? [],
-            (try? scrabbleMatches) ?? [],
-            (try? bongoMatches) ?? []
-        )
+        // Use SQLite database for fast batch lookup
+        let words = list.map { $0.word }
+        let wordFlags = await WordListDatabase.shared.lookupWords(words)
 
         // Map results with all flags
         let result = list.map { word -> DataMuseWord in
             let lowercased = word.word.lowercased()
-            let isWordle = wordle.contains(lowercased)
-            let isScrabble = scrabble.contains(lowercased)
-            let isCommonBongo = bongo.contains(lowercased)
-
-            if isWordle || isScrabble || isCommonBongo {
+            
+            if let flags = wordFlags[lowercased] {
                 return DataMuseWord(
                     word: word.word,
                     score: word.score,
-                    isWordle: isWordle,
-                    isScrabble: isScrabble,
-                    isCommonBongo: isCommonBongo
+                    isWordle: flags.isWordle,
+                    isScrabble: flags.isScrabble,
+                    isCommonBongo: flags.isCommonBongo
                 )
             }
             return word
         }
 
         return result
-    }
-
-    /// Loads a word list file and returns matches against the given candidates
-    private func loadWordMatches(
-        resource: String,
-        extension ext: String,
-        candidates: Set<String>,
-        subdirectory: String? = nil
-    ) async throws -> Set<String> {
-        guard !candidates.isEmpty else {
-            return []
-        }
-
-        guard let url = Bundle.main.url(forResource: resource, withExtension: ext, subdirectory: subdirectory) else {
-            print("Failed to load word list file: \(resource).\(ext)")
-            return []
-        }
-
-        var remainingCandidates = candidates
-        var matches: Set<String> = []
-
-        let (bytes, _) = try await URLSession.shared.bytes(from: url)
-
-        for try await line in bytes.lines {
-            let lowercasedLine = line.lowercased()
-            if resource == "bongo-commonWords" {
-                print("Bongo word: \(lowercasedLine) comparing to: \(remainingCandidates)")
-            }
-            if remainingCandidates.remove(lowercasedLine) != nil {
-                matches.insert(lowercasedLine)
-
-                if remainingCandidates.isEmpty {
-                    break
-                }
-            }
-        }
-
-        return matches
     }
 
     func definitions(search: String) async -> [DataMuseDefinition] {

@@ -196,7 +196,7 @@ struct ContentView: View {
                 .contentMargins(.bottom, 200, for: .scrollContent)
                 .modifier(ScrollEdgeEffectModifier())
                 .overlay(alignment: .top) {
-                                Picker("Search Scope", selection: $model.searchScope) {
+                        Picker("Search Scope", selection: $model.searchScope) {
                             ForEach(model.globalSearchScopes) { scope in
                                 Text(scope.label)
                                     .font(.callout)
@@ -292,7 +292,7 @@ struct ContentView: View {
 
             self.model.searchResults = await self.model.fetch(scope: self.model.searchScope, searchText: self.model.searchText)
         }
-        .onChange(of: model.searchScope, initial: false, { oldValue, newValue in
+        .onChange(of: model.searchScope, initial: true, { oldValue, newValue in
             if model.searchText.isEmpty {
                 self.model.searchResults = []
                 return
