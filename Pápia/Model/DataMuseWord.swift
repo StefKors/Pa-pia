@@ -12,6 +12,8 @@ struct DataMuseWord: Identifiable, Codable, Hashable {
     let score: Int
 
     var isWordle: Bool = false
+    var isScrabble: Bool = false
+    var isCommonBongo: Bool = false
 
     var id: String {
         self.word + "-" + self.score.description
@@ -22,10 +24,12 @@ struct DataMuseWord: Identifiable, Codable, Hashable {
         self.score = score
     }
 
-    init(word: String, score: Int, isWordle: Bool) {
+    init(word: String, score: Int, isWordle: Bool, isScrabble: Bool, isCommonBongo: Bool) {
         self.word = word
         self.score = score
         self.isWordle = isWordle
+        self.isScrabble = isScrabble
+        self.isCommonBongo = isCommonBongo
     }
 
     enum CodingKeys: CodingKey {

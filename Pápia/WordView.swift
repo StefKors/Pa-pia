@@ -21,12 +21,19 @@ struct WordView: View {
                     .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
             }
 
-//            if word.isWordle {
-//                Image(.scrabble)
-//                    .resizable()
-//                    .aspectRatio(contentMode: .fit)
-//                    .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
-//            }
+            if word.isScrabble {
+                Image(.scrabble)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
+            }
+
+            if word.isCommonBongo {
+                Image(.bongo)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
+            }
         }
     }
 }
