@@ -251,6 +251,7 @@ struct ContentView: View {
                     }
                 }
                 .padding(.horizontal)
+                .padding(.bottom, 6)
             }
         }
         .animation(.snappy(duration: 0.16), value: showClearButton)
