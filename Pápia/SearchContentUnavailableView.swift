@@ -1,6 +1,6 @@
 //
 //  SearchContentUnavailableView.swift
-//  Pápia
+//  Pápia
 //
 //  Created by Stef Kors on 30/04/2024.
 //
@@ -9,13 +9,14 @@ import SwiftUI
 import SwiftData
 
 extension View {
-    func searchContentUnavailableView(searchResultsCount: Int, searchText: String, searchIsFocused: FocusState<Bool>.Binding, searchHistoryItems: [DataMuseWord]) -> some View {
+    func searchContentUnavailableView(searchResultsCount: Int, searchText: String, searchIsFocused: FocusState<Bool>.Binding, searchHistoryItems: [DataMuseWord], showSettings: Binding<Bool>) -> some View {
         modifier(
             SearchContentUnavailableViewModifier(
                 searchResultsCount: searchResultsCount,
                 searchText: searchText,
                 searchIsFocused: searchIsFocused,
-                searchHistoryItems: searchHistoryItems
+                searchHistoryItems: searchHistoryItems,
+                showSettings: showSettings
             )
         )
     }
@@ -26,6 +27,7 @@ struct SearchContentUnavailableViewModifier: ViewModifier {
     let searchText: String
     let searchIsFocused: FocusState<Bool>.Binding
     let searchHistoryItems: [DataMuseWord]
+    @Binding var showSettings: Bool
 
     func body(content: Content) -> some View {
         content
@@ -34,7 +36,8 @@ struct SearchContentUnavailableViewModifier: ViewModifier {
                     searchResultsCount: searchResultsCount,
                     searchText: searchText,
                     searchIsFocused: searchIsFocused,
-                    searchHistoryItems: searchHistoryItems
+                    searchHistoryItems: searchHistoryItems,
+                    showSettings: $showSettings
                 )
             }
     }
@@ -47,6 +50,7 @@ struct SearchContentUnavailableView: View {
     let searchText: String
     let searchIsFocused: FocusState<Bool>.Binding
     let searchHistoryItems: [DataMuseWord]
+    @Binding var showSettings: Bool
 
     @State private var isDragging = false
     @State private var ignoreDragging = false
@@ -94,7 +98,7 @@ struct SearchContentUnavailableView: View {
                 Group {
                     if #available(iOS 17.0, *) {
                         ContentUnavailableView {
-                            Label("Search Pápia...", systemImage: "bird.fill")
+                            Label("Search Pápia...", systemImage: "bird.fill")
                         } description: {
                             Text("Start your search, then filter your query")
                         } actions: {
@@ -107,10 +111,17 @@ struct SearchContentUnavailableView: View {
                                     .buttonStyle(NavigationButtonStyle())
                                 }
                             }
+                            
+                            Button {
+                                showSettings = true
+                            } label: {
+                                Label("Settings", systemImage: "gearshape")
+                            }
+                            .buttonStyle(.bordered)
                         }
                     } else {
                         VStack {
-                            Label("Search Pápia...", systemImage: "bird.fill")
+                            Label("Search Pápia...", systemImage: "bird.fill")
                             Text("Start your search, then filter your query")
                         }
                     }

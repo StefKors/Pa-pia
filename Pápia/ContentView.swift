@@ -78,7 +78,8 @@ struct ContentView: View {
                     searchResultsCount: model.searchResults.count,
                     searchText: model.searchText,
                     searchIsFocused: $searchIsFocused,
-                    searchHistoryItems: []
+                    searchHistoryItems: [],
+                    showSettings: $showSettings
                 )
             }
         }
@@ -113,7 +114,8 @@ struct ContentView: View {
                 searchResultsCount: model.searchResults.count,
                 searchText: model.searchText,
                 searchIsFocused: $searchIsFocused,
-                searchHistoryItems: []
+                searchHistoryItems: [],
+                showSettings: $showSettings
             )
         )
         .toolbar {
@@ -190,7 +192,8 @@ struct ContentView: View {
                         searchResultsCount: model.searchResults.count,
                         searchText: model.searchText,
                         searchIsFocused: $searchIsFocused,
-                        searchHistoryItems: state.navigationHistory
+                        searchHistoryItems: state.navigationHistory,
+                        showSettings: $showSettings
                     )
                 )
                 .contentMargins(.top, 60, for: .scrollContent)
