@@ -36,7 +36,7 @@ struct ContentView: View {
     private var macOSContentView: some View {
 #if os(macOS)
         NavigationSplitView {
-            List(model.searchResults, selection: $state.selection) { word in
+            List(model.filteredSearchResults, selection: $state.selection) { word in
                 WordView(word: word)
                     .tag(word)
             }
@@ -75,7 +75,7 @@ struct ContentView: View {
                 }
             } else {
                 SearchContentUnavailableView(
-                    searchResultsCount: model.searchResults.count,
+                    searchResultsCount: model.filteredSearchResults.count,
                     searchText: model.searchText,
                     searchIsFocused: $searchIsFocused,
                     searchHistoryItems: [],
@@ -84,6 +84,12 @@ struct ContentView: View {
             }
         }
         .searchable(text: $model.searchText, placement: .toolbar, prompt: "Find words...")
+        .toolbar {
+            ToolbarItem(placement: .automatic) {
+                FilterButtonsGroup()
+                    .environmentObject(model)
+            }
+        }
         .searchSuggestions {
             ForEach(filteredSearchHistory, id: \.self) { suggestion in
                 HighlightedText(
@@ -111,7 +117,7 @@ struct ContentView: View {
         .environmentObject(state)
         .modifier(
             iOSContentViewAdjustmentsView(
-                searchResultsCount: model.searchResults.count,
+                searchResultsCount: model.filteredSearchResults.count,
                 searchText: model.searchText,
                 searchIsFocused: $searchIsFocused,
                 searchHistoryItems: [],
@@ -175,7 +181,7 @@ struct ContentView: View {
         NavigationStack(path: $state.navigation) {
             VStack(spacing: 0) {
                 List {
-                    ForEach(model.searchResults) { word in
+                    ForEach(model.filteredSearchResults) { word in
                         NavigationLink(value: word) {
                             WordView(word: word)
                         }
@@ -189,25 +195,30 @@ struct ContentView: View {
                 })
                 .modifier(
                     iOSContentViewAdjustmentsView(
-                        searchResultsCount: model.searchResults.count,
+                        searchResultsCount: model.filteredSearchResults.count,
                         searchText: model.searchText,
                         searchIsFocused: $searchIsFocused,
                         searchHistoryItems: state.navigationHistory,
                         showSettings: $showSettings
                     )
                 )
-                .contentMargins(.top, 60, for: .scrollContent)
+                .contentMargins(.top, 110, for: .scrollContent)
                 .contentMargins(.bottom, 200, for: .scrollContent)
                 .overlay(alignment: .top) {
-                    Picker("Search Scope", selection: $model.searchScope) {
-                        ForEach(model.globalSearchScopes) { scope in
-                            Text(scope.label)
-                                .font(.callout)
-                                .tag(scope)
+                    VStack(spacing: 8) {
+                        Picker("Search Scope", selection: $model.searchScope) {
+                            ForEach(model.globalSearchScopes) { scope in
+                                Text(scope.label)
+                                    .font(.callout)
+                                    .tag(scope)
+                            }
                         }
+                        .pickerStyle(.segmented)
+                        .glassEffect()
+                        
+                        FilterButtonsGroup()
+                            .environmentObject(model)
                     }
-                    .pickerStyle(.segmented)
-                    .glassEffect()
                     .scenePadding()
                 }
             }
