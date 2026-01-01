@@ -73,7 +73,7 @@ struct PlatformButton: UIViewRepresentable {
     func makeUIView(context: Context) -> UIButton {
         let button = UIButton(type: .system)
         button.setTitle(label, for: .normal)
-        button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .callout)
+        button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
         button.setContentHuggingPriority(.required, for: .horizontal)
         button.setContentHuggingPriority(.required, for: .vertical)
         button.configuration = .glass()
@@ -140,7 +140,7 @@ struct PlatformButton: NSViewRepresentable {
         let button = NSButton(title: label, target: context.coordinator, action: #selector(Coordinator.handleTap))
         button.bezelStyle = .inline
         button.isBordered = false
-        button.font = NSFont.preferredFont(forTextStyle: .callout)
+        button.font = NSFont.preferredFont(forTextStyle: .body)
         button.setContentHuggingPriority(.required, for: .horizontal)
         button.setContentHuggingPriority(.required, for: .vertical)
         
