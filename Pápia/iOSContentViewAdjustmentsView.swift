@@ -13,6 +13,7 @@ struct iOSContentViewAdjustmentsView: ViewModifier {
     let searchText: String
     let searchIsFocused: FocusState<Bool>.Binding
     let searchHistoryItems: [DataMuseWord]
+    @Binding var showSettings: Bool
     func body(content: Content) -> some View {
 #if os(macOS)
         content
@@ -23,7 +24,8 @@ struct iOSContentViewAdjustmentsView: ViewModifier {
                 searchResultsCount: searchResultsCount,
                 searchText: searchText,
                 searchIsFocused: searchIsFocused,
-                searchHistoryItems: searchHistoryItems
+                searchHistoryItems: searchHistoryItems,
+                showSettings: $showSettings
             )
 #endif
     }
