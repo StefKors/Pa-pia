@@ -16,12 +16,39 @@ private let logger = Logger(subsystem: "com.stefkors.Papia", category: "DataMuse
 let memoryCapacity = 1024 * 1024 * 1024 // 1 GB
 let diskCapacity = 2 * 1024 * 1024 * 1024 // 2 GB
 
+/// Filter options for word results
+enum WordFilter: String, CaseIterable, Identifiable, Codable {
+    case wordle = "wordle"
+    case scrabble = "scrabble"
+    case bongo = "bongo"
+    
+    var id: String { rawValue }
+    
+    var label: String {
+        switch self {
+        case .wordle: return "Wordle"
+        case .scrabble: return "Scrabble"
+        case .bongo: return "Bongo"
+        }
+    }
+    
+    var imageName: String {
+        switch self {
+        case .wordle: return "wordle"
+        case .scrabble: return "scrabble"
+        case .bongo: return "bongo"
+        }
+    }
+}
 
 /// https://api.datamuse.com/words?ml=tree&qe=ml&md=dpfcy&max=1&rif=1&k=olthes_r4
 /// get defintions: https://api.datamuse.com/words?ml=tree&qe=ml&md=dp&max=1
 class DataMuseViewModel: ObservableObject {
     @Published var searchText: String = ""
     @Published var searchTextSelection: TextSelection? = nil
+    
+    /// Active filters for word results
+    @Published var activeFilters: Set<WordFilter> = []
     /// TODO: don't hardcode?
     @Published var searchScope: SearchScope = SearchScope(
         queryParam: "sp",
@@ -41,6 +68,41 @@ require that the results are spelled similarly to this string of characters, or 
 
     @Published var searchResults: [DataMuseWord] = []
     @Published var suggestedSearches: [DataMuseWord] = []
+    
+    /// Filtered search results based on active filters
+    var filteredSearchResults: [DataMuseWord] {
+        guard !activeFilters.isEmpty else {
+            return searchResults
+        }
+        
+        return searchResults.filter { word in
+            for filter in activeFilters {
+                switch filter {
+                case .wordle:
+                    if !word.isWordle { return false }
+                case .scrabble:
+                    if !word.isScrabble { return false }
+                case .bongo:
+                    if !word.isCommonBongo { return false }
+                }
+            }
+            return true
+        }
+    }
+    
+    /// Toggle a filter on or off
+    func toggleFilter(_ filter: WordFilter) {
+        if activeFilters.contains(filter) {
+            activeFilters.remove(filter)
+        } else {
+            activeFilters.insert(filter)
+        }
+    }
+    
+    /// Check if a filter is active
+    func isFilterActive(_ filter: WordFilter) -> Bool {
+        activeFilters.contains(filter)
+    }
 
     private let client = APIClient(baseURL: URL(string: "https://api.datamuse.com")) {
         $0.sessionConfiguration.urlCache = URLCache(
