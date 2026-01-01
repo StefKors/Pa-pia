@@ -1,0 +1,81 @@
+# Pápia Project - Cursor Rules
+
+## Cross-Platform Build Requirements
+
+This is a SwiftUI app that targets **both iOS and macOS**. All code changes must compile and work correctly on both platforms.
+
+### Platform-Specific Code Guidelines
+
+1. **Always check both platforms when modifying code**
+   - When editing any Swift file, verify the code compiles for both iOS and macOS
+   - Pay special attention to `#if os(macOS)` and `#if os(iOS)` conditional compilation blocks
+
+2. **@FocusState and platform-specific properties**
+   - This codebase uses separate `@FocusState` properties for each platform:
+     - `searchFocused` - Used in macOS code blocks (`#if os(macOS)`)
+     - `searchIsFocused` - Used in iOS code blocks (`#if os(iOS)`)
+   - Never reference an iOS-only property inside a macOS block or vice versa
+
+3. **Platform-specific APIs**
+   - `NSColor` is macOS-only, use `UIColor` for iOS
+   - `UINavigationController` is iOS-only
+   - Some SwiftUI modifiers are platform-specific (e.g., `.navigationBarTitleDisplayMode` is iOS-only)
+   - Always wrap platform-specific code in appropriate `#if os()` blocks
+
+4. **View Modifiers**
+   - When creating view modifiers that behave differently per platform, use `#if os(macOS)` / `#else` patterns
+   - See `iOSContentViewAdjustmentsView.swift` and `GlassEffectModifier.swift` for examples
+
+5. **Availability checks**
+   - Use `#available(iOS X.X, *)` and `#available(macOS X.X, *)` for version-specific APIs
+   - When using both, combine them: `if #available(iOS 26.0, *), #available(macOS 26.0, *)`
+
+### Code Review Checklist
+
+Before completing any code change, verify:
+
+- [ ] No iOS-only variables/types are referenced in `#if os(macOS)` blocks
+- [ ] No macOS-only variables/types are referenced in `#if os(iOS)` blocks
+- [ ] Platform-specific UI code is properly wrapped in conditional compilation
+- [ ] New features work conceptually on both platforms (even if UI differs)
+
+### Common Patterns in This Codebase
+
+```swift
+// Color that works on both platforms
+private var backgroundColor: Color {
+#if os(macOS)
+    Color(nsColor: NSColor.windowBackgroundColor)
+#else
+    Color(uiColor: UIColor.secondarySystemBackground)
+#endif
+}
+
+// View that returns different content per platform
+private var macOSContentView: some View {
+#if os(macOS)
+    // macOS-specific implementation
+#else
+    EmptyView()
+#endif
+}
+
+// Toolbar placement that differs per platform
+.toolbar {
+#if os(macOS)
+    ToolbarItem {
+        Button("Done") { /* ... */ }
+    }
+#else
+    ToolbarItem(placement: .topBarTrailing) {
+        Button("Done") { /* ... */ }
+    }
+#endif
+}
+```
+
+### File Structure
+
+- `ContentView.swift` - Main view with both iOS and macOS implementations
+- `iOSContentViewAdjustmentsView.swift` - iOS-specific view adjustments (no-op on macOS)
+- Platform-specific modifiers should follow the pattern of returning `content` unchanged on unsupported platforms

@@ -77,7 +77,7 @@ struct ContentView: View {
                 SearchContentUnavailableView(
                     searchResultsCount: model.filteredSearchResults.count,
                     searchText: model.searchText,
-                    searchIsFocused: $searchIsFocused,
+                    searchIsFocused: $searchFocused,
                     searchHistoryItems: [],
                     showSettings: $showSettings
                 )
@@ -119,7 +119,7 @@ struct ContentView: View {
             iOSContentViewAdjustmentsView(
                 searchResultsCount: model.filteredSearchResults.count,
                 searchText: model.searchText,
-                searchIsFocused: $searchIsFocused,
+                searchIsFocused: $searchFocused,
                 searchHistoryItems: [],
                 showSettings: $showSettings
             )
