@@ -87,4 +87,41 @@ final class Pa_piaUITests: XCTestCase {
             }
         }
     }
+
+    /// Test that pressing a toolbar button after clearing the search input does not crash
+    /// This tests for a bug where stale TextSelection indices would cause an index out of bounds crash
+    func testToolbarButtonAfterClearDoesNotCrash() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        // Add some characters using the toolbar buttons
+        let questionMarkButton = app.buttons["? any"].firstMatch
+        questionMarkButton.tap()
+        questionMarkButton.tap()
+        questionMarkButton.tap()
+
+        // Verify text was added
+        let searchInput = app.textFields["search-input"].firstMatch
+        XCTAssertEqual(searchInput.value as? String, "???", "Expected search input to contain \"???\"")
+
+        // Clear the input using the clear button
+        let clearButton = app.buttons["xmark"].firstMatch
+        XCTAssertTrue(clearButton.waitForExistence(timeout: 2), "Clear button should exist")
+        clearButton.tap()
+
+        // Verify input is cleared
+        XCTAssertEqual(searchInput.value as? String, "", "Expected search input to be empty after clear")
+
+        // Now tap a toolbar button again - this should NOT crash
+        // The bug was that stale TextSelection indices from the previous text would cause a crash
+        let asteriskButton = app.buttons["* many"].firstMatch
+        asteriskButton.tap()
+
+        // Verify the character was added successfully
+        XCTAssertEqual(searchInput.value as? String, "*", "Expected search input to contain \"*\" after pressing toolbar button")
+
+        // Tap another button to make sure it continues to work
+        questionMarkButton.tap()
+        XCTAssertEqual(searchInput.value as? String, "*?", "Expected search input to contain \"*?\"")
+    }
 }
