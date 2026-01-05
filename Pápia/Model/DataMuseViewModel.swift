@@ -108,6 +108,11 @@ require that the results are spelled similarly to this string of characters, or 
         activeFilters.contains(filter)
     }
 
+    /// Clear all active filters
+    func clearFilters() {
+        activeFilters.removeAll()
+    }
+
     private let client = APIClient(baseURL: URL(string: "https://api.datamuse.com")) {
         $0.sessionConfiguration.urlCache = URLCache(
             memoryCapacity: memoryCapacity,

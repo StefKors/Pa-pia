@@ -9,13 +9,25 @@ import SwiftUI
 import SwiftData
 
 extension View {
-    func searchContentUnavailableView(searchResultsCount: Int, searchText: String, searchIsFocused: FocusState<Bool>.Binding, searchHistoryItems: [DataMuseWord], showSettings: Binding<Bool>) -> some View {
+    func searchContentUnavailableView(
+        searchResultsCount: Int,
+        totalResultsCount: Int,
+        searchText: String,
+        searchIsFocused: FocusState<Bool>.Binding,
+        searchHistoryItems: [DataMuseWord],
+        hasActiveFilters: Bool,
+        onClearFilters: @escaping () -> Void,
+        showSettings: Binding<Bool>
+    ) -> some View {
         modifier(
             SearchContentUnavailableViewModifier(
                 searchResultsCount: searchResultsCount,
+                totalResultsCount: totalResultsCount,
                 searchText: searchText,
                 searchIsFocused: searchIsFocused,
                 searchHistoryItems: searchHistoryItems,
+                hasActiveFilters: hasActiveFilters,
+                onClearFilters: onClearFilters,
                 showSettings: showSettings
             )
         )
@@ -24,9 +36,12 @@ extension View {
 
 struct SearchContentUnavailableViewModifier: ViewModifier {
     let searchResultsCount: Int
+    let totalResultsCount: Int
     let searchText: String
     let searchIsFocused: FocusState<Bool>.Binding
     let searchHistoryItems: [DataMuseWord]
+    let hasActiveFilters: Bool
+    let onClearFilters: () -> Void
     @Binding var showSettings: Bool
 
     func body(content: Content) -> some View {
@@ -34,9 +49,12 @@ struct SearchContentUnavailableViewModifier: ViewModifier {
             .overlay {
                 SearchContentUnavailableView(
                     searchResultsCount: searchResultsCount,
+                    totalResultsCount: totalResultsCount,
                     searchText: searchText,
                     searchIsFocused: searchIsFocused,
                     searchHistoryItems: searchHistoryItems,
+                    hasActiveFilters: hasActiveFilters,
+                    onClearFilters: onClearFilters,
                     showSettings: $showSettings
                 )
             }
@@ -47,9 +65,12 @@ struct SearchContentUnavailableViewModifier: ViewModifier {
 /// TODO: open on button click
 struct SearchContentUnavailableView: View {
     let searchResultsCount: Int
+    let totalResultsCount: Int
     let searchText: String
     let searchIsFocused: FocusState<Bool>.Binding
     let searchHistoryItems: [DataMuseWord]
+    let hasActiveFilters: Bool
+    let onClearFilters: () -> Void
     @Binding var showSettings: Bool
 
     @State private var isDragging = false
@@ -89,9 +110,28 @@ struct SearchContentUnavailableView: View {
                 /// In case there aren't any search results, we can
                 /// show the new content unavailable view.
                 if #available(iOS 17.0, *) {
-                    ContentUnavailableView.search(text: searchText)
+                    ContentUnavailableView {
+                        Label("No results for \"\(searchText)\"", systemImage: "magnifyingglass")
+                    } description: {
+                        if shouldShowClearFilters {
+                            Text("Your filters hide matching results.")
+                        }
+                    } actions: {
+                        if shouldShowClearFilters {
+                            Button("Clear filters") {
+                                onClearFilters()
+                            }
+                            .buttonStyle(.bordered)
+                        }
+                    }
                 } else {
                     Text("No results for: \(searchText)")
+                    if shouldShowClearFilters {
+                        Button("Clear filters") {
+                            onClearFilters()
+                        }
+                        .buttonStyle(.bordered)
+                    }
                     // Fallback on earlier versions
                 }
             } else {
@@ -134,5 +174,9 @@ struct SearchContentUnavailableView: View {
                 }
             }
         }
+    }
+
+    private var shouldShowClearFilters: Bool {
+        totalResultsCount > 0 && hasActiveFilters
     }
 }

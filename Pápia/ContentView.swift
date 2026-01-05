@@ -79,9 +79,14 @@ struct ContentView: View {
             } else {
                 SearchContentUnavailableView(
                     searchResultsCount: model.filteredSearchResults.count,
+                    totalResultsCount: model.searchResults.count,
                     searchText: model.searchText,
                     searchIsFocused: $searchFocused,
                     searchHistoryItems: [],
+                    hasActiveFilters: !model.activeFilters.isEmpty,
+                    onClearFilters: {
+                        model.clearFilters()
+                    },
                     showSettings: $showSettings
                 )
             }
@@ -121,9 +126,14 @@ struct ContentView: View {
         .modifier(
             iOSContentViewAdjustmentsView(
                 searchResultsCount: model.filteredSearchResults.count,
+                totalResultsCount: model.searchResults.count,
                 searchText: model.searchText,
                 searchIsFocused: $searchFocused,
                 searchHistoryItems: [],
+                hasActiveFilters: !model.activeFilters.isEmpty,
+                onClearFilters: {
+                    model.clearFilters()
+                },
                 showSettings: $showSettings
             )
         )
@@ -252,9 +262,14 @@ struct ContentView: View {
             .modifier(
                 iOSContentViewAdjustmentsView(
                     searchResultsCount: model.filteredSearchResults.count,
+                    totalResultsCount: model.searchResults.count,
                     searchText: model.searchText,
                     searchIsFocused: $searchIsFocused,
                     searchHistoryItems: state.navigationHistory,
+                    hasActiveFilters: !model.activeFilters.isEmpty,
+                    onClearFilters: {
+                        model.clearFilters()
+                    },
                     showSettings: $showSettings
                 )
             )
