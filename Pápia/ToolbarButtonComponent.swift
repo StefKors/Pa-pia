@@ -28,8 +28,8 @@ struct ToolbarButtonComponent: View {
             onTap: { insertLabel() },
             onLongPress: { onLongPress?(explainer) }
         )
+        .frame(width: 36, height: 36)
         .modifier(PrimaryButtonModifier())
-        .fixedSize()
         .help(explainer)
     }
     
@@ -97,12 +97,25 @@ struct PlatformButton: UIViewRepresentable {
     let onTap: () -> Void
     let onLongPress: () -> Void
     
+    private static let buttonSize: CGFloat = 36
+    
     func makeUIView(context: Context) -> UIButton {
         let button = UIButton(type: .system)
         button.setTitle(label, for: .normal)
         button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .body)
-        button.setContentHuggingPriority(.required, for: .horizontal)
-        button.setContentHuggingPriority(.required, for: .vertical)
+        button.titleLabel?.adjustsFontSizeToFitWidth = true
+        button.titleLabel?.minimumScaleFactor = 0.6
+        
+        // Fixed circular size
+        button.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            button.widthAnchor.constraint(equalToConstant: Self.buttonSize),
+            button.heightAnchor.constraint(equalToConstant: Self.buttonSize)
+        ])
+        
+        // Make it circular
+        button.layer.cornerRadius = Self.buttonSize / 2
+        button.clipsToBounds = true
         button.configuration = .glass()
 
         // Tap gesture - requires long press to fail first
@@ -211,4 +224,3 @@ struct PlatformButton: NSViewRepresentable {
     }
 }
 #endif
-

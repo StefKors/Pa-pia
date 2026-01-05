@@ -51,7 +51,7 @@ struct ToolbarButtonsGroup: View {
             }
 
             HStack(alignment: .center, spacing: 4) {
-                Spacer()
+//                Spacer()
                 ToolbarButtonComponent(
                     label: "*",
                     shortexplainer: "many",
@@ -94,9 +94,9 @@ struct ToolbarButtonsGroup: View {
                     explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)",
                     onLongPress: showExplainer
                 )
-                Spacer()
+//                Spacer()
             }
-            .modifier(GlassContainerModifier(spacing: 18))
+            .modifier(GlassContainerModifier(spacing: 28))
         }
     }
 }
