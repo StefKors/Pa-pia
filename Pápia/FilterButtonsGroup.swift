@@ -46,12 +46,16 @@ struct FilterButton: View {
             .background {
                 if isActive {
                     Capsule()
-                        .fill(.tint.opacity(0.2))
+                        .fill(.tint)
+                        .opacity(0.2)
                 }
             }
             .overlay {
                 Capsule()
-                    .strokeBorder(isActive ? .tint : .secondary.opacity(0.3), lineWidth: 1)
+                    .strokeBorder(
+                        isActive ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary.opacity(0.3)),
+                        lineWidth: 1
+                    )
             }
         }
         .buttonStyle(.plain)
@@ -66,3 +70,4 @@ struct FilterButton: View {
         .environmentObject(DataMuseViewModel())
         .padding()
 }
+
