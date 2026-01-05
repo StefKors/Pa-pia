@@ -26,6 +26,30 @@ struct FilterButton: View {
     private var isActive: Bool {
         model.isFilterActive(filter)
     }
+
+    private var labelContent: some View {
+        HStack(spacing: 4) {
+            Image(filter.imageName)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 16, height: 16)
+            Text(filter.label)
+                .font(.caption)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+    }
+
+    @ViewBuilder
+    private var glassyLabel: some View {
+        if #available(iOS 26.0, macOS 26.0, *) {
+            labelContent
+                .glassEffect(.regular, in: .capsule(style: .continuous))
+        } else {
+            labelContent
+                .background(.quinary, in: Capsule(style: .continuous))
+        }
+    }
     
     var body: some View {
         Button {
@@ -33,30 +57,21 @@ struct FilterButton: View {
                 model.toggleFilter(filter)
             }
         } label: {
-            HStack(spacing: 4) {
-                Image(filter.imageName)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 16, height: 16)
-                Text(filter.label)
-                    .font(.caption)
-            }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background {
-                if isActive {
-                    Capsule()
-                        .fill(.tint)
-                        .opacity(0.2)
+            glassyLabel
+                .overlay {
+                    if isActive {
+                        Capsule(style: .continuous)
+                            .fill(.tint)
+                            .opacity(0.2)
+                    }
                 }
-            }
-            .overlay {
-                Capsule()
-                    .strokeBorder(
-                        isActive ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary.opacity(0.3)),
-                        lineWidth: 1
-                    )
-            }
+                .overlay {
+                    Capsule(style: .continuous)
+                        .strokeBorder(
+                            isActive ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary.opacity(0.3)),
+                            lineWidth: 1
+                        )
+                }
         }
         .buttonStyle(.plain)
         .foregroundStyle(isActive ? .primary : .secondary)
@@ -70,4 +85,3 @@ struct FilterButton: View {
         .environmentObject(DataMuseViewModel())
         .padding()
 }
-
