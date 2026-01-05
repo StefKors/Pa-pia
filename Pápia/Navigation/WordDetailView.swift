@@ -30,6 +30,7 @@ struct WordDetailView: View {
     @StateObject private var model = DataMuseViewModel()
     @State private var results: [WordDetailInformation] = []
     @State private var definitions: [DataMuseDefinition] = []
+    @State private var synonyms: WordDetailInformation?
 
     @EnvironmentObject private var state: InterfaceState
 
@@ -39,6 +40,11 @@ struct WordDetailView: View {
             VStack(alignment: .leading) {
                 ForEach(definitions) { definition in
                     DefinitionView(def: definition)
+                }
+
+                // Show synonyms below definitions
+                if let synonyms {
+                    WordDetailSectionView(info: synonyms)
                 }
 
                 ForEach(results) { info in
@@ -57,6 +63,11 @@ struct WordDetailView: View {
         }
         .task(id: word) {
             self.definitions = await model.definitions(search: word.word)
+        }
+        .task(id: word) {
+            // Fetch synonyms separately to show below definitions
+            let words = await model.fetch(scope: model.synonymsScope, searchText: word.word)
+            self.synonyms = WordDetailInformation(scope: model.synonymsScope, words: words)
         }
     }
 }
@@ -224,6 +235,8 @@ struct OldPagedWordDetailView: View {
     let definitions: [DataMuseDefinition]
     let word: DataMuseWord
 
+    @EnvironmentObject private var model: DataMuseViewModel
+
     var body: some View {
         ScrollView {
             VStack {
@@ -231,6 +244,9 @@ struct OldPagedWordDetailView: View {
                     ForEach(definitions) { definition in
                         DefinitionView(def: definition)
                     }
+                    
+                    // Show synonyms below definitions
+                    WordDetailListSectionView(scope: model.synonymsScope, word: word)
                 } else if let selectedScope {
                     WordDetailListSectionView(scope: selectedScope, word: word)
                         .id(selectedScope)
@@ -244,6 +260,7 @@ struct OldPagedWordDetailView: View {
 
 #Preview {
     OldPagedWordDetailView(selectedScope: .constant(.preview), definitions: [], word: .preview)
+        .environmentObject(DataMuseViewModel())
 }
 
 /// https://www.appcoda.com/scrollview-paging/
@@ -267,6 +284,9 @@ struct ModernPagedWordDetailView: View {
                             DefinitionView(def: definition)
                                 .id(definition)
                         }
+                        
+                        // Show synonyms below definitions
+                        WordDetailListSectionView(scope: model.synonymsScope, word: word)
                     }
                     //                    .scenePadding(.horizontal)
                 }

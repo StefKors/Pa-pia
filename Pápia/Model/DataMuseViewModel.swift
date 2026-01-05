@@ -348,6 +348,14 @@ require that the results are spelled similarly to this string of characters, or 
         ),
     ]
 
+    /// Synonyms scope - displayed inline with definitions, not as a separate tab
+    let synonymsScope = SearchScope(
+        queryParam: "rel_syn",
+        label: "Synonyms",
+        description: "Synonyms (words contained within the same WordNet synset)"
+    )
+    
+    /// Related scopes shown as separate tabs (excludes synonyms which are shown inline)
     let relatedScopes = [
         SearchScope(
             queryParam: "rel_jja",
@@ -358,11 +366,6 @@ require that the results are spelled similarly to this string of characters, or 
             queryParam: "rel_jjb",
             label: "Related: Adjectives",
             description: "Popular adjectives used to modify the given noun, per Google Books Ngrams"
-        ),
-        SearchScope(
-            queryParam: "rel_syn",
-            label: "Related: Synoyms",
-            description: "Synonyms (words contained within the same WordNet synset)"
         ),
         SearchScope(
             queryParam: "rel_ant",
