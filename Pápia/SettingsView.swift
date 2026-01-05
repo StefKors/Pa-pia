@@ -21,30 +21,18 @@ struct SettingsView: View {
                     description: "Common words used in the Bongo word game",
                     isEnabled: $enableBongoDictionary
                 )
-            } header: {
-                DictionarySectionHeader(imageName: "Bongo", title: "Bongo")
-            }
-
-            Section {
                 DictionaryToggleRow(
                     imageName: "Scrabble",
                     title: "Scrabble English Dictionary",
                     description: "Official Scrabble word list (SOWPODS)",
                     isEnabled: $enableScrabbleEnglish
                 )
-            } header: {
-                DictionarySectionHeader(imageName: "Scrabble", title: "Scrabble")
-            }
-
-            Section {
                 DictionaryToggleRow(
                     imageName: "Wordle",
                     title: "Wordle Dictionary",
                     description: "5-letter words used in Wordle",
                     isEnabled: $enableWordleDictionary
                 )
-            } header: {
-                DictionarySectionHeader(imageName: "Wordle", title: "Wordle")
             }
         }
         .navigationTitle("Settings")

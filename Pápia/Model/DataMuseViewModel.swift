@@ -68,6 +68,17 @@ require that the results are spelled similarly to this string of characters, or 
 
     @Published var searchResults: [DataMuseWord] = []
     @Published var suggestedSearches: [DataMuseWord] = []
+    @Published private(set) var resultsLimit: Int = 0
+    @Published private(set) var hasReachedMaxResults: Bool = false
+    @Published private(set) var isLoadingMore: Bool = false
+
+    init() {
+        resultsLimit = defaultWordsMax
+    }
+
+    var isAtMaxResultsLimit: Bool {
+        searchResults.count >= maxResultsLimit
+    }
     
     /// Filtered search results based on active filters
     var filteredSearchResults: [DataMuseWord] {
@@ -112,14 +123,62 @@ require that the results are spelled similarly to this string of characters, or 
         )
     }
 
-    func fetch(scope: SearchScope, searchText: String) async -> [DataMuseWord] {
-        let list = await query("/words", scope: scope, search: searchText)
+    private let maxResultsLimit = 1000
+#if os(macOS)
+    private let defaultWordsMax = 1000
+#else
+    private let defaultWordsMax = 100
+#endif
+    private let defaultSuggestionsMax = 10
+
+    func fetch(scope: SearchScope, searchText: String, maxResults: Int? = nil) async -> [DataMuseWord] {
+        let list = await query(
+            "/words",
+            scope: scope,
+            search: searchText,
+            maxResults: maxResults,
+            defaultMax: defaultWordsMax
+        )
         return await addWordInfo(list: list)
+    }
+
+    func resetPagination() {
+        resultsLimit = defaultWordsMax
+        hasReachedMaxResults = false
+    }
+
+    func updatePaginationState(resultCount: Int) {
+        if resultsLimit >= maxResultsLimit || resultCount < resultsLimit {
+            hasReachedMaxResults = true
+        } else {
+            hasReachedMaxResults = false
+        }
+    }
+
+    func loadMore(scope: SearchScope, searchText: String) async -> [DataMuseWord] {
+        guard !isLoadingMore, !hasReachedMaxResults else {
+            return []
+        }
+
+        isLoadingMore = true
+        defer { isLoadingMore = false }
+
+        let nextLimit = min(resultsLimit + defaultWordsMax, maxResultsLimit)
+        resultsLimit = nextLimit
+        let list = await fetch(scope: scope, searchText: searchText, maxResults: nextLimit)
+        updatePaginationState(resultCount: list.count)
+        return list
     }
 
     func autocomplete() {
         Task {
-            self.suggestedSearches = await query("/sug", scope: autocompleteScope, search: searchText)
+            self.suggestedSearches = await query(
+                "/sug",
+                scope: autocompleteScope,
+                search: searchText,
+                maxResults: defaultSuggestionsMax,
+                defaultMax: defaultSuggestionsMax
+            )
         }
     }
 
@@ -179,7 +238,13 @@ require that the results are spelled similarly to this string of characters, or 
         return result
     }
 
-    private func query(_ path: String, scope: SearchScope, search: String) async -> [DataMuseWord] {
+    private func query(
+        _ path: String,
+        scope: SearchScope,
+        search: String,
+        maxResults: Int?,
+        defaultMax: Int
+    ) async -> [DataMuseWord] {
         // filter out empty queries
         if path.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return []
@@ -191,12 +256,15 @@ require that the results are spelled similarly to this string of characters, or 
             return []
         }
 
+        let requestedMax = maxResults ?? defaultMax
+        let clampedMax = min(max(requestedMax, 1), maxResultsLimit)
+
         var result: [DataMuseWord] = []
         do {
             result = try await client.send(
                 Request(
                     path: path,
-                    query: [("max", "1000"), (scope.queryParam, search)]
+                    query: [("max", String(clampedMax)), (scope.queryParam, search)]
                 )
             ).value
         } catch {
@@ -251,7 +319,7 @@ require that the results are spelled similarly to this string of characters, or 
     let autocompleteScope = SearchScope(
         queryParam: "s",
         label: "Autocomplete",
-        description: "It provides word suggestions given a partially-entered query using a combination of the operations described in the “/words” resource above. The suggestions perform live spelling correction and intelligently fall back to choices that are phonetically or semantically similar when an exact prefix match can't be found."
+        description: "Provides word suggestions given a partially-entered query using a combination of the operations described in the \"/words\" resource above. The suggestions perform live spelling correction and intelligently fall back to choices that are phonetically or semantically similar when an exact prefix match can't be found."
     )
 
     let searchScopes: [SearchScope] = [
@@ -293,13 +361,13 @@ require that the results are spelled similarly to this string of characters, or 
         ),
         SearchScope(
             queryParam: "rel_syn",
-            label: "Related: Synoyms",
+            label: "Related: Synonyms",
             description: "Synonyms (words contained within the same WordNet synset)"
         ),
         SearchScope(
             queryParam: "rel_trg",
             label: "Related: Triggers",
-            description: "\"Triggers]\" (words that are statistically associated with the query word in the same piece of text.)"
+            description: "\"Triggers\" (words that are statistically associated with the query word in the same piece of text.)"
         ),
         SearchScope(
             queryParam: "rel_ant",

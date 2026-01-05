@@ -72,6 +72,7 @@ struct FilterButton: View {
                             lineWidth: 1
                         )
                 }
+                .contentShape(Capsule())
         }
         .buttonStyle(.plain)
         .foregroundStyle(isActive ? .primary : .secondary)

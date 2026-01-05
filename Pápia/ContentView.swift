@@ -36,9 +36,12 @@ struct ContentView: View {
     private var macOSContentView: some View {
 #if os(macOS)
         NavigationSplitView {
-            List(model.filteredSearchResults, selection: $state.selection) { word in
-                WordView(word: word)
-                    .tag(word)
+            List(selection: $state.selection) {
+                ForEach(model.filteredSearchResults) { word in
+                    WordView(word: word)
+                        .tag(word)
+                }
+                resultsFooterRow
             }
             .onChange(of: state.selection) { oldValue, newValue in
                 if let newValue {
@@ -173,39 +176,32 @@ struct ContentView: View {
 #endif
     }
 
+    @Namespace private var namespace
+
     // iOS search focus
     @FocusState private var searchIsFocused: Bool
 
     private var iOSContentView: some View {
 #if os(iOS)
         NavigationStack(path: $state.navigation) {
-            VStack(spacing: 0) {
-                List {
-                    ForEach(model.filteredSearchResults) { word in
-                        NavigationLink(value: word) {
-                            WordView(word: word)
-                        }
-                        .accessibilityLabel("word-list-word-view")
+            List {
+                ForEach(model.filteredSearchResults) { word in
+                    NavigationLink(value: word) {
+                        WordView(word: word)
+                    }
+                    .accessibilityLabel("word-list-word-view")
+                    .onAppear {
+                        loadMoreIfNeeded(for: word)
                     }
                 }
-                .scrollEdgeEffectStyle(.soft, for: .vertical)
-                .scrollBounceBehavior(.basedOnSize)
-                .navigationDestination(for: DataMuseWord.self, destination: { word in
-                    WordDetailView(word: word)
-                })
-                .modifier(
-                    iOSContentViewAdjustmentsView(
-                        searchResultsCount: model.filteredSearchResults.count,
-                        searchText: model.searchText,
-                        searchIsFocused: $searchIsFocused,
-                        searchHistoryItems: state.navigationHistory,
-                        showSettings: $showSettings
-                    )
-                )
-                .contentMargins(.top, 110, for: .scrollContent)
-                .contentMargins(.bottom, 200, for: .scrollContent)
-                .overlay(alignment: .top) {
-                    VStack(spacing: 8) {
+                resultsFooterRow
+            }
+            .contentMargins(.bottom, 60, for: .scrollContent)
+            .scrollEdgeEffectStyle(.soft, for: .vertical)
+            .scrollBounceBehavior(.basedOnSize)
+            .toolbar {
+                ToolbarItem(placement: .title) {
+                    VStack {
                         Picker("Search Scope", selection: $model.searchScope) {
                             ForEach(model.globalSearchScopes) { scope in
                                 Text(scope.label)
@@ -215,13 +211,56 @@ struct ContentView: View {
                         }
                         .pickerStyle(.segmented)
                         .glassEffect()
-                        
+
                         FilterButtonsGroup()
                             .environmentObject(model)
                     }
-                    .scenePadding()
+                }
+
+                ToolbarItem(placement: .bottomBar) {
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .imageScale(.medium)
+                            .foregroundStyle(.tertiary)
+                        TextField("Find words...", text: $model.searchText, selection: $model.searchTextSelection)
+                            .focused($searchIsFocused)
+                            .environmentObject(model)
+                            .defaultFocus($searchIsFocused, true)
+                            .accessibilityLabel("search-input")
+                    }
+                    .padding(8)
+                    .glassEffectID("search", in: namespace)
+
+                }
+
+
+                if showClearButton {
+                    ToolbarSpacer(placement: .bottomBar)
+
+                    ToolbarItem(placement: .bottomBar) {
+                        Button {
+                            self.model.searchText = ""
+                        } label: {
+                            Image(systemName: "xmark")
+                                .foregroundColor(Color.secondary)
+                                .imageScale(.medium)
+                        }
+                        .glassEffectID("clear", in: namespace)
+                    }
                 }
             }
+            .navigationDestination(for: DataMuseWord.self, destination: { word in
+                WordDetailView(word: word)
+            })
+            .modifier(
+                iOSContentViewAdjustmentsView(
+                    searchResultsCount: model.filteredSearchResults.count,
+                    searchText: model.searchText,
+                    searchIsFocused: $searchIsFocused,
+                    searchHistoryItems: state.navigationHistory,
+                    showSettings: $showSettings
+                )
+            )
             .scrollDismissesKeyboard(.immediately)
             .background(backgroundColor)
             .environmentObject(model)
@@ -229,40 +268,6 @@ struct ContentView: View {
                 VStack(alignment: .trailing) {
                     ToolbarButtonsGroup()
                         .environmentObject(model)
-
-                    HStack {
-                        GlassEffectContainer {
-                            HStack {
-                                Image(systemName: "magnifyingglass")
-                                    .imageScale(.medium)
-                                    .foregroundStyle(.tertiary)
-                                TextField("Find words...", text: $model.searchText, selection: $model.searchTextSelection)
-                                    .focused($searchIsFocused)
-                                    .environmentObject(model)
-                                    .defaultFocus($searchIsFocused, true)
-                                    .accessibilityLabel("search-input")
-                            }
-                            .padding()
-                        }
-                        .glassEffect(.regular, in: .capsule(style: .continuous))
-
-                        if showClearButton {
-                            GlassEffectContainer {
-                                Button {
-                                    self.model.searchText = ""
-                                } label: {
-                                    Image(systemName: "xmark")
-                                        .foregroundColor(Color.secondary)
-                                        .imageScale(.medium)
-                                        .padding()
-                                }
-                                .layoutPriority(1)
-                                .transition(.scale(scale: 0.7).combined(with: .opacity))
-                            }
-                            .glassEffect(.regular, in: .capsule(style: .continuous))
-
-                        }
-                    }
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 6)
@@ -302,21 +307,63 @@ struct ContentView: View {
         }
         .task(id: model.searchText, priority: .userInitiated) {
             if model.searchText.isEmpty {
+                self.model.resetPagination()
                 self.model.searchResults = []
                 return
             }
 
-            self.model.searchResults = await self.model.fetch(scope: self.model.searchScope, searchText: self.model.searchText)
+            self.model.resetPagination()
+            let results = await self.model.fetch(
+                scope: self.model.searchScope,
+                searchText: self.model.searchText,
+                maxResults: self.model.resultsLimit
+            )
+            self.model.searchResults = results
+            self.model.updatePaginationState(resultCount: results.count)
         }
         .onChange(of: model.searchScope, initial: true, { oldValue, newValue in
             if model.searchText.isEmpty {
+                self.model.resetPagination()
                 self.model.searchResults = []
                 return
             }
             Task(priority: .userInitiated) {
-                self.model.searchResults = await self.model.fetch(scope: newValue, searchText: self.model.searchText)
+                self.model.resetPagination()
+                let results = await self.model.fetch(
+                    scope: newValue,
+                    searchText: self.model.searchText,
+                    maxResults: self.model.resultsLimit
+                )
+                self.model.searchResults = results
+                self.model.updatePaginationState(resultCount: results.count)
             }
         })
+    }
+
+    private var shouldShowResultsFooter: Bool {
+        !model.searchText.isEmpty && !model.searchResults.isEmpty
+    }
+
+    private func loadMoreIfNeeded(for word: DataMuseWord) {
+        guard !model.searchText.isEmpty else { return }
+        guard word.id == model.filteredSearchResults.last?.id else { return }
+
+        Task(priority: .userInitiated) {
+            let results = await model.loadMore(scope: model.searchScope, searchText: model.searchText)
+            if !results.isEmpty {
+                self.model.searchResults = results
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var resultsFooterRow: some View {
+        if shouldShowResultsFooter {
+            ResultsFooterView(
+                resultsCount: model.searchResults.count,
+                showsMax: model.isAtMaxResultsLimit
+            )
+        }
     }
 }
 
