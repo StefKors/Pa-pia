@@ -190,9 +190,6 @@ struct ContentView: View {
                         WordView(word: word)
                     }
                     .accessibilityLabel("word-list-word-view")
-                    .onAppear {
-                        loadMoreIfNeeded(for: word)
-                    }
                 }
                 resultsFooterRow
             }
@@ -307,53 +304,31 @@ struct ContentView: View {
         }
         .task(id: model.searchText, priority: .userInitiated) {
             if model.searchText.isEmpty {
-                self.model.resetPagination()
                 self.model.searchResults = []
                 return
             }
 
-            self.model.resetPagination()
-            let results = await self.model.fetch(
+            self.model.searchResults = await self.model.fetch(
                 scope: self.model.searchScope,
-                searchText: self.model.searchText,
-                maxResults: self.model.resultsLimit
+                searchText: self.model.searchText
             )
-            self.model.searchResults = results
-            self.model.updatePaginationState(resultCount: results.count)
         }
         .onChange(of: model.searchScope, initial: true, { oldValue, newValue in
             if model.searchText.isEmpty {
-                self.model.resetPagination()
                 self.model.searchResults = []
                 return
             }
             Task(priority: .userInitiated) {
-                self.model.resetPagination()
-                let results = await self.model.fetch(
+                self.model.searchResults = await self.model.fetch(
                     scope: newValue,
-                    searchText: self.model.searchText,
-                    maxResults: self.model.resultsLimit
+                    searchText: self.model.searchText
                 )
-                self.model.searchResults = results
-                self.model.updatePaginationState(resultCount: results.count)
             }
         })
     }
 
     private var shouldShowResultsFooter: Bool {
         !model.searchText.isEmpty && !model.searchResults.isEmpty
-    }
-
-    private func loadMoreIfNeeded(for word: DataMuseWord) {
-        guard !model.searchText.isEmpty else { return }
-        guard word.id == model.filteredSearchResults.last?.id else { return }
-
-        Task(priority: .userInitiated) {
-            let results = await model.loadMore(scope: model.searchScope, searchText: model.searchText)
-            if !results.isEmpty {
-                self.model.searchResults = results
-            }
-        }
     }
 
     @ViewBuilder

@@ -12,11 +12,15 @@ struct ResultsFooterView: View {
     let showsMax: Bool
 
     var body: some View {
-        Text("Returned \(resultsCount) results\(showsMax ? " (max 1000)" : "")")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, alignment: .center)
-            .padding(.vertical, 8)
+        Text(footerText)
+        .font(.footnote)
+        .foregroundStyle(.secondary)
+        .frame(maxWidth: .infinity, alignment: .center)
+        .padding(.vertical, 8)
+    }
+
+    private var footerText: String {
+        return "Returned \(resultsCount) results\(showsMax ? " (max 1000)" : "")"
     }
 }
 

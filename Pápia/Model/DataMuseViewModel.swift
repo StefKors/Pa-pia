@@ -68,13 +68,6 @@ require that the results are spelled similarly to this string of characters, or 
 
     @Published var searchResults: [DataMuseWord] = []
     @Published var suggestedSearches: [DataMuseWord] = []
-    @Published private(set) var resultsLimit: Int = 0
-    @Published private(set) var hasReachedMaxResults: Bool = false
-    @Published private(set) var isLoadingMore: Bool = false
-
-    init() {
-        resultsLimit = defaultWordsMax
-    }
 
     var isAtMaxResultsLimit: Bool {
         searchResults.count >= maxResultsLimit
@@ -124,50 +117,17 @@ require that the results are spelled similarly to this string of characters, or 
     }
 
     private let maxResultsLimit = 1000
-#if os(macOS)
-    private let defaultWordsMax = 1000
-#else
-    private let defaultWordsMax = 100
-#endif
-    private let defaultSuggestionsMax = 10
+    private let wordsMax = 1000
+    private let suggestionsMax = 10
 
-    func fetch(scope: SearchScope, searchText: String, maxResults: Int? = nil) async -> [DataMuseWord] {
+    func fetch(scope: SearchScope, searchText: String) async -> [DataMuseWord] {
         let list = await query(
             "/words",
             scope: scope,
             search: searchText,
-            maxResults: maxResults,
-            defaultMax: defaultWordsMax
+            maxResults: wordsMax
         )
         return await addWordInfo(list: list)
-    }
-
-    func resetPagination() {
-        resultsLimit = defaultWordsMax
-        hasReachedMaxResults = false
-    }
-
-    func updatePaginationState(resultCount: Int) {
-        if resultsLimit >= maxResultsLimit || resultCount < resultsLimit {
-            hasReachedMaxResults = true
-        } else {
-            hasReachedMaxResults = false
-        }
-    }
-
-    func loadMore(scope: SearchScope, searchText: String) async -> [DataMuseWord] {
-        guard !isLoadingMore, !hasReachedMaxResults else {
-            return []
-        }
-
-        isLoadingMore = true
-        defer { isLoadingMore = false }
-
-        let nextLimit = min(resultsLimit + defaultWordsMax, maxResultsLimit)
-        resultsLimit = nextLimit
-        let list = await fetch(scope: scope, searchText: searchText, maxResults: nextLimit)
-        updatePaginationState(resultCount: list.count)
-        return list
     }
 
     func autocomplete() {
@@ -176,8 +136,7 @@ require that the results are spelled similarly to this string of characters, or 
                 "/sug",
                 scope: autocompleteScope,
                 search: searchText,
-                maxResults: defaultSuggestionsMax,
-                defaultMax: defaultSuggestionsMax
+                maxResults: suggestionsMax
             )
         }
     }
@@ -242,8 +201,7 @@ require that the results are spelled similarly to this string of characters, or 
         _ path: String,
         scope: SearchScope,
         search: String,
-        maxResults: Int?,
-        defaultMax: Int
+        maxResults: Int
     ) async -> [DataMuseWord] {
         // filter out empty queries
         if path.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -256,8 +214,7 @@ require that the results are spelled similarly to this string of characters, or 
             return []
         }
 
-        let requestedMax = maxResults ?? defaultMax
-        let clampedMax = min(max(requestedMax, 1), maxResultsLimit)
+        let clampedMax = min(max(maxResults, 1), maxResultsLimit)
 
         var result: [DataMuseWord] = []
         do {

@@ -103,7 +103,7 @@ struct SearchContentUnavailableView: View {
                             Text("Start your search, then filter your query")
                         } actions: {
                             WrappingHStack(alignment: .center) {
-                                ForEach(searchHistoryItems, id: \.self) { word in
+                                ForEach(Array(Set(searchHistoryItems)), id: \.id) { word in
                                     NavigationLink(value: word) {
                                         Text(word.word.capitalized)
                                     }
