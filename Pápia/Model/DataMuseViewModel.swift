@@ -34,9 +34,9 @@ enum WordFilter: String, CaseIterable, Identifiable, Codable {
     
     var imageName: String {
         switch self {
-        case .wordle: return "wordle"
-        case .scrabble: return "scrabble"
-        case .bongo: return "bongo"
+        case .wordle: return "Wordle"
+        case .scrabble: return "Scrabble"
+        case .bongo: return "Bongo"
         }
     }
 }
