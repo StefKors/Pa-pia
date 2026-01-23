@@ -109,9 +109,7 @@ struct ContentView: View {
             }
         }
         .onSubmit(of: .search, {
-            var newHistory = Set(state.searchHistory)
-            newHistory.insert(model.searchText)
-            state.searchHistory = Array(newHistory)
+            state.recordSearchText(model.searchText)
         })
         .searchFocused($searchFocused)
         .task {
@@ -233,6 +231,9 @@ struct ContentView: View {
                             .focused($searchIsFocused)
                             .environmentObject(model)
                             .defaultFocus($searchIsFocused, true)
+                            .onSubmit {
+                                state.recordSearchText(model.searchText)
+                            }
                             .accessibilityLabel("search-input")
                     }
                     .padding(8)
