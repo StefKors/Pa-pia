@@ -677,7 +677,7 @@
 		};
 		8AD888BE2F040A9E00CBCFF7 /* XCRemoteSwiftPackageReference "sqlite-data" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:pointfreeco/sqlite-data.git";
+			repositoryURL = "https://github.com/pointfreeco/sqlite-data.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.4.2;
