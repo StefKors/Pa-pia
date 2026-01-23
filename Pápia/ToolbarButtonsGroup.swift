@@ -28,6 +28,8 @@ import SwiftUI
 
 struct ToolbarButtonsGroup: View {
     @State private var presentedExplainer: String?
+    @EnvironmentObject private var model: DataMuseViewModel
+    @EnvironmentObject private var state: InterfaceState
 
     private func showExplainer(_ text: String) {
         withAnimation {
@@ -38,6 +40,12 @@ struct ToolbarButtonsGroup: View {
                 presentedExplainer = text
             }
         }
+    }
+
+    private func applySearchText(_ text: String) {
+        model.searchText = text
+        let endIndex = text.endIndex
+        model.searchTextSelection = TextSelection(insertionPoint: endIndex)
     }
     
     var body: some View {
@@ -51,6 +59,36 @@ struct ToolbarButtonsGroup: View {
             }
 
             HStack(alignment: .center, spacing: 4) {
+                HStack(spacing: 4) {
+                    Button {
+                        if let previous = state.goBackInSearchHistory() {
+                            applySearchText(previous)
+                        }
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .imageScale(.medium)
+                    }
+                    .frame(width: 36, height: 36)
+                    .modifier(PrimaryButtonModifier())
+                    .disabled(!state.canGoBackInSearchHistory)
+                    .help("Previous search")
+                    .accessibilityLabel("Previous search")
+
+                    Button {
+                        if let next = state.goForwardInSearchHistory() {
+                            applySearchText(next)
+                        }
+                    } label: {
+                        Image(systemName: "chevron.right")
+                            .imageScale(.medium)
+                    }
+                    .frame(width: 36, height: 36)
+                    .modifier(PrimaryButtonModifier())
+                    .disabled(!state.canGoForwardInSearchHistory)
+                    .help("Next search")
+                    .accessibilityLabel("Next search")
+                }
+                .padding(.trailing, 8)
 //                Spacer()
                 ToolbarButtonComponent(
                     label: "*",
@@ -103,5 +141,7 @@ struct ToolbarButtonsGroup: View {
 
 #Preview {
     ToolbarButtonsGroup()
+        .environmentObject(DataMuseViewModel())
+        .environmentObject(InterfaceState())
         .scenePadding()
 }
