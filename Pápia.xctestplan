@@ -21,6 +21,13 @@
     {
       "target" : {
         "containerPath" : "container:Pápia.xcodeproj",
+        "identifier" : "8AA9038A2BDF940D00D553A9",
+        "name" : "PápiaTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Pápia.xcodeproj",
         "identifier" : "8AA903942BDF940D00D553A9",
         "name" : "PápiaUITests"
       }
