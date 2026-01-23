@@ -31,7 +31,7 @@
     {
       "identity" : "sqlite-data",
       "kind" : "remoteSourceControl",
-      "location" : "git@github.com:pointfreeco/sqlite-data.git",
+      "location" : "https://github.com/pointfreeco/sqlite-data.git",
       "state" : {
         "revision" : "45a7a199b7547a1c80ae064fb05ff866625585ea",
         "version" : "1.4.2"
