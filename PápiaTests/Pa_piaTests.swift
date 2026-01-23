@@ -6,30 +6,66 @@
 //
 
 import XCTest
+@testable import Pápia
 
+@MainActor
 final class Pa_piaTests: XCTestCase {
+    private let searchHistoryKey = "search-history"
 
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        UserDefaults.standard.removeObject(forKey: searchHistoryKey)
     }
 
     override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        UserDefaults.standard.removeObject(forKey: searchHistoryKey)
     }
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
+    func testAppendSearchHistoryTrimsAndCaps() {
+        let state = InterfaceState()
+
+        state.appendSearchHistory("  apple  ", maxCount: 3)
+        state.appendSearchHistory("banana", maxCount: 3)
+        state.appendSearchHistory("cherry", maxCount: 3)
+        state.appendSearchHistory("date", maxCount: 3)
+
+        XCTAssertEqual(state.searchHistory, ["banana", "cherry", "date"])
     }
 
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        measure {
-            // Put the code you want to measure the time of here.
+    func testAppendSearchHistoryMovesExistingToEnd() {
+        let state = InterfaceState()
+
+        state.appendSearchHistory("apple")
+        state.appendSearchHistory("banana")
+        state.appendSearchHistory("apple")
+
+        XCTAssertEqual(state.searchHistory, ["banana", "apple"])
+    }
+
+    func testAppendSearchHistoryIgnoresEmptyValues() {
+        let state = InterfaceState()
+
+        state.appendSearchHistory("")
+        state.appendSearchHistory("   ")
+
+        XCTAssertTrue(state.searchHistory.isEmpty)
+    }
+
+    func testSearchHistoryMemoryProfile() {
+        let state = InterfaceState()
+        measure(metrics: [XCTMemoryMetric()]) {
+            state.searchHistory = []
+            for index in 0..<1000 {
+                state.appendSearchHistory("term-\(index)", maxCount: 50)
+            }
+            XCTAssertLessThanOrEqual(state.searchHistory.count, 50)
         }
     }
 
+    func testViewModelCreationMemoryProfile() {
+        measure(metrics: [XCTMemoryMetric()]) {
+            for _ in 0..<200 {
+                _ = DataMuseViewModel()
+            }
+        }
+    }
 }
