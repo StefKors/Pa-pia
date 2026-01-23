@@ -13,8 +13,18 @@ import os
 
 private let logger = Logger(subsystem: "com.stefkors.Papia", category: "DataMuse")
 
-let memoryCapacity = 1024 * 1024 * 1024 // 1 GB
-let diskCapacity = 2 * 1024 * 1024 * 1024 // 2 GB
+private enum DataMuseClient {
+    static let memoryCapacity = 32 * 1024 * 1024 // 32 MB
+    static let diskCapacity = 128 * 1024 * 1024 // 128 MB
+    static let cache = URLCache(
+        memoryCapacity: memoryCapacity,
+        diskCapacity: diskCapacity,
+        diskPath: "papia_url_cache"
+    )
+    static let client = APIClient(baseURL: URL(string: "https://api.datamuse.com")) {
+        $0.sessionConfiguration.urlCache = cache
+    }
+}
 
 /// Filter options for word results
 enum WordFilter: String, CaseIterable, Identifiable, Codable {
@@ -113,13 +123,7 @@ require that the results are spelled similarly to this string of characters, or 
         activeFilters.removeAll()
     }
 
-    private let client = APIClient(baseURL: URL(string: "https://api.datamuse.com")) {
-        $0.sessionConfiguration.urlCache = URLCache(
-            memoryCapacity: memoryCapacity,
-            diskCapacity: diskCapacity,
-            diskPath: "papia_url_cache"
-        )
-    }
+    private let client = DataMuseClient.client
 
     private let maxResultsLimit = 1000
     private let wordsMax = 1000

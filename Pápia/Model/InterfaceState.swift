@@ -34,4 +34,19 @@ class InterfaceState: ObservableObject {
             navigationHistory.remove(at: 0)
         }
     }
+
+    /// Add query to search history with a fixed cap.
+    func appendSearchHistory(_ query: String, maxCount: Int = 50) {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        if let existingIndex = searchHistory.firstIndex(of: trimmed) {
+            searchHistory.remove(at: existingIndex)
+        }
+        searchHistory.append(trimmed)
+
+        if searchHistory.count > maxCount {
+            searchHistory.removeFirst(searchHistory.count - maxCount)
+        }
+    }
 }

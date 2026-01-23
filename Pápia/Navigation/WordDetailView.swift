@@ -26,8 +26,7 @@ struct WordDetailInformation: Identifiable {
 struct WordDetailView: View {
     let word: DataMuseWord
 
-    @State private var information: [DataMuseViewModel.SearchScope: [DataMuseWord]] = [:]
-    @StateObject private var model = DataMuseViewModel()
+    @EnvironmentObject private var model: DataMuseViewModel
     @State private var results: [WordDetailInformation] = []
     @State private var definitions: [DataMuseDefinition] = []
     @State private var synonyms: WordDetailInformation?
@@ -112,8 +111,7 @@ struct NavigationPillTag: View {
 struct WordDetailView: View {
     let word: DataMuseWord
 
-    @State private var information: [DataMuseViewModel.SearchScope: [DataMuseWord]] = [:]
-    @StateObject private var model = DataMuseViewModel()
+    @EnvironmentObject private var model: DataMuseViewModel
     @State private var results: [WordDetailInformation] = []
     @State private var definitions: [DataMuseDefinition] = []
 
@@ -406,4 +404,6 @@ struct BookFlipScrollTransition: ViewModifier {
 
 #Preview {
     WordDetailView(word: .preview)
+        .environmentObject(DataMuseViewModel())
+        .environmentObject(InterfaceState())
 }

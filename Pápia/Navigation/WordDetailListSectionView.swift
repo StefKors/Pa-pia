@@ -48,6 +48,7 @@ struct WordDetailListSectionView: View {
 
 #Preview {
     WordDetailListSectionView(scope: .preview, word: .preview)
+        .environmentObject(DataMuseViewModel())
 }
 
 
@@ -105,4 +106,5 @@ struct WordDetailSectionView: View {
 
 #Preview {
     WordDetailSectionView(info: .preview)
+        .environmentObject(InterfaceState())
 }

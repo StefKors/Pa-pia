@@ -109,9 +109,7 @@ struct ContentView: View {
             }
         }
         .onSubmit(of: .search, {
-            var newHistory = Set(state.searchHistory)
-            newHistory.insert(model.searchText)
-            state.searchHistory = Array(newHistory)
+            state.appendSearchHistory(model.searchText)
         })
         .searchFocused($searchFocused)
         .task {
@@ -300,6 +298,7 @@ struct ContentView: View {
 #endif
         }
         .environmentObject(state)
+        .environmentObject(model)
         .sheet(isPresented: $showSettings) {
             NavigationStack {
                 SettingsView()
