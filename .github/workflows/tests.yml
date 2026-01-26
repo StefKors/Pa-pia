@@ -1,7 +1,6 @@
 name: Tests
 
 on:
-  push:
   pull_request:
 
 jobs:
@@ -19,7 +18,7 @@ jobs:
           set -o pipefail
           xcodebuild test \
             -project "Papia.xcodeproj" \
-            -scheme "Papia" \
+            -scheme "Pápia" \
             -testPlan "TestPlan" \
             -destination "platform=iOS Simulator,name=iPhone 17 Pro,OS=latest" \
             -configuration Debug
