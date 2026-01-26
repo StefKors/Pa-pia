@@ -18,8 +18,8 @@ jobs:
         run: |
           set -o pipefail
           xcodebuild test \
-            -project "Pápia.xcodeproj" \
-            -scheme "Pápia" \
-            -testPlan "Pápia" \
+            -project "Papia.xcodeproj" \
+            -scheme "Papia" \
+            -testPlan "TestPlan" \
             -destination "platform=iOS Simulator,name=iPhone 17 Pro,OS=latest" \
             -configuration Debug
