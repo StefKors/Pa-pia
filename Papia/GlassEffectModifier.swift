@@ -1,6 +1,6 @@
 //
 //  GlassEffectModifier.swift
-//  Pápia
+//  Papia
 //
 //  Created by Stef Kors on 23/09/2025.
 //

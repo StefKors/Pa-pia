@@ -1,6 +1,6 @@
 //
 //  IndeterminateProgressView.swift
-//  Pápia
+//  Papia
 //
 //  Created by Stef Kors on 29/04/2024.
 //  source: https://matthewcodes.uk/articles/indeterminate-linear-progress-view/

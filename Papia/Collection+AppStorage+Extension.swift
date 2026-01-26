@@ -1,6 +1,6 @@
 //
 //  Collection+AppStorage2.swift
-//  Pápia
+//  Papia
 //
 //  Created by Stef Kors on 29/01/2025.
 //  from: https://fatbobman.com/en/posts/appstorage/

@@ -1,6 +1,6 @@
 //
 //  WordDetailView.swift
-//  Pápia
+//  Papia
 //
 //  Created by Stef Kors on 29/04/2024.
 //

@@ -1,6 +1,6 @@
 //
 //  Pa_piaUITestsLaunchTests.swift
-//  PápiaUITests
+//  PapiaUITests
 //
 //  Created by Stef Kors on 29/04/2024.
 //

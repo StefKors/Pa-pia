@@ -1,6 +1,6 @@
 //
 //  DefinitionView.swift
-//  Pápia
+//  Papia
 //
 //  Created by Stef Kors on 02/05/2024.
 //

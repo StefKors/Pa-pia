@@ -1,6 +1,6 @@
 //
 //  HighlightAttribute.swift
-//  Pápia
+//  Papia
 //
 //  Created by Stef Kors on 29/01/2025.
 //  from: https://alexanderweiss.dev/blog/2024-06-24-using-textrenderer-to-create-highlighted-text

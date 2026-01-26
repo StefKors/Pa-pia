@@ -1,6 +1,6 @@
 //
 //  Pa_piaTests.swift
-//  PápiaTests
+//  PapiaTests
 //
 //  Created by Stef Kors on 29/04/2024.
 //

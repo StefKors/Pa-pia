@@ -1,6 +1,6 @@
 //
 //  FullSizePapiaIcon.swift
-//  Pápia
+//  Papia
 //
 //  Created by Stef Kors on 08/12/2024.
 //

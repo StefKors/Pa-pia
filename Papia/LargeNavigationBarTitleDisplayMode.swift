@@ -1,6 +1,6 @@
 //
 //  LargeNavigationBarTitleDisplayMode.swift
-//  Pápia
+//  Papia
 //
 //  Created by Stef Kors on 30/04/2024.
 //

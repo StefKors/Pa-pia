@@ -12,6 +12,7 @@
 		8AA903AD2BDF993A00D553A9 /* Get in Frameworks */ = {isa = PBXBuildFile; productRef = 8AA903AC2BDF993A00D553A9 /* Get */; };
 		8AA903AF2BDF993D00D553A9 /* Get in Frameworks */ = {isa = PBXBuildFile; productRef = 8AA903AE2BDF993D00D553A9 /* Get */; };
 		8AD888C02F040A9E00CBCFF7 /* SQLiteData in Frameworks */ = {isa = PBXBuildFile; productRef = 8AD888BF2F040A9E00CBCFF7 /* SQLiteData */; };
+		8AF61BFE2F278174003AF95A /* TestPlan.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 8AF61BFD2F278174003AF95A /* TestPlan.xctestplan */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -20,14 +21,14 @@
 			containerPortal = 8AA903702BDF940C00D553A9 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 8AA903772BDF940C00D553A9;
-			remoteInfo = "Pápia";
+			remoteInfo = Papia;
 		};
 		8AA903962BDF940D00D553A9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8AA903702BDF940C00D553A9 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 8AA903772BDF940C00D553A9;
-			remoteInfo = "Pápia";
+			remoteInfo = Papia;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -52,6 +53,7 @@
 		8AA903952BDF940D00D553A9 /* PapiaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PapiaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AC7B4922CB51A1C00CBD21C /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		8AC7B4942CB51A1C00CBD21C /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		8AF61BFD2F278174003AF95A /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -112,6 +114,7 @@
 		8AA9036F2BDF940C00D553A9 = {
 			isa = PBXGroup;
 			children = (
+				8AF61BFD2F278174003AF95A /* TestPlan.xctestplan */,
 				8A4FB41A2F04626300FD1417 /* ci_scripts */,
 				8A8016422BE1062E005DEE89 /* Pa-pia-Info.plist */,
 				8A6C8E702E8A6B3500D6049C /* Papia */,
@@ -165,7 +168,7 @@
 				8AA903AA2BDF993500D553A9 /* Get */,
 				8AD888BF2F040A9E00CBCFF7 /* SQLiteData */,
 			);
-			productName = "Pápia";
+			productName = Papia;
 			productReference = 8AA903782BDF940C00D553A9 /* Papia.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -189,7 +192,7 @@
 			packageProductDependencies = (
 				8AA903AC2BDF993A00D553A9 /* Get */,
 			);
-			productName = "PápiaTests";
+			productName = PapiaTests;
 			productReference = 8AA9038B2BDF940D00D553A9 /* PapiaTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -213,7 +216,7 @@
 			packageProductDependencies = (
 				8AA903AE2BDF993D00D553A9 /* Get */,
 			);
-			productName = "PápiaUITests";
+			productName = PapiaUITests;
 			productReference = 8AA903952BDF940D00D553A9 /* PapiaUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
@@ -270,6 +273,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8A4FB41B2F04626300FD1417 /* ci_post_clone.sh in Resources */,
+				8AF61BFE2F278174003AF95A /* TestPlan.xctestplan in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -452,10 +456,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Beta";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "Pápia/Pa_pia.entitlements";
+				CODE_SIGN_ENTITLEMENTS = Papia/Pa_pia.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"Pápia/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Papia/Preview Content\"";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -496,10 +500,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "Pápia/Pa_pia.entitlements";
+				CODE_SIGN_ENTITLEMENTS = Papia/Pa_pia.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"Pápia/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Papia/Preview Content\"";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -543,8 +547,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
-				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.stefkors.Pa-piaTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -565,8 +569,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
-				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.stefkors.Pa-piaTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -586,8 +590,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
-				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.stefkors.Pa-piaUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -596,7 +600,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "Pápia";
+				TEST_TARGET_NAME = Papia;
 			};
 			name = Debug;
 		};
@@ -607,8 +611,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
-				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.stefkors.Pa-piaUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -617,7 +621,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "Pápia";
+				TEST_TARGET_NAME = Papia;
 			};
 			name = Release;
 		};
