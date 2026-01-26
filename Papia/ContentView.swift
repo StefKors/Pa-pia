@@ -197,7 +197,7 @@ struct ContentView: View {
                     NavigationLink(value: word) {
                         WordView(word: word)
                     }
-                    .accessibilityLabel("word-list-word-view")
+                    .accessibilityIdentifier("word-list-word-view")
                 }
                 resultsFooterRow
             }
@@ -231,7 +231,7 @@ struct ContentView: View {
                             .focused($searchIsFocused)
                             .environmentObject(model)
                             .defaultFocus($searchIsFocused, true)
-                            .accessibilityLabel("search-input")
+                            .accessibilityIdentifier("search-input")
                     }
                     .padding(8)
                     .glassEffectID("search", in: namespace)
@@ -250,6 +250,7 @@ struct ContentView: View {
                                 .foregroundColor(Color.secondary)
                                 .imageScale(.medium)
                         }
+                        .accessibilityIdentifier("xmark")
                         .glassEffectID("clear", in: namespace)
                     }
                 }

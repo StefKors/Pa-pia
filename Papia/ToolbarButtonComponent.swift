@@ -30,6 +30,7 @@ struct ToolbarButtonComponent: View {
         )
         .frame(width: 36, height: 36)
         .modifier(PrimaryButtonModifier())
+        .accessibilityIdentifier("\(label) \(shortexplainer)")
         .help(explainer)
     }
     

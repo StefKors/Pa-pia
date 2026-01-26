@@ -157,7 +157,7 @@ struct WordDetailView: View {
                     Spacer()
                 }
                 .scenePadding(.horizontal)
-                .accessibilityLabel("navigation-back-button")
+                .accessibilityIdentifier("navigation-back-button")
             }
             .buttonStyle(.plain)
 
