@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "8AA903772BDF940C00D553A9"
-               BuildableName = "Pa&#x301;pia.app"
-               BlueprintName = "Pa&#x301;pia"
-               ReferencedContainer = "container:Pa&#x301;pia.xcodeproj">
+               BuildableName = "Papia.app"
+               BlueprintName = "Papia"
+               ReferencedContainer = "container:Papia.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -30,7 +30,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:Pa&#x301;piaUITests/Pa&#x301;pia.xctestplan"
+            reference = "container:Pa&#x301;pia.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>
@@ -50,9 +50,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8AA903772BDF940C00D553A9"
-            BuildableName = "Pa&#x301;pia.app"
-            BlueprintName = "Pa&#x301;pia"
-            ReferencedContainer = "container:Pa&#x301;pia.xcodeproj">
+            BuildableName = "Papia.app"
+            BlueprintName = "Papia"
+            ReferencedContainer = "container:Papia.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -67,9 +67,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8AA903772BDF940C00D553A9"
-            BuildableName = "Pa&#x301;pia.app"
-            BlueprintName = "Pa&#x301;pia"
-            ReferencedContainer = "container:Pa&#x301;pia.xcodeproj">
+            BuildableName = "Papia.app"
+            BlueprintName = "Papia"
+            ReferencedContainer = "container:Papia.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

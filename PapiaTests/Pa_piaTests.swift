@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import Pápia
+@testable import Papia
 
 @MainActor
 final class Pa_piaTests: XCTestCase {

@@ -7,7 +7,7 @@
 
 import XCTest
 
-final class Pa_piaUITests: XCTestCase {
+final class PapiaUITests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -22,7 +22,7 @@ final class Pa_piaUITests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testExample() throws {
+    func testSearchAndNavigation() throws {
         let app = XCUIApplication()
         app.activate()
         let element = app.buttons["? any"].firstMatch

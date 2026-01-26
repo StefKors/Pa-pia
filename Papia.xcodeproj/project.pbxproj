@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		8A4FB41B2F04626300FD1417 /* ci_post_clone.sh in Resources */ = {isa = PBXBuildFile; fileRef = 8A4FB4192F04626300FD1417 /* ci_post_clone.sh */; };
-		8A7F17F72E82AF1D0094CD3F /* Pápia.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 8A7F17F62E82AF1D0094CD3F /* Pápia.xctestplan */; };
 		8AA903AB2BDF993500D553A9 /* Get in Frameworks */ = {isa = PBXBuildFile; productRef = 8AA903AA2BDF993500D553A9 /* Get */; };
 		8AA903AD2BDF993A00D553A9 /* Get in Frameworks */ = {isa = PBXBuildFile; productRef = 8AA903AC2BDF993A00D553A9 /* Get */; };
 		8AA903AF2BDF993D00D553A9 /* Get in Frameworks */ = {isa = PBXBuildFile; productRef = 8AA903AE2BDF993D00D553A9 /* Get */; };
@@ -47,11 +46,10 @@
 
 /* Begin PBXFileReference section */
 		8A4FB4192F04626300FD1417 /* ci_post_clone.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = ci_post_clone.sh; sourceTree = "<group>"; };
-		8A7F17F62E82AF1D0094CD3F /* Pápia.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Pápia.xctestplan"; sourceTree = "<group>"; };
 		8A8016422BE1062E005DEE89 /* Pa-pia-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Pa-pia-Info.plist"; sourceTree = SOURCE_ROOT; };
-		8AA903782BDF940C00D553A9 /* Pápia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pápia.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		8AA9038B2BDF940D00D553A9 /* PápiaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "PápiaTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		8AA903952BDF940D00D553A9 /* PápiaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "PápiaUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8AA903782BDF940C00D553A9 /* Papia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Papia.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8AA9038B2BDF940D00D553A9 /* PapiaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PapiaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8AA903952BDF940D00D553A9 /* PapiaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PapiaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AC7B4922CB51A1C00CBD21C /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		8AC7B4942CB51A1C00CBD21C /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -64,14 +62,14 @@
 				scrabble/README.md,
 				wordle/readme.md,
 			);
-			target = 8AA903772BDF940C00D553A9 /* Pápia */;
+			target = 8AA903772BDF940C00D553A9 /* Papia */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		8A6C8E702E8A6B3500D6049C /* Pápia */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (8AA6F48E2F01418D00EC2740 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = "Pápia"; sourceTree = "<group>"; };
-		8A7F17EA2E829E220094CD3F /* PápiaTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "PápiaTests"; sourceTree = "<group>"; };
-		8A7F17EE2E829E240094CD3F /* PápiaUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "PápiaUITests"; sourceTree = "<group>"; };
+		8A6C8E702E8A6B3500D6049C /* Papia */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (8AA6F48E2F01418D00EC2740 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Papia; sourceTree = "<group>"; };
+		8A7F17EA2E829E220094CD3F /* PapiaTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = PapiaTests; sourceTree = "<group>"; };
+		8A7F17EE2E829E240094CD3F /* PapiaUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = PapiaUITests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,11 +113,10 @@
 			isa = PBXGroup;
 			children = (
 				8A4FB41A2F04626300FD1417 /* ci_scripts */,
-				8A7F17F62E82AF1D0094CD3F /* Pápia.xctestplan */,
 				8A8016422BE1062E005DEE89 /* Pa-pia-Info.plist */,
-				8A6C8E702E8A6B3500D6049C /* Pápia */,
-				8A7F17EA2E829E220094CD3F /* PápiaTests */,
-				8A7F17EE2E829E240094CD3F /* PápiaUITests */,
+				8A6C8E702E8A6B3500D6049C /* Papia */,
+				8A7F17EA2E829E220094CD3F /* PapiaTests */,
+				8A7F17EE2E829E240094CD3F /* PapiaUITests */,
 				8AA903792BDF940C00D553A9 /* Products */,
 				8AA903A92BDF993500D553A9 /* Frameworks */,
 			);
@@ -128,9 +125,9 @@
 		8AA903792BDF940C00D553A9 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8AA903782BDF940C00D553A9 /* Pápia.app */,
-				8AA9038B2BDF940D00D553A9 /* PápiaTests.xctest */,
-				8AA903952BDF940D00D553A9 /* PápiaUITests.xctest */,
+				8AA903782BDF940C00D553A9 /* Papia.app */,
+				8AA9038B2BDF940D00D553A9 /* PapiaTests.xctest */,
+				8AA903952BDF940D00D553A9 /* PapiaUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -147,9 +144,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8AA903772BDF940C00D553A9 /* Pápia */ = {
+		8AA903772BDF940C00D553A9 /* Papia */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8AA9039F2BDF940D00D553A9 /* Build configuration list for PBXNativeTarget "Pápia" */;
+			buildConfigurationList = 8AA9039F2BDF940D00D553A9 /* Build configuration list for PBXNativeTarget "Papia" */;
 			buildPhases = (
 				8AA903742BDF940C00D553A9 /* Sources */,
 				8AA903752BDF940C00D553A9 /* Frameworks */,
@@ -161,20 +158,20 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				8A6C8E702E8A6B3500D6049C /* Pápia */,
+				8A6C8E702E8A6B3500D6049C /* Papia */,
 			);
-			name = "Pápia";
+			name = Papia;
 			packageProductDependencies = (
 				8AA903AA2BDF993500D553A9 /* Get */,
 				8AD888BF2F040A9E00CBCFF7 /* SQLiteData */,
 			);
 			productName = "Pápia";
-			productReference = 8AA903782BDF940C00D553A9 /* Pápia.app */;
+			productReference = 8AA903782BDF940C00D553A9 /* Papia.app */;
 			productType = "com.apple.product-type.application";
 		};
-		8AA9038A2BDF940D00D553A9 /* PápiaTests */ = {
+		8AA9038A2BDF940D00D553A9 /* PapiaTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8AA903A22BDF940D00D553A9 /* Build configuration list for PBXNativeTarget "PápiaTests" */;
+			buildConfigurationList = 8AA903A22BDF940D00D553A9 /* Build configuration list for PBXNativeTarget "PapiaTests" */;
 			buildPhases = (
 				8AA903872BDF940D00D553A9 /* Sources */,
 				8AA903882BDF940D00D553A9 /* Frameworks */,
@@ -186,19 +183,19 @@
 				8AA9038D2BDF940D00D553A9 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				8A7F17EA2E829E220094CD3F /* PápiaTests */,
+				8A7F17EA2E829E220094CD3F /* PapiaTests */,
 			);
-			name = "PápiaTests";
+			name = PapiaTests;
 			packageProductDependencies = (
 				8AA903AC2BDF993A00D553A9 /* Get */,
 			);
 			productName = "PápiaTests";
-			productReference = 8AA9038B2BDF940D00D553A9 /* PápiaTests.xctest */;
+			productReference = 8AA9038B2BDF940D00D553A9 /* PapiaTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		8AA903942BDF940D00D553A9 /* PápiaUITests */ = {
+		8AA903942BDF940D00D553A9 /* PapiaUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8AA903A52BDF940D00D553A9 /* Build configuration list for PBXNativeTarget "PápiaUITests" */;
+			buildConfigurationList = 8AA903A52BDF940D00D553A9 /* Build configuration list for PBXNativeTarget "PapiaUITests" */;
 			buildPhases = (
 				8AA903912BDF940D00D553A9 /* Sources */,
 				8AA903922BDF940D00D553A9 /* Frameworks */,
@@ -210,14 +207,14 @@
 				8AA903972BDF940D00D553A9 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				8A7F17EE2E829E240094CD3F /* PápiaUITests */,
+				8A7F17EE2E829E240094CD3F /* PapiaUITests */,
 			);
-			name = "PápiaUITests";
+			name = PapiaUITests;
 			packageProductDependencies = (
 				8AA903AE2BDF993D00D553A9 /* Get */,
 			);
 			productName = "PápiaUITests";
-			productReference = 8AA903952BDF940D00D553A9 /* PápiaUITests.xctest */;
+			productReference = 8AA903952BDF940D00D553A9 /* PapiaUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -243,7 +240,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 8AA903732BDF940C00D553A9 /* Build configuration list for PBXProject "Pápia" */;
+			buildConfigurationList = 8AA903732BDF940C00D553A9 /* Build configuration list for PBXProject "Papia" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -260,9 +257,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8AA903772BDF940C00D553A9 /* Pápia */,
-				8AA9038A2BDF940D00D553A9 /* PápiaTests */,
-				8AA903942BDF940D00D553A9 /* PápiaUITests */,
+				8AA903772BDF940C00D553A9 /* Papia */,
+				8AA9038A2BDF940D00D553A9 /* PapiaTests */,
+				8AA903942BDF940D00D553A9 /* PapiaUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -287,7 +284,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8A7F17F72E82AF1D0094CD3F /* Pápia.xctestplan in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -320,12 +316,12 @@
 /* Begin PBXTargetDependency section */
 		8AA9038D2BDF940D00D553A9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 8AA903772BDF940C00D553A9 /* Pápia */;
+			target = 8AA903772BDF940C00D553A9 /* Papia */;
 			targetProxy = 8AA9038C2BDF940D00D553A9 /* PBXContainerItemProxy */;
 		};
 		8AA903972BDF940D00D553A9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 8AA903772BDF940C00D553A9 /* Pápia */;
+			target = 8AA903772BDF940C00D553A9 /* Papia */;
 			targetProxy = 8AA903962BDF940D00D553A9 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -557,7 +553,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Pápia.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Pápia";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Papia.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Papia";
 			};
 			name = Debug;
 		};
@@ -579,7 +575,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Pápia.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Pápia";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Papia.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Papia";
 			};
 			name = Release;
 		};
@@ -628,7 +624,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		8AA903732BDF940C00D553A9 /* Build configuration list for PBXProject "Pápia" */ = {
+		8AA903732BDF940C00D553A9 /* Build configuration list for PBXProject "Papia" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8AA9039D2BDF940D00D553A9 /* Debug */,
@@ -637,7 +633,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8AA9039F2BDF940D00D553A9 /* Build configuration list for PBXNativeTarget "Pápia" */ = {
+		8AA9039F2BDF940D00D553A9 /* Build configuration list for PBXNativeTarget "Papia" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8AA903A02BDF940D00D553A9 /* Debug */,
@@ -646,7 +642,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8AA903A22BDF940D00D553A9 /* Build configuration list for PBXNativeTarget "PápiaTests" */ = {
+		8AA903A22BDF940D00D553A9 /* Build configuration list for PBXNativeTarget "PapiaTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8AA903A32BDF940D00D553A9 /* Debug */,
@@ -655,7 +651,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8AA903A52BDF940D00D553A9 /* Build configuration list for PBXNativeTarget "PápiaUITests" */ = {
+		8AA903A52BDF940D00D553A9 /* Build configuration list for PBXNativeTarget "PapiaUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8AA903A62BDF940D00D553A9 /* Debug */,
