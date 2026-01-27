@@ -10,9 +10,20 @@ import XCTest
 final class PapiaUITests: XCTestCase {
 
     private func searchInput(in app: XCUIApplication) -> XCUIElement {
+#if os(macOS)
+        let field = app.searchFields.matching(identifier: "search-input").firstMatch
+#else
         let field = app.textFields.matching(identifier: "search-input").firstMatch
+#endif
         XCTAssertTrue(field.waitForExistence(timeout: 2), "Search input should exist")
         return field
+    }
+
+    private func waitForSearchValue(_ value: String, searchInput: XCUIElement, timeout: TimeInterval = 2) {
+        let predicate = NSPredicate(format: "value == %@", value)
+        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: searchInput)
+        let result = XCTWaiter.wait(for: [expectation], timeout: timeout)
+        XCTAssertEqual(result, .completed, "Expected search input to contain \"\(value)\"")
     }
 
     private func addQuestionMarks(app: XCUIApplication, searchInput: XCUIElement, count: Int) {
@@ -38,8 +49,14 @@ final class PapiaUITests: XCTestCase {
 
     private func clearSearchInput(app: XCUIApplication, searchInput: XCUIElement) {
 #if os(macOS)
-        searchInput.click()
-        searchInput.typeKey(XCUIKeyboardKey.escape.rawValue, modifierFlags: [])
+        let clearButton = searchInput.buttons.matching(identifier: "Clear text").firstMatch
+        if clearButton.waitForExistence(timeout: 1) {
+            clearButton.tap()
+        } else {
+            let fallbackButton = searchInput.buttons.matching(identifier: "Clear search text").firstMatch
+            XCTAssertTrue(fallbackButton.waitForExistence(timeout: 1), "Clear button should exist")
+            fallbackButton.tap()
+        }
 #else
         let clearButton = app.buttons.matching(identifier: "xmark").firstMatch
         XCTAssertTrue(clearButton.waitForExistence(timeout: 2), "Clear button should exist")
@@ -62,12 +79,12 @@ final class PapiaUITests: XCTestCase {
 
     func testSearchAndNavigation() throws {
         let app = XCUIApplication()
-        app.activate()
+        app.launch()
         let searchInput = searchInput(in: app)
         addQuestionMarks(app: app, searchInput: searchInput, count: 5)
 
         // confirm button result
-        XCTAssertEqual(searchInput.value as? String, "?????", "Expected search input to contain \"?????\"")
+        waitForSearchValue("?????", searchInput: searchInput)
 
         // navigate to word detail
         app.buttons.matching(identifier: "word-list-word-view").firstMatch.tap()
@@ -77,7 +94,7 @@ final class PapiaUITests: XCTestCase {
 
         // clear input
         clearSearchInput(app: app, searchInput: searchInput)
-        XCTAssertEqual(searchInput.value as? String, "", "Expected search input to be empty")
+        waitForSearchValue("", searchInput: searchInput)
 
 
     }
@@ -87,12 +104,12 @@ final class PapiaUITests: XCTestCase {
             // This measures how long it takes to launch your application.
             measure() {
                 let app = XCUIApplication()
-                app.activate()
+                app.launch()
                 let searchInput = searchInput(in: app)
                 addQuestionMarks(app: app, searchInput: searchInput, count: 5)
 
                 // confirm button result
-                XCTAssertEqual(searchInput.value as? String, "?????", "Expected search input to contain \"?????\"")
+                waitForSearchValue("?????", searchInput: searchInput)
 
                 // navigate to word detail
                 app.buttons.matching(identifier: "word-list-word-view").firstMatch.tap()
@@ -102,7 +119,7 @@ final class PapiaUITests: XCTestCase {
 
                 // clear input
                 clearSearchInput(app: app, searchInput: searchInput)
-                XCTAssertEqual(searchInput.value as? String, "", "Expected search input to be empty")
+                waitForSearchValue("", searchInput: searchInput)
             }
         }
     }
@@ -128,23 +145,23 @@ final class PapiaUITests: XCTestCase {
         addQuestionMarks(app: app, searchInput: searchInput, count: 3)
 
         // Verify text was added
-        XCTAssertEqual(searchInput.value as? String, "???", "Expected search input to contain \"???\"")
+        waitForSearchValue("???", searchInput: searchInput)
 
         // Clear the input using the clear button
         clearSearchInput(app: app, searchInput: searchInput)
 
         // Verify input is cleared
-        XCTAssertEqual(searchInput.value as? String, "", "Expected search input to be empty after clear")
+        waitForSearchValue("", searchInput: searchInput)
 
         // Now tap a toolbar button again - this should NOT crash
         // The bug was that stale TextSelection indices from the previous text would cause a crash
         addAsterisk(app: app, searchInput: searchInput)
 
         // Verify the character was added successfully
-        XCTAssertEqual(searchInput.value as? String, "*", "Expected search input to contain \"*\" after pressing toolbar button")
+        waitForSearchValue("*", searchInput: searchInput)
 
         // Tap another button to make sure it continues to work
         addQuestionMarks(app: app, searchInput: searchInput, count: 1)
-        XCTAssertEqual(searchInput.value as? String, "*?", "Expected search input to contain \"*?\"")
+        waitForSearchValue("*?", searchInput: searchInput)
     }
 }

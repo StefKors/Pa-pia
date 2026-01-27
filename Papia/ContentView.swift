@@ -92,6 +92,7 @@ struct ContentView: View {
             }
         }
         .searchable(text: $model.searchText, placement: .toolbar, prompt: "Find words...")
+        .accessibilityIdentifier("search-input")
         .toolbar {
             ToolbarItem(placement: .automatic) {
                 FilterButtonsGroup()
