@@ -206,6 +206,33 @@ require that the results are spelled similarly to this string of characters, or 
         return result
     }
 
+    func definition(for word: String) async -> DataMuseDefinition? {
+        let path = "/words"
+        let trimmed = word.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if trimmed.isEmpty {
+            return nil
+        }
+
+        do {
+            let result: [DataMuseDefinition] = try await client.send(
+                Request(
+                    path: path,
+                    query: [
+                        ("sp", trimmed),
+                        ("md", "dp"),
+                        ("max", "1"),
+                    ]
+                )
+            ).value
+            return result.first
+        } catch {
+            logger.error("Failed to fetch definition for \(trimmed): \(error.localizedDescription)")
+        }
+
+        return nil
+    }
+
     private func query(
         _ path: String,
         scope: SearchScope,

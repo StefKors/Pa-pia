@@ -52,6 +52,18 @@ actor WordListDatabase {
                 .fetchCount(db) > 0
         }) ?? false
     }
+
+    /// Fetch a random word from the scrabble list
+    func randomScrabbleWord() async -> String? {
+        guard let dbQueue else { return nil }
+
+        return (try? await dbQueue.read { db in
+            try String.fetchOne(
+                db,
+                sql: "SELECT word FROM words WHERE isScrabble = 1 ORDER BY RANDOM() LIMIT 1"
+            )
+        }) ?? nil
+    }
     
     /// Check if a word exists in the common bongo list
     func isCommonBongo(_ word: String) async -> Bool {
