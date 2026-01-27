@@ -1,0 +1,31 @@
+{
+  "configurations" : [
+    {
+      "id" : "768DFACF-053F-4DCA-94EF-E62C3D200A6E",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Papia.xcodeproj",
+        "identifier" : "8AA903942BDF940D00D553A9",
+        "name" : "PapiaUITests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Papia.xcodeproj",
+        "identifier" : "8AA9038A2BDF940D00D553A9",
+        "name" : "PapiaTests"
+      }
+    }
+  ],
+  "version" : 1
+}
