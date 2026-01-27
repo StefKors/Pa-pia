@@ -9,6 +9,44 @@ import XCTest
 
 final class PapiaUITests: XCTestCase {
 
+    private func searchInput(in app: XCUIApplication) -> XCUIElement {
+        let field = app.textFields.matching(identifier: "search-input").firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 2), "Search input should exist")
+        return field
+    }
+
+    private func addQuestionMarks(app: XCUIApplication, searchInput: XCUIElement, count: Int) {
+#if os(macOS)
+        searchInput.click()
+        searchInput.typeText(String(repeating: "?", count: count))
+#else
+        let button = app.buttons.matching(identifier: "? any letter").firstMatch
+        for _ in 0..<count {
+            button.tap()
+        }
+#endif
+    }
+
+    private func addAsterisk(app: XCUIApplication, searchInput: XCUIElement) {
+#if os(macOS)
+        searchInput.click()
+        searchInput.typeText("*")
+#else
+        app.buttons.matching(identifier: "* many").firstMatch.tap()
+#endif
+    }
+
+    private func clearSearchInput(app: XCUIApplication, searchInput: XCUIElement) {
+#if os(macOS)
+        searchInput.click()
+        searchInput.typeKey(XCUIKeyboardKey.escape.rawValue, modifierFlags: [])
+#else
+        let clearButton = app.buttons.matching(identifier: "xmark").firstMatch
+        XCTAssertTrue(clearButton.waitForExistence(timeout: 2), "Clear button should exist")
+        clearButton.tap()
+#endif
+    }
+
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
 
@@ -25,15 +63,11 @@ final class PapiaUITests: XCTestCase {
     func testSearchAndNavigation() throws {
         let app = XCUIApplication()
         app.activate()
-        let element = app.buttons.matching(identifier: "? any letter").firstMatch
-        element.tap()
-        element.tap()
-        element.tap()
-        element.tap()
-        element.tap()
+        let searchInput = searchInput(in: app)
+        addQuestionMarks(app: app, searchInput: searchInput, count: 5)
 
         // confirm button result
-        XCTAssertEqual(app.textFields.matching(identifier: "search-input").firstMatch.value as? String, "?????", "Expected search input to contain \"?????\"")
+        XCTAssertEqual(searchInput.value as? String, "?????", "Expected search input to contain \"?????\"")
 
         // navigate to word detail
         app.buttons.matching(identifier: "word-list-word-view").firstMatch.tap()
@@ -42,9 +76,8 @@ final class PapiaUITests: XCTestCase {
         app.staticTexts.matching(identifier: "navigation-back-button").firstMatch.tap()
 
         // clear input
-        let element2 = app.buttons.matching(identifier: "xmark").firstMatch
-        element2.tap()
-        XCTAssertEqual(app.textFields.matching(identifier: "search-input").firstMatch.value as? String, "", "Expected search input to be empty")
+        clearSearchInput(app: app, searchInput: searchInput)
+        XCTAssertEqual(searchInput.value as? String, "", "Expected search input to be empty")
 
 
     }
@@ -55,15 +88,11 @@ final class PapiaUITests: XCTestCase {
             measure() {
                 let app = XCUIApplication()
                 app.activate()
-                let element = app.buttons.matching(identifier: "? any letter").firstMatch
-                element.tap()
-                element.tap()
-                element.tap()
-                element.tap()
-                element.tap()
+                let searchInput = searchInput(in: app)
+                addQuestionMarks(app: app, searchInput: searchInput, count: 5)
 
                 // confirm button result
-                XCTAssertEqual(app.textFields.matching(identifier: "search-input").firstMatch.value as? String, "?????", "Expected search input to contain \"?????\"")
+                XCTAssertEqual(searchInput.value as? String, "?????", "Expected search input to contain \"?????\"")
 
                 // navigate to word detail
                 app.buttons.matching(identifier: "word-list-word-view").firstMatch.tap()
@@ -72,9 +101,8 @@ final class PapiaUITests: XCTestCase {
                 app.staticTexts.matching(identifier: "navigation-back-button").firstMatch.tap()
 
                 // clear input
-                let element2 = app.buttons.matching(identifier: "xmark").firstMatch
-                element2.tap()
-                XCTAssertEqual(app.textFields.matching(identifier: "search-input").firstMatch.value as? String, "", "Expected search input to be empty")
+                clearSearchInput(app: app, searchInput: searchInput)
+                XCTAssertEqual(searchInput.value as? String, "", "Expected search input to be empty")
             }
         }
     }
@@ -94,34 +122,29 @@ final class PapiaUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
+        let searchInput = searchInput(in: app)
+
         // Add some characters using the toolbar buttons
-        let questionMarkButton = app.buttons.matching(identifier: "? any letter").firstMatch
-        questionMarkButton.tap()
-        questionMarkButton.tap()
-        questionMarkButton.tap()
+        addQuestionMarks(app: app, searchInput: searchInput, count: 3)
 
         // Verify text was added
-        let searchInput = app.textFields.matching(identifier: "search-input").firstMatch
         XCTAssertEqual(searchInput.value as? String, "???", "Expected search input to contain \"???\"")
 
         // Clear the input using the clear button
-        let clearButton = app.buttons.matching(identifier: "xmark").firstMatch
-        XCTAssertTrue(clearButton.waitForExistence(timeout: 2), "Clear button should exist")
-        clearButton.tap()
+        clearSearchInput(app: app, searchInput: searchInput)
 
         // Verify input is cleared
         XCTAssertEqual(searchInput.value as? String, "", "Expected search input to be empty after clear")
 
         // Now tap a toolbar button again - this should NOT crash
         // The bug was that stale TextSelection indices from the previous text would cause a crash
-        let asteriskButton = app.buttons.matching(identifier: "* many").firstMatch
-        asteriskButton.tap()
+        addAsterisk(app: app, searchInput: searchInput)
 
         // Verify the character was added successfully
         XCTAssertEqual(searchInput.value as? String, "*", "Expected search input to contain \"*\" after pressing toolbar button")
 
         // Tap another button to make sure it continues to work
-        questionMarkButton.tap()
+        addQuestionMarks(app: app, searchInput: searchInput, count: 1)
         XCTAssertEqual(searchInput.value as? String, "*?", "Expected search input to contain \"*?\"")
     }
 }
