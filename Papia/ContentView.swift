@@ -8,6 +8,70 @@
 import SwiftUI
 import SwiftData
 import Get
+#if os(macOS)
+import AppKit
+#endif
+
+#if os(macOS)
+struct MacSearchField: NSViewRepresentable {
+    @Binding var text: String
+    var isFocused: FocusState<Bool>.Binding
+    var onSubmit: () -> Void
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(text: $text, isFocused: isFocused, onSubmit: onSubmit)
+    }
+
+    func makeNSView(context: Context) -> NSSearchField {
+        let searchField = NSSearchField()
+        searchField.placeholderString = "Find words..."
+        searchField.delegate = context.coordinator
+        searchField.target = context.coordinator
+        searchField.action = #selector(Coordinator.handleSubmit)
+        searchField.accessibilityIdentifier = "search-input"
+        return searchField
+    }
+
+    func updateNSView(_ nsView: NSSearchField, context: Context) {
+        if nsView.stringValue != text {
+            nsView.stringValue = text
+        }
+        if isFocused.wrappedValue, nsView.window?.firstResponder != nsView {
+            nsView.window?.makeFirstResponder(nsView)
+        }
+    }
+
+    final class Coordinator: NSObject, NSSearchFieldDelegate {
+        var text: Binding<String>
+        var isFocused: FocusState<Bool>.Binding
+        var onSubmit: () -> Void
+
+        init(text: Binding<String>, isFocused: FocusState<Bool>.Binding, onSubmit: @escaping () -> Void) {
+            self.text = text
+            self.isFocused = isFocused
+            self.onSubmit = onSubmit
+            super.init()
+        }
+
+        func controlTextDidChange(_ notification: Notification) {
+            guard let searchField = notification.object as? NSSearchField else { return }
+            text.wrappedValue = searchField.stringValue
+        }
+
+        func controlTextDidBeginEditing(_ notification: Notification) {
+            isFocused.wrappedValue = true
+        }
+
+        func controlTextDidEndEditing(_ notification: Notification) {
+            isFocused.wrappedValue = false
+        }
+
+        @objc func handleSubmit() {
+            onSubmit()
+        }
+    }
+}
+#endif
 
 // TODO: add search progress @Environment(\.isSearching) private var isSearching
 // TODO: add indicator if the word exists in the wordle dictionary
@@ -91,27 +155,22 @@ struct ContentView: View {
                 )
             }
         }
-        .searchable(text: $model.searchText, placement: .toolbar, prompt: "Find words...")
         .toolbar {
+            ToolbarItem(placement: .automatic) {
+                MacSearchField(
+                    text: $model.searchText,
+                    isFocused: $searchFocused,
+                    onSubmit: {
+                        state.appendSearchHistory(model.searchText)
+                    }
+                )
+                .frame(width: 220)
+            }
             ToolbarItem(placement: .automatic) {
                 FilterButtonsGroup()
                     .environmentObject(model)
             }
         }
-        .searchSuggestions {
-            ForEach(filteredSearchHistory, id: \.self) { suggestion in
-                HighlightedText(
-                    text: suggestion,
-                    highlightedText: model.searchText,
-                    shapeStyle: .tint.opacity(0.4)
-                )
-                .searchCompletion(suggestion)
-            }
-        }
-        .onSubmit(of: .search, {
-            state.appendSearchHistory(model.searchText)
-        })
-        .searchFocused($searchFocused)
         .task {
             searchFocused = true
         }
