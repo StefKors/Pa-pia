@@ -35,57 +35,34 @@ struct ToolbarButtonComponent: View {
     }
     
     private func insertLabel() {
-        // If text is empty, just append - any previous selection is invalid
         guard !model.searchText.isEmpty else {
-            self.model.searchText = self.label
-            // Set cursor position to end of the inserted text
-            let endIndex = self.model.searchText.endIndex
+            model.searchText = label
+            let endIndex = model.searchText.endIndex
             model.searchTextSelection = TextSelection(insertionPoint: endIndex)
             return
         }
-        
-        if let searchTextSelection = model.searchTextSelection {
-            let indices = searchTextSelection.indices
-            switch indices {
-            case .selection(let range):
-                // Validate that the range is within the current text bounds
-                guard range.lowerBound >= model.searchText.startIndex,
-                      range.upperBound <= model.searchText.endIndex else {
-                    // Invalid range - append to end instead
-                    self.model.searchText += self.label
-                    let endIndex = self.model.searchText.endIndex
-                    model.searchTextSelection = TextSelection(insertionPoint: endIndex)
-                    return
+
+        if let selection = model.searchTextSelection {
+            let range: Range<String.Index>? = {
+                switch selection.indices {
+                case .selection(let r): return r
+                case .multiSelection(let rs): return rs.ranges.last
+                @unknown default: return nil
                 }
-                // Calculate insertion position as integer offset before mutation
-                let insertionOffset = self.model.searchText.distance(from: self.model.searchText.startIndex, to: range.lowerBound)
-                self.model.searchText.replaceSubrange(range, with: self.label)
-                // Position cursor after the inserted text
-                let newCursorOffset = insertionOffset + self.label.count
-                let newCursorIndex = self.model.searchText.index(self.model.searchText.startIndex, offsetBy: newCursorOffset)
-                model.searchTextSelection = TextSelection(insertionPoint: newCursorIndex)
-            case .multiSelection(let rangeSet):
-                if let range = rangeSet.ranges.last {
-                    // Validate that the range is within the current text bounds
-                    guard range.lowerBound >= model.searchText.startIndex,
-                          range.upperBound <= model.searchText.endIndex else {
-                        // Invalid range - append to end instead
-                        self.model.searchText += self.label
-                        let endIndex = self.model.searchText.endIndex
-                        model.searchTextSelection = TextSelection(insertionPoint: endIndex)
-                        return
-                    }
-                    let insertionOffset = self.model.searchText.distance(from: self.model.searchText.startIndex, to: range.lowerBound)
-                    self.model.searchText.replaceSubrange(range, with: self.label)
-                    let newCursorOffset = insertionOffset + self.label.count
-                    let newCursorIndex = self.model.searchText.index(self.model.searchText.startIndex, offsetBy: newCursorOffset)
-                    model.searchTextSelection = TextSelection(insertionPoint: newCursorIndex)
-                }
-            @unknown default:
-                self.model.searchText += self.label
+            }()
+
+            if let range,
+               range.lowerBound >= model.searchText.startIndex,
+               range.upperBound <= model.searchText.endIndex {
+                let offset = model.searchText.distance(from: model.searchText.startIndex, to: range.lowerBound)
+                model.searchText.replaceSubrange(range, with: label)
+                let newIndex = model.searchText.index(model.searchText.startIndex, offsetBy: offset + label.count)
+                model.searchTextSelection = TextSelection(insertionPoint: newIndex)
+            } else {
+                model.searchText += label
             }
         } else {
-            self.model.searchText += self.label
+            model.searchText += label
         }
     }
 }

@@ -92,6 +92,7 @@ struct ContentView: View {
             }
         }
         .searchable(text: $model.searchText, placement: .toolbar, prompt: "Find words...")
+        .searchSelection($model.searchTextSelection)
         .toolbar {
             ToolbarItem(placement: .automatic) {
                 FilterButtonsGroup()
@@ -215,6 +216,7 @@ struct ContentView: View {
                 DefaultToolbarItem(kind: .search, placement: .bottomBar)
             }
             .searchable(text: $model.searchText, placement: .toolbar, prompt: "Find words...")
+            .searchSelection($model.searchTextSelection)
             .searchFocused($searchIsFocused)
             .onSubmit(of: .search) {
                 if !model.searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -282,29 +284,23 @@ struct ContentView: View {
                     }
             }
         }
-        .task(id: model.searchText, priority: .userInitiated) {
+        .task(id: model.searchQuery, priority: .userInitiated) {
             if model.searchText.isEmpty {
                 self.model.searchResults = []
                 return
             }
+
+            // Debounce: wait 120ms before firing the request.
+            // If the user types another character the task is cancelled
+            // automatically by SwiftUI before the sleep finishes.
+            try? await Task.sleep(for: .milliseconds(120))
+            guard !Task.isCancelled else { return }
 
             self.model.searchResults = await self.model.fetch(
                 scope: self.model.searchScope,
                 searchText: self.model.searchText
             )
         }
-        .onChange(of: model.searchScope, initial: true, { oldValue, newValue in
-            if model.searchText.isEmpty {
-                self.model.searchResults = []
-                return
-            }
-            Task(priority: .userInitiated) {
-                self.model.searchResults = await self.model.fetch(
-                    scope: newValue,
-                    searchText: self.model.searchText
-                )
-            }
-        })
     }
 
     private var shouldShowResultsFooter: Bool {
