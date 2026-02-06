@@ -30,13 +30,9 @@ final class iOSRootViewController: UIViewController {
     private lazy var navigationController_: UINavigationController = {
         let nav = UINavigationController(rootViewController: searchListVC)
         nav.navigationBar.prefersLargeTitles = false
-        // Remove the navigation bar background/shadow so there's no
-        // visible title area on the root screen. The search bar still
-        // renders because it's attached to the navigation item.
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithTransparentBackground()
-        nav.navigationBar.standardAppearance = appearance
-        nav.navigationBar.scrollEdgeAppearance = appearance
+        // Hide the navigation bar on the root screen — the search bar
+        // lives in the bottom area, not in the navigation bar.
+        nav.setNavigationBarHidden(true, animated: false)
         return nav
     }()
 

@@ -13,12 +13,21 @@ import os
 
 private let logger = Logger(subsystem: "com.stefkors.Papia", category: "SearchList")
 
-/// The main search screen on iOS. Owns:
-/// - UISearchController with a real UITextField
-/// - UICollectionView with diffable data source (hosting SwiftUI WordView cells)
-/// - Scope segmented control + filter bar at the top
-/// - Wildcard toolbar at the bottom
-/// - Empty state (hosted SwiftUI SearchContentUnavailableView)
+/// The main search screen on iOS.
+///
+/// Layout (top → bottom):
+///   ┌─────────────────────────┐
+///   │  Top area (floating)    │  scope picker + filter buttons
+///   ├─────────────────────────┤
+///   │                         │
+///   │  Collection view        │  full-height, scrolls underneath
+///   │  (or empty state)       │  both top and bottom areas
+///   │                         │
+///   ├─────────────────────────┤
+///   │  Bottom area (floating) │  wildcard toolbar + search bar
+///   └─────────────────────────┘
+///   │  Keyboard               │
+///
 final class SearchListViewController: UIViewController {
 
     // MARK: - Dependencies
@@ -38,19 +47,10 @@ final class SearchListViewController: UIViewController {
 
     // MARK: - UI Components
 
-    private lazy var searchController: UISearchController = {
-        let sc = UISearchController(searchResultsController: nil)
-        sc.searchResultsUpdater = self
-        sc.delegate = self
-        sc.obscuresBackgroundDuringPresentation = false
-        sc.searchBar.placeholder = "Find words..."
-        sc.searchBar.delegate = self
-        sc.searchBar.showsScopeBar = false
-        return sc
-    }()
-
     private var collectionView: UICollectionView!
     private var dataSource: UICollectionViewDiffableDataSource<Section, DataMuseWord>!
+
+    // --- Top area ---
 
     private lazy var filterBar: FilterBarView = {
         FilterBarView(viewModel: viewModel)
@@ -72,15 +72,11 @@ final class SearchListViewController: UIViewController {
         return control
     }()
 
-    /// Combined container for the scope picker, filter buttons, and wildcard toolbar.
-    private lazy var headerContainerView: UIView = {
+    private lazy var topContainerView: UIView = {
         let container = UIView()
-        container.backgroundColor = .systemGroupedBackground
-
-        // Scope control should fill the width
         scopeControl.translatesAutoresizingMaskIntoConstraints = false
 
-        let stack = UIStackView(arrangedSubviews: [scopeControl, filterBar, wildcardToolbar])
+        let stack = UIStackView(arrangedSubviews: [scopeControl, filterBar])
         stack.axis = .vertical
         stack.spacing = 8
         stack.alignment = .fill
@@ -97,13 +93,47 @@ final class SearchListViewController: UIViewController {
         return container
     }()
 
+    // --- Bottom area ---
+
+    private lazy var searchBar: UISearchBar = {
+        let bar = UISearchBar()
+        bar.placeholder = "Find words..."
+        bar.delegate = self
+        bar.searchBarStyle = .minimal
+        bar.returnKeyType = .search
+        return bar
+    }()
+
     private lazy var wildcardToolbar: WildcardToolbarView = {
         let toolbar = WildcardToolbarView()
         toolbar.resolveTextField = { [weak self] in
-            self?.searchController.searchBar.searchTextField
+            self?.searchBar.searchTextField
         }
         return toolbar
     }()
+
+    private lazy var bottomContainerView: UIView = {
+        let container = UIView()
+
+        let stack = UIStackView(arrangedSubviews: [wildcardToolbar, searchBar])
+        stack.axis = .vertical
+        stack.spacing = 4
+        stack.alignment = .fill
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(stack)
+
+        NSLayoutConstraint.activate([
+            container.heightAnchor.constraint(equalToConstant: 96),
+            stack.topAnchor.constraint(equalTo: container.topAnchor, constant: 4),
+            stack.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            stack.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            stack.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -4),
+        ])
+
+        return container
+    }()
+
+    // --- Empty state ---
 
     private lazy var emptyStateHost: UIHostingController<EmptyStateWrapper> = {
         let host = UIHostingController(rootView: EmptyStateWrapper(
@@ -136,20 +166,19 @@ final class SearchListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGroupedBackground
-        navigationItem.searchController = searchController
+
+        // No navigation-bar search controller — we use our own search bar at the bottom.
         navigationItem.hidesSearchBarWhenScrolling = false
-        definesPresentationContext = true
 
         setupCollectionView()
-        setupHeaderView()
+        setupTopArea()
+        setupBottomArea()
         setupEmptyState()
         bindViewModel()
 
-        // Activate search immediately so the keyboard appears on launch
+        // Focus the search bar on launch
         DispatchQueue.main.async {
-            self.searchController.isActive = true
-            self.searchController.searchBar.searchTextField.becomeFirstResponder()
-
+            self.searchBar.becomeFirstResponder()
         }
     }
 
@@ -166,6 +195,7 @@ final class SearchListViewController: UIViewController {
         collectionView.keyboardDismissMode = .onDrag
         view.addSubview(collectionView)
 
+        // Full-height — scrolls underneath both top and bottom areas.
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.topAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -173,12 +203,11 @@ final class SearchListViewController: UIViewController {
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
 
-        // Cell registration using UIHostingConfiguration to render SwiftUI WordView
+        // Cell registration
         let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, DataMuseWord> { cell, indexPath, word in
             cell.contentConfiguration = UIHostingConfiguration {
                 WordView(word: word)
             }
-            // Disclosure indicator for navigation
             cell.accessories = [.disclosureIndicator()]
         }
 
@@ -187,39 +216,62 @@ final class SearchListViewController: UIViewController {
         }
     }
 
-    // MARK: - Header View Setup (scope picker + filter buttons)
+    // MARK: - Top Area Setup (scope picker + filter buttons)
 
-    private func setupHeaderView() {
-        headerContainerView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(headerContainerView)
+    private func setupTopArea() {
+        topContainerView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(topContainerView)
 
         NSLayoutConstraint.activate([
-            headerContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            headerContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            headerContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            topContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            topContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            topContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ])
 
-        // Push collection view content below the header
-        // We'll update this once layout is known; use a reasonable estimate
-        collectionView.contentInset.top = 90
-        collectionView.verticalScrollIndicatorInsets.top = 90
+        // Initial estimate — updated in viewDidLayoutSubviews
+        collectionView.contentInset.top = 80
+        collectionView.verticalScrollIndicatorInsets.top = 80
+    }
+
+    // MARK: - Bottom Area Setup (wildcard toolbar + search bar)
+
+    private func setupBottomArea() {
+        bottomContainerView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(bottomContainerView)
+
+        NSLayoutConstraint.activate([
+            bottomContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bottomContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            // Pin to keyboard layout guide so it floats above the keyboard.
+            bottomContainerView.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor),
+        ])
+
+        // Initial estimate — updated in viewDidLayoutSubviews
+        collectionView.contentInset.bottom = 100
+        collectionView.verticalScrollIndicatorInsets.bottom = 100
     }
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        // Update collection view inset to match actual header height
-        let headerHeight = headerContainerView.systemLayoutSizeFitting(
+
+        // Update collection view top inset to match actual top area height
+        let topHeight = topContainerView.systemLayoutSizeFitting(
             CGSize(width: view.bounds.width, height: UIView.layoutFittingCompressedSize.height),
             withHorizontalFittingPriority: .required,
             verticalFittingPriority: .fittingSizeLevel
         ).height
-        if collectionView.contentInset.top != headerHeight {
-            collectionView.contentInset.top = headerHeight
-            collectionView.verticalScrollIndicatorInsets.top = headerHeight
+        if collectionView.contentInset.top != topHeight {
+            collectionView.contentInset.top = topHeight
+            collectionView.verticalScrollIndicatorInsets.top = topHeight
+        }
+
+        // Update collection view bottom inset to match actual bottom area height
+        let bottomHeight = bottomContainerView.bounds.height
+        if bottomHeight > 0 && collectionView.contentInset.bottom != bottomHeight {
+            collectionView.contentInset.bottom = bottomHeight
+            collectionView.verticalScrollIndicatorInsets.bottom = bottomHeight
         }
     }
-
-    // (Wildcard toolbar is now part of the headerContainerView stack)
 
     // MARK: - Empty State Setup
 
@@ -228,11 +280,11 @@ final class SearchListViewController: UIViewController {
         view.addSubview(emptyStateHost.view)
         emptyStateHost.view.translatesAutoresizingMaskIntoConstraints = false
 
-        let bottom = emptyStateHost.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        bottom.priority = .defaultHigh  // avoid fighting with header intrinsic size
+        let bottom = emptyStateHost.view.bottomAnchor.constraint(equalTo: bottomContainerView.topAnchor)
+        bottom.priority = .defaultHigh
 
         NSLayoutConstraint.activate([
-            emptyStateHost.view.topAnchor.constraint(equalTo: headerContainerView.bottomAnchor),
+            emptyStateHost.view.topAnchor.constraint(equalTo: topContainerView.bottomAnchor),
             emptyStateHost.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             emptyStateHost.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             bottom,
@@ -244,7 +296,6 @@ final class SearchListViewController: UIViewController {
     // MARK: - Combine Bindings
 
     private func bindViewModel() {
-        // Update collection view when filtered results change
         viewModel.$filteredSearchResults
             .receive(on: DispatchQueue.main)
             .sink { [weak self] results in
@@ -253,7 +304,6 @@ final class SearchListViewController: UIViewController {
             }
             .store(in: &cancellables)
 
-        // Trigger fetch on search text or scope change (with debounce)
         viewModel.$searchText
             .combineLatest(viewModel.$searchScope)
             .debounce(for: .milliseconds(120), scheduler: DispatchQueue.main)
@@ -277,7 +327,6 @@ final class SearchListViewController: UIViewController {
     }
 
     private func performSearch(text: String, scope: DataMuseViewModel.SearchScope) {
-        // Cancel previous search
         searchTask?.cancel()
 
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -294,8 +343,8 @@ final class SearchListViewController: UIViewController {
 
     /// Set the search bar text from a history item and trigger a search.
     private func searchFromHistory(_ query: String) {
-        searchController.searchBar.text = query
-        searchController.isActive = true
+        searchBar.text = query
+        searchBar.becomeFirstResponder()
         viewModel.searchText = query
     }
 
@@ -328,27 +377,13 @@ final class SearchListViewController: UIViewController {
     }
 }
 
-// MARK: - UISearchResultsUpdating
-
-extension SearchListViewController: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        viewModel.searchText = searchController.searchBar.text ?? ""
-    }
-}
-
-// MARK: - UISearchControllerDelegate
-
-extension SearchListViewController: UISearchControllerDelegate {
-    func didDismissSearchController(_ searchController: UISearchController) {
-        // Re-activate immediately so the navigation bar layout never changes
-        // and the header/filter bar don't jump.
-        searchController.isActive = true
-    }
-}
-
 // MARK: - UISearchBarDelegate
 
 extension SearchListViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        viewModel.searchText = searchText
+    }
+
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         let text = searchBar.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         if !text.isEmpty {

@@ -31,6 +31,8 @@ final class FilterBarView: UIView {
 
     // MARK: - UI Setup
 
+    private static let barHeight: CGFloat = 32
+
     private func setupUI() {
         let stack = UIStackView()
         stack.axis = .horizontal
@@ -40,9 +42,9 @@ final class FilterBarView: UIView {
         addSubview(stack)
 
         NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: topAnchor),
+            heightAnchor.constraint(equalToConstant: Self.barHeight),
             stack.centerXAnchor.constraint(equalTo: centerXAnchor),
-            stack.bottomAnchor.constraint(equalTo: bottomAnchor),
+            stack.centerYAnchor.constraint(equalTo: centerYAnchor),
         ])
 
         for filter in WordFilter.allCases {
