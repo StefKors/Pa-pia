@@ -18,6 +18,8 @@ struct SettingsView: View {
     @AppStorage("selected-scrabble-dictionary") private var selectedDictionary: String = ScrabbleDictionary.default.rawValue
     /// True while the word‑list database is being rebuilt after a dictionary change.
     @State private var isRebuilding = false
+    /// The in‑flight rebuild task so we can cancel a previous one before starting a new rebuild.
+    @State private var rebuildTask: Task<Void, Never>?
 
     private var selectedScrabbleDictionary: ScrabbleDictionary {
         ScrabbleDictionary(rawValue: selectedDictionary) ?? .default
@@ -91,15 +93,23 @@ struct SettingsView: View {
     }
 
     private func rebuildDatabase() {
+        // Cancel any in‑flight rebuild before starting a new one.
+        rebuildTask?.cancel()
         isRebuilding = true
-        Task {
+        rebuildTask = Task {
             do {
                 try await WordListDatabase.shared.rebuildIfNeeded()
+            } catch is CancellationError {
+                // Another rebuild was requested; this one was cancelled.
             } catch {
                 logger.error("Failed to rebuild word list database: \(error)")
             }
-            await MainActor.run {
-                isRebuilding = false
+            // Only clear the spinner if this task wasn't cancelled (a new
+            // rebuild is already in progress in that case).
+            if !Task.isCancelled {
+                await MainActor.run {
+                    isRebuilding = false
+                }
             }
         }
     }
