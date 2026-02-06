@@ -20,6 +20,8 @@ actor WordListDatabase {
     
     /// The scrabble dictionary that was used to build the current database.
     private var loadedDictionary: ScrabbleDictionary?
+    /// The crossplay dictionary that was used to build the current database.
+    private var loadedCrossPlayDictionary: CrossPlayDictionary?
     
     /// Separate database for user data (search history) that survives
     /// word-list rebuilds.
@@ -30,18 +32,21 @@ actor WordListDatabase {
     /// Initialize the database and load word lists if needed.
     func initialize() async throws {
         let selected = Self.selectedScrabbleDictionary
-        guard !isInitialized || loadedDictionary != selected else { return }
+        let selectedCP = Self.selectedCrossPlayDictionary
+        guard !isInitialized || loadedDictionary != selected || loadedCrossPlayDictionary != selectedCP else { return }
         
         let dbQueue = try await setupDatabase()
         self.dbQueue = dbQueue
         self.isInitialized = true
         self.loadedDictionary = selected
+        self.loadedCrossPlayDictionary = selectedCP
     }
     
-    /// Re‑initialize the database when the user changes the scrabble dictionary.
+    /// Re‑initialize the database when the user changes a dictionary.
     func rebuildIfNeeded() async throws {
         let selected = Self.selectedScrabbleDictionary
-        guard loadedDictionary != selected else { return }
+        let selectedCP = Self.selectedCrossPlayDictionary
+        guard loadedDictionary != selected || loadedCrossPlayDictionary != selectedCP else { return }
 
         // Close the current database connection so the file can be deleted.
         dbQueue = nil
@@ -79,6 +84,15 @@ actor WordListDatabase {
     static var selectedScrabbleDictionary: ScrabbleDictionary {
         guard let raw = UserDefaults.standard.string(forKey: "selected-scrabble-dictionary"),
               let dict = ScrabbleDictionary(rawValue: raw) else {
+            return .default
+        }
+        return dict
+    }
+
+    /// Read the user's preferred CrossPlay dictionary from UserDefaults.
+    static var selectedCrossPlayDictionary: CrossPlayDictionary {
+        guard let raw = UserDefaults.standard.string(forKey: "selected-crossplay-dictionary"),
+              let dict = CrossPlayDictionary(rawValue: raw) else {
             return .default
         }
         return dict
@@ -137,6 +151,7 @@ actor WordListDatabase {
                 result[entry.word] = WordFlags(
                     isWordle: existing.isWordle || entry.isWordle,
                     isScrabble: existing.isScrabble || entry.isScrabble,
+                    isCrossPlay: existing.isCrossPlay || entry.isCrossPlay,
                     isCommonBongo: existing.isCommonBongo || entry.isCommonBongo
                 )
             }
@@ -270,9 +285,10 @@ actor WordListDatabase {
         
         // Encode both a schema version AND the selected dictionary into the
         // version string so the database is rebuilt whenever either changes.
-        let schemaVersion = 3 // Increment when the DB schema or bundled files change
+        let schemaVersion = 4 // Increment when the DB schema or bundled files change
         let selected = Self.selectedScrabbleDictionary
-        let currentVersionTag = "\(schemaVersion)-\(selected.rawValue)"
+        let selectedCrossPlay = Self.selectedCrossPlayDictionary
+        let currentVersionTag = "\(schemaVersion)-\(selected.rawValue)-\(selectedCrossPlay.rawValue)"
         let versionURL = papiaDirectory.appendingPathComponent("db_version.txt")
         let existingVersionTag = try? String(contentsOf: versionURL, encoding: .utf8)
             .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -288,7 +304,7 @@ actor WordListDatabase {
             try fileManager.removeItem(at: dbURL)
         }
         
-        logger.info("Creating new database with scrabble dictionary: \(selected.rawValue)")
+        logger.info("Creating new database with scrabble dictionary: \(selected.rawValue), crossplay: \(selectedCrossPlay.rawValue)")
         let dbQueue = try DatabaseQueue(path: dbURL.path)
         
         try await dbQueue.write { db in
@@ -299,6 +315,7 @@ actor WordListDatabase {
                     word TEXT NOT NULL,
                     isWordle INTEGER NOT NULL DEFAULT 0,
                     isScrabble INTEGER NOT NULL DEFAULT 0,
+                    isCrossPlay INTEGER NOT NULL DEFAULT 0,
                     isCommonBongo INTEGER NOT NULL DEFAULT 0
                 )
             """)
@@ -308,7 +325,7 @@ actor WordListDatabase {
         }
         
         // Load word lists
-        try await loadWordLists(into: dbQueue, scrabbleDictionary: selected)
+        try await loadWordLists(into: dbQueue, scrabbleDictionary: selected, crossPlayDictionary: selectedCrossPlay)
         
         // Save version tag
         try currentVersionTag.write(to: versionURL, atomically: true, encoding: .utf8)
@@ -317,7 +334,7 @@ actor WordListDatabase {
         return dbQueue
     }
     
-    private func loadWordLists(into dbQueue: DatabaseQueue, scrabbleDictionary: ScrabbleDictionary) async throws {
+    private func loadWordLists(into dbQueue: DatabaseQueue, scrabbleDictionary: ScrabbleDictionary, crossPlayDictionary: CrossPlayDictionary) async throws {
         // Collect all words with their flags
         var wordFlags: [String: WordFlags] = [:]
         
@@ -360,6 +377,26 @@ actor WordListDatabase {
             logger.warning("Scrabble dictionary not found in bundle: \(scrabbleDictionary.resourceName).txt")
         }
         
+        // Load CrossPlay words using the user's selected dictionary.
+        // Same format as scrabble dictionaries: first token per line is the word.
+        if let url = Bundle.main.url(forResource: crossPlayDictionary.resourceName, withExtension: "txt", subdirectory: "crossplay") ?? Bundle.main.url(forResource: crossPlayDictionary.resourceName, withExtension: "txt") {
+            let content = try String(contentsOf: url, encoding: .utf8)
+            for line in content.components(separatedBy: .newlines) {
+                let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                if trimmed.isEmpty || trimmed.hasPrefix("#") { continue }
+                let word = trimmed.split(separator: " ", maxSplits: 1).first
+                    .map { String($0).lowercased() } ?? ""
+                if !word.isEmpty {
+                    var flags = wordFlags[word] ?? WordFlags()
+                    flags.isCrossPlay = true
+                    wordFlags[word] = flags
+                }
+            }
+            logger.info("Loaded crossplay dictionary: \(crossPlayDictionary.label) (\(crossPlayDictionary.resourceName).txt)")
+        } else {
+            logger.warning("CrossPlay dictionary not found in bundle: \(crossPlayDictionary.resourceName).txt")
+        }
+
         // Load Bongo common words
         if let url = Bundle.main.url(forResource: "bongo-commonWords", withExtension: "txt") {
             let content = try String(contentsOf: url, encoding: .utf8)
@@ -377,12 +414,12 @@ actor WordListDatabase {
         let allWordFlags = wordFlags // capture as let for Sendable safety
         try await dbQueue.write { db in
             // Use a prepared statement for efficiency
-            let insertSQL = "INSERT INTO words (word, isWordle, isScrabble, isCommonBongo) VALUES (?, ?, ?, ?)"
+            let insertSQL = "INSERT INTO words (word, isWordle, isScrabble, isCrossPlay, isCommonBongo) VALUES (?, ?, ?, ?, ?)"
             
             for (word, flags) in allWordFlags {
                 try db.execute(
                     sql: insertSQL,
-                    arguments: [word, flags.isWordle, flags.isScrabble, flags.isCommonBongo]
+                    arguments: [word, flags.isWordle, flags.isScrabble, flags.isCrossPlay, flags.isCommonBongo]
                 )
             }
         }
@@ -394,6 +431,7 @@ actor WordListDatabase {
 struct WordFlags {
     var isWordle: Bool = false
     var isScrabble: Bool = false
+    var isCrossPlay: Bool = false
     var isCommonBongo: Bool = false
 }
 
@@ -405,6 +443,7 @@ struct WordEntry: Codable, FetchableRecord, PersistableRecord {
     var word: String
     var isWordle: Bool
     var isScrabble: Bool
+    var isCrossPlay: Bool
     var isCommonBongo: Bool
 }
 

@@ -54,6 +54,7 @@ enum ScrabbleIconStyle: String, CaseIterable, Identifiable {
 enum WordFilter: String, CaseIterable, Identifiable, Codable {
     case wordle = "wordle"
     case scrabble = "scrabble"
+    case crossPlay = "crossPlay"
     case bongo = "bongo"
     
     var id: String { rawValue }
@@ -62,6 +63,7 @@ enum WordFilter: String, CaseIterable, Identifiable, Codable {
         switch self {
         case .wordle: return "Wordle"
         case .scrabble: return ScrabbleIconStyle.current.label
+        case .crossPlay: return "CrossPlay"
         case .bongo: return "Bongo"
         }
     }
@@ -70,6 +72,7 @@ enum WordFilter: String, CaseIterable, Identifiable, Codable {
         switch self {
         case .wordle: return "Wordle"
         case .scrabble: return ScrabbleIconStyle.current.rawValue
+        case .crossPlay: return "CrossPlay"
         case .bongo: return "Bongo"
         }
     }
@@ -134,6 +137,8 @@ require that the results are spelled similarly to this string of characters, or 
                     if !word.isWordle { return false }
                 case .scrabble:
                     if !word.isScrabble { return false }
+                case .crossPlay:
+                    if !word.isCrossPlay { return false }
                 case .bongo:
                     if !word.isCommonBongo { return false }
                 }
@@ -195,6 +200,7 @@ require that the results are spelled similarly to this string of characters, or 
                     score: word.score,
                     isWordle: flags.isWordle,
                     isScrabble: flags.isScrabble,
+                    isCrossPlay: flags.isCrossPlay,
                     isCommonBongo: flags.isCommonBongo
                 )
             }

@@ -13,6 +13,7 @@ struct DataMuseWord: Identifiable, Codable, Hashable {
 
     var isWordle: Bool = false
     var isScrabble: Bool = false
+    var isCrossPlay: Bool = false
     var isCommonBongo: Bool = false
 
     var id: String {
@@ -24,11 +25,12 @@ struct DataMuseWord: Identifiable, Codable, Hashable {
         self.score = score
     }
 
-    init(word: String, score: Int, isWordle: Bool, isScrabble: Bool, isCommonBongo: Bool) {
+    init(word: String, score: Int, isWordle: Bool, isScrabble: Bool, isCrossPlay: Bool, isCommonBongo: Bool) {
         self.word = word
         self.score = score
         self.isWordle = isWordle
         self.isScrabble = isScrabble
+        self.isCrossPlay = isCrossPlay
         self.isCommonBongo = isCommonBongo
     }
 

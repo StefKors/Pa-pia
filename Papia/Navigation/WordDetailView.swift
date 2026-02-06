@@ -140,6 +140,13 @@ struct WordDetailView: View {
                     .frame(width: 16, height: 16)
             }
 
+            if word.isCrossPlay {
+                Image(.crossPlay)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 16, height: 16)
+            }
+
             if word.isCommonBongo {
                 Image(.bongo)
                     .resizable()
