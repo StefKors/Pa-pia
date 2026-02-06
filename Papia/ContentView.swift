@@ -92,6 +92,7 @@ struct ContentView: View {
             }
         }
         .searchable(text: $model.searchText, placement: .toolbar, prompt: "Find words...")
+        .searchSelection($model.searchTextSelection)
         .toolbar {
             ToolbarItem(placement: .automatic) {
                 FilterButtonsGroup()
@@ -168,178 +169,36 @@ struct ContentView: View {
 #endif
     }
 
-    private var showClearButton: Bool {
-        !model.searchText.isEmpty
-    }
-
-    private var showCancelButton: Bool {
-        showClearButton || searchIsFocused
-    }
-
-    private var backgroundColor: Color {
-#if os(macOS)
-        Color(nsColor: NSColor.windowBackgroundColor)
-#else
-        Color(uiColor: UIColor.secondarySystemBackground)
-#endif
-    }
-
-    @Namespace private var namespace
-
-    // iOS search focus
-    @FocusState private var searchIsFocused: Bool
-
-    private var iOSContentView: some View {
-#if os(iOS)
-        NavigationStack(path: $state.navigation) {
-            List {
-                ForEach(model.filteredSearchResults) { word in
-                    NavigationLink(value: word) {
-                        WordView(word: word)
-                    }
-                    .accessibilityIdentifier("word-list-word-view")
-                }
-                resultsFooterRow
-            }
-            .contentMargins(.bottom, 60, for: .scrollContent)
-            .scrollEdgeEffectStyle(.soft, for: .vertical)
-            .scrollBounceBehavior(.basedOnSize)
-            .toolbar {
-                ToolbarItem(placement: .title) {
-                    VStack {
-                        Picker("Search Scope", selection: $model.searchScope) {
-                            ForEach(model.globalSearchScopes) { scope in
-                                Text(scope.label)
-                                    .font(.callout)
-                                    .tag(scope)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                        .glassEffect()
-
-                        FilterButtonsGroup()
-                            .environmentObject(model)
-                    }
-                }
-
-                ToolbarItem(placement: .bottomBar) {
-                    HStack {
-                        Image(systemName: "magnifyingglass")
-                            .imageScale(.medium)
-                            .foregroundStyle(.tertiary)
-                        TextField("Find words...", text: $model.searchText, selection: $model.searchTextSelection)
-                            .focused($searchIsFocused)
-                            .environmentObject(model)
-                            .defaultFocus($searchIsFocused, true)
-                            .accessibilityIdentifier("search-input")
-                    }
-                    .padding(8)
-                    .glassEffectID("search", in: namespace)
-
-                }
-
-
-                if showClearButton {
-                    ToolbarSpacer(placement: .bottomBar)
-
-                    ToolbarItem(placement: .bottomBar) {
-                        Button {
-                            self.model.searchText = ""
-                        } label: {
-                            Image(systemName: "xmark")
-                                .foregroundColor(Color.secondary)
-                                .imageScale(.medium)
-                        }
-                        .accessibilityIdentifier("xmark")
-                        .glassEffectID("clear", in: namespace)
-                    }
-                }
-            }
-            .navigationDestination(for: DataMuseWord.self, destination: { word in
-                WordDetailView(word: word)
-            })
-            .modifier(
-                iOSContentViewAdjustmentsView(
-                    searchResultsCount: model.filteredSearchResults.count,
-                    totalResultsCount: model.searchResults.count,
-                    searchText: model.searchText,
-                    searchIsFocused: $searchIsFocused,
-                    searchHistoryItems: state.navigationHistory,
-                    hasActiveFilters: !model.activeFilters.isEmpty,
-                    onClearFilters: {
-                        model.clearFilters()
-                    },
-                    showSettings: $showSettings
-                )
-            )
-            .scrollDismissesKeyboard(.immediately)
-            .background(backgroundColor)
-            .environmentObject(model)
-            .overlay(alignment: .bottom) {
-                VStack(alignment: .trailing) {
-                    ToolbarButtonsGroup()
-                        .environmentObject(model)
-                }
-                .padding(.horizontal)
-                .padding(.bottom, 6)
-            }
-        }
-        .animation(.snappy(duration: 0.16), value: showClearButton)
-#else
-        EmptyView()
-#endif
-    }
-
     var body: some View {
-        VStack {
 #if os(macOS)
+        VStack {
             macOSContentView
-#else
-            iOSContentView
-#endif
         }
         .environmentObject(state)
         .environmentObject(model)
-        .sheet(isPresented: $showSettings) {
-            NavigationStack {
-                SettingsView()
-                    .navigationTitle("Settings")
-                    .toolbar {
-#if os(macOS)
-                        ToolbarItem {
-                            Button("Done") { showSettings = false }
-                        }
-#else
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button("Done") { showSettings = false }
-                        }
-#endif
-                    }
-            }
-        }
-        .task(id: model.searchText, priority: .userInitiated) {
+        .task(id: model.searchQuery, priority: .userInitiated) {
             if model.searchText.isEmpty {
                 self.model.searchResults = []
                 return
             }
+
+            // Debounce: wait 120ms before firing the request.
+            // If the user types another character the task is cancelled
+            // automatically by SwiftUI before the sleep finishes.
+            try? await Task.sleep(for: .milliseconds(120))
+            guard !Task.isCancelled else { return }
 
             self.model.searchResults = await self.model.fetch(
                 scope: self.model.searchScope,
                 searchText: self.model.searchText
             )
         }
-        .onChange(of: model.searchScope, initial: true, { oldValue, newValue in
-            if model.searchText.isEmpty {
-                self.model.searchResults = []
-                return
-            }
-            Task(priority: .userInitiated) {
-                self.model.searchResults = await self.model.fetch(
-                    scope: newValue,
-                    searchText: self.model.searchText
-                )
-            }
-        })
+#else
+        // iOS uses UIKit navigation core (see Papia/UIKit/).
+        // This path should never be reached since Pa_piaApp routes
+        // iOS to iOSRootView() instead.
+        EmptyView()
+#endif
     }
 
     private var shouldShowResultsFooter: Bool {

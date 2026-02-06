@@ -26,6 +26,30 @@ private enum DataMuseClient {
     }
 }
 
+/// Which icon to display for the Scrabble filter / badge.
+enum ScrabbleIconStyle: String, CaseIterable, Identifiable {
+    case scrabble = "Scrabble"
+    case crossPlay = "CrossPlay"
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .scrabble:  return "Scrabble"
+        case .crossPlay: return "CrossPlay"
+        }
+    }
+
+    /// Read the user's preference from UserDefaults.
+    static var current: ScrabbleIconStyle {
+        guard let raw = UserDefaults.standard.string(forKey: "scrabble-icon-style"),
+              let style = ScrabbleIconStyle(rawValue: raw) else {
+            return .scrabble
+        }
+        return style
+    }
+}
+
 /// Filter options for word results
 enum WordFilter: String, CaseIterable, Identifiable, Codable {
     case wordle = "wordle"
@@ -37,7 +61,7 @@ enum WordFilter: String, CaseIterable, Identifiable, Codable {
     var label: String {
         switch self {
         case .wordle: return "Wordle"
-        case .scrabble: return "Scrabble"
+        case .scrabble: return ScrabbleIconStyle.current.label
         case .bongo: return "Bongo"
         }
     }
@@ -45,7 +69,7 @@ enum WordFilter: String, CaseIterable, Identifiable, Codable {
     var imageName: String {
         switch self {
         case .wordle: return "Wordle"
-        case .scrabble: return "Scrabble"
+        case .scrabble: return ScrabbleIconStyle.current.rawValue
         case .bongo: return "Bongo"
         }
     }
@@ -53,12 +77,15 @@ enum WordFilter: String, CaseIterable, Identifiable, Codable {
 
 /// https://api.datamuse.com/words?ml=tree&qe=ml&md=dpfcy&max=1&rif=1&k=olthes_r4
 /// get defintions: https://api.datamuse.com/words?ml=tree&qe=ml&md=dp&max=1
+@MainActor
 class DataMuseViewModel: ObservableObject {
     @Published var searchText: String = ""
     @Published var searchTextSelection: TextSelection? = nil
-    
+
     /// Active filters for word results
-    @Published var activeFilters: Set<WordFilter> = []
+    @Published var activeFilters: Set<WordFilter> = [] {
+        didSet { recomputeFilteredResults() }
+    }
     /// TODO: don't hardcode?
     @Published var searchScope: SearchScope = SearchScope(
         queryParam: "sp",
@@ -76,20 +103,31 @@ require that the results are spelled similarly to this string of characters, or 
 """
     )
 
-    @Published var searchResults: [DataMuseWord] = []
-    @Published var suggestedSearches: [DataMuseWord] = []
+    @Published var searchResults: [DataMuseWord] = [] {
+        didSet { recomputeFilteredResults() }
+    }
+
+    /// Composite key that changes when either the search text or scope changes.
+    /// Used as the `.task(id:)` identity so SwiftUI cancels and restarts the
+    /// fetch whenever the user types or switches scope.
+    var searchQuery: String {
+        "\(searchText)\0\(searchScope.queryParam)"
+    }
 
     var isAtMaxResultsLimit: Bool {
         searchResults.count >= maxResultsLimit
     }
-    
-    /// Filtered search results based on active filters
-    var filteredSearchResults: [DataMuseWord] {
+
+    /// Filtered search results, updated whenever `searchResults` or `activeFilters` change.
+    @Published private(set) var filteredSearchResults: [DataMuseWord] = []
+
+    private func recomputeFilteredResults() {
         guard !activeFilters.isEmpty else {
-            return searchResults
+            filteredSearchResults = searchResults
+            return
         }
-        
-        return searchResults.filter { word in
+
+        filteredSearchResults = searchResults.filter { word in
             for filter in activeFilters {
                 switch filter {
                 case .wordle:
@@ -127,7 +165,6 @@ require that the results are spelled similarly to this string of characters, or 
 
     private let maxResultsLimit = 1000
     private let wordsMax = 1000
-    private let suggestionsMax = 10
 
     func fetch(scope: SearchScope, searchText: String) async -> [DataMuseWord] {
         let list = await query(
@@ -137,17 +174,6 @@ require that the results are spelled similarly to this string of characters, or 
             maxResults: wordsMax
         )
         return await addWordInfo(list: list)
-    }
-
-    func autocomplete() {
-        Task {
-            self.suggestedSearches = await query(
-                "/sug",
-                scope: autocompleteScope,
-                search: searchText,
-                maxResults: suggestionsMax
-            )
-        }
     }
 
     func addWordInfo(list: [DataMuseWord]) async -> [DataMuseWord] {
@@ -181,8 +207,13 @@ require that the results are spelled similarly to this string of characters, or 
     func definitions(search: String) async -> [DataMuseDefinition] {
         let path = "/words"
 
+        // Normalize: trim whitespace and lowercase before sending
+        let normalizedSearch = search
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+
         // filter out empty queries
-        if search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        if normalizedSearch.isEmpty {
             return []
         }
 
@@ -192,13 +223,15 @@ require that the results are spelled similarly to this string of characters, or 
                 Request(
                     path: path,
                     query: [
-                        ("ml", search),
+                        ("ml", normalizedSearch),
                         ("qe", "ml"),
                         ("md", "dp"),
                         ("max", "1"),
                     ]
                 )
             ).value
+        } catch is CancellationError {
+            // Task was cancelled, this is expected.
         } catch {
             logger.error("Failed to fetch definitions: \(error.localizedDescription)")
         }
@@ -212,6 +245,11 @@ require that the results are spelled similarly to this string of characters, or 
         search: String,
         maxResults: Int
     ) async -> [DataMuseWord] {
+        // Normalize: trim whitespace and lowercase before sending
+        let normalizedSearch = search
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+
         // filter out empty queries
         if path.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return []
@@ -219,7 +257,7 @@ require that the results are spelled similarly to this string of characters, or 
         if scope.queryParam.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return []
         }
-        if search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        if normalizedSearch.isEmpty {
             return []
         }
 
@@ -230,9 +268,11 @@ require that the results are spelled similarly to this string of characters, or 
             result = try await client.send(
                 Request(
                     path: path,
-                    query: [("max", String(clampedMax)), (scope.queryParam, search)]
+                    query: [("max", String(clampedMax)), (scope.queryParam, normalizedSearch)]
                 )
             ).value
+        } catch is CancellationError {
+            // Task was cancelled (e.g. user typed a new character), this is expected.
         } catch {
             logger.error("Query failed for \(path) with scope \(scope.queryParam): \(error.localizedDescription)")
         }
@@ -281,12 +321,6 @@ require that the results are spelled similarly to this string of characters, or 
             return !scope.queryParam.contains("rel_")
         }
     }
-
-    let autocompleteScope = SearchScope(
-        queryParam: "s",
-        label: "Autocomplete",
-        description: "Provides word suggestions given a partially-entered query using a combination of the operations described in the \"/words\" resource above. The suggestions perform live spelling correction and intelligently fall back to choices that are phonetically or semantically similar when an exact prefix match can't be found."
-    )
 
     let searchScopes: [SearchScope] = [
         // TODO: Please be sure that your parameters are properly URL encoded when you form your request.
@@ -382,35 +416,22 @@ require that the results are spelled similarly to this string of characters, or 
         ),
     ]
 
-    /// Synonyms scope - displayed inline with definitions, not as a separate tab
+    /// Synonyms scope - displayed inline with definitions, not as a separate tab.
+    /// Uses a shorter label than the one in `searchScopes` ("Related: Synonyms").
     let synonymsScope = SearchScope(
         queryParam: "rel_syn",
         label: "Synonyms",
         description: "Synonyms (words contained within the same WordNet synset)"
     )
-    
-    /// Related scopes shown as separate tabs (excludes synonyms which are shown inline)
-    let relatedScopes = [
-        SearchScope(
-            queryParam: "rel_jja",
-            label: "Related: Nouns",
-            description: "Popular nouns modified by the given adjective, per Google Books Ngrams"
-        ),
-        SearchScope(
-            queryParam: "rel_jjb",
-            label: "Related: Adjectives",
-            description: "Popular adjectives used to modify the given noun, per Google Books Ngrams"
-        ),
-        SearchScope(
-            queryParam: "rel_ant",
-            label: "Related: Antonyms",
-            description: "Antonyms (per WordNet)"
-        ),
-        SearchScope(
-            queryParam: "rel_hom",
-            label: "Related: Homophones",
-            description: "Homophones (sound-alike words)"
-        ),
+
+    /// Related scopes shown as separate tabs (excludes synonyms which are shown inline).
+    /// Derived from `searchScopes` to avoid duplicating definitions.
+    private static let relatedScopeParams: Set<String> = [
+        "rel_jja", "rel_jjb", "rel_ant", "rel_hom"
     ]
+
+    var relatedScopes: [SearchScope] {
+        searchScopes.filter { Self.relatedScopeParams.contains($0.queryParam) }
+    }
 
 }

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct WordView: View {
     let word: DataMuseWord
+    @AppStorage("scrabble-icon-style") private var scrabbleIconStyle: String = ScrabbleIconStyle.scrabble.rawValue
 
     var body: some View {
         HStack {
@@ -22,7 +23,7 @@ struct WordView: View {
             }
 
             if word.isScrabble {
-                Image(.scrabble)
+                Image(scrabbleIconStyle)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)

@@ -118,50 +118,39 @@ struct WordDetailView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var selectedScope: DataMuseViewModel.SearchScope? = nil
+    @AppStorage("scrabble-icon-style") private var scrabbleIconStyle: String = ScrabbleIconStyle.scrabble.rawValue
+
+    /// Navigation bar title view with word name and dictionary badge icons.
+    private var titleWithBadges: some View {
+        HStack(spacing: 4) {
+            Text(word.word.capitalized)
+                .font(.headline)
+
+            if word.isWordle {
+                Image(.wordle)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 16, height: 16)
+            }
+
+            if word.isScrabble {
+                Image(scrabbleIconStyle)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 16, height: 16)
+            }
+
+            if word.isCommonBongo {
+                Image(.bongo)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 16, height: 16)
+            }
+        }
+    }
 
     var body: some View {
         VStack(spacing: 0) {
-            Button {
-                dismiss()
-            } label: {
-                HStack {
-                    Image(systemName: "chevron.left")
-                        .bold()
-                        .font(.title3)
-
-                    Text(word.word.capitalized)
-                        .font(.title)
-                        .bold()
-
-                    if word.isWordle {
-                        Image(.wordle)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
-                    }
-
-                    if word.isScrabble {
-                        Image(.scrabble)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
-                    }
-
-                    if word.isCommonBongo {
-                        Image(.bongo)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)
-                    }
-
-                    Spacer()
-                }
-                .scenePadding(.horizontal)
-                .accessibilityIdentifier("navigation-back-button")
-            }
-            .buttonStyle(.plain)
-
-
             ScrollViewReader { value in
                 ScrollView(.horizontal) {
                     HStack {
@@ -219,7 +208,11 @@ struct WordDetailView: View {
         }
         .navigationTitle(word.word)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar(.hidden, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                titleWithBadges
+            }
+        }
         .task(id: word) {
             self.definitions = await model.definitions(search: word.word)
         }

@@ -18,15 +18,70 @@ actor WordListDatabase {
     private var dbQueue: DatabaseQueue?
     private var isInitialized = false
     
+    /// The scrabble dictionary that was used to build the current database.
+    private var loadedDictionary: ScrabbleDictionary?
+    
+    /// Separate database for user data (search history) that survives
+    /// word-list rebuilds.
+    private var userDbQueue: DatabaseQueue?
+    
     private init() {}
     
-    /// Initialize the database and load word lists if needed
+    /// Initialize the database and load word lists if needed.
     func initialize() async throws {
-        guard !isInitialized else { return }
+        let selected = Self.selectedScrabbleDictionary
+        guard !isInitialized || loadedDictionary != selected else { return }
         
         let dbQueue = try await setupDatabase()
         self.dbQueue = dbQueue
         self.isInitialized = true
+        self.loadedDictionary = selected
+    }
+    
+    /// Re‑initialize the database when the user changes the scrabble dictionary.
+    func rebuildIfNeeded() async throws {
+        let selected = Self.selectedScrabbleDictionary
+        guard loadedDictionary != selected else { return }
+
+        // Close the current database connection so the file can be deleted.
+        dbQueue = nil
+        isInitialized = false
+
+        // Delete the existing database file. If this fails we log and
+        // continue — `setupDatabase()` will recreate it.
+        do {
+            try deleteDatabase()
+        } catch {
+            logger.error("Failed to delete old database during rebuild: \(error)")
+        }
+
+        try await initialize()
+    }
+
+    /// Remove the on-disk word-list database file so it can be recreated.
+    private func deleteDatabase() throws {
+        let fileManager = FileManager.default
+        let appSupportURL = try fileManager.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: false
+        )
+        let dbURL = appSupportURL
+            .appendingPathComponent("Papia", isDirectory: true)
+            .appendingPathComponent("wordlists.sqlite")
+        if fileManager.fileExists(atPath: dbURL.path) {
+            try fileManager.removeItem(at: dbURL)
+        }
+    }
+    
+    /// Read the user's preferred scrabble dictionary from UserDefaults.
+    static var selectedScrabbleDictionary: ScrabbleDictionary {
+        guard let raw = UserDefaults.standard.string(forKey: "selected-scrabble-dictionary"),
+              let dict = ScrabbleDictionary(rawValue: raw) else {
+            return .default
+        }
+        return dict
     }
     
     /// Check if a word exists in the wordle list
@@ -89,6 +144,113 @@ actor WordListDatabase {
         }) ?? [:]
     }
     
+    // MARK: - Search History (separate database, survives word-list rebuilds)
+
+    /// Ensure the user database (search history) is set up.
+    private func ensureUserDatabase() async throws -> DatabaseQueue {
+        if let userDbQueue { return userDbQueue }
+
+        let fileManager = FileManager.default
+        let appSupportURL = try fileManager.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        let papiaDirectory = appSupportURL.appendingPathComponent("Papia", isDirectory: true)
+        try fileManager.createDirectory(at: papiaDirectory, withIntermediateDirectories: true)
+
+        let dbURL = papiaDirectory.appendingPathComponent("user_data.sqlite")
+        let db = try DatabaseQueue(path: dbURL.path)
+
+        try await db.write { db in
+            try db.execute(sql: """
+                CREATE TABLE IF NOT EXISTS search_history (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    query TEXT NOT NULL UNIQUE,
+                    timestamp REAL NOT NULL
+                )
+            """)
+            try db.execute(sql: """
+                CREATE INDEX IF NOT EXISTS idx_search_history_timestamp
+                ON search_history(timestamp)
+            """)
+        }
+
+        self.userDbQueue = db
+        return db
+    }
+
+    /// Add or update a search history entry with the current timestamp.
+    func addSearchHistoryEntry(_ query: String) async {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        let db: DatabaseQueue
+        do {
+            db = try await ensureUserDatabase()
+        } catch {
+            logger.error("Failed to open user database for search history write: \(error)")
+            return
+        }
+
+        do {
+            let now = Date().timeIntervalSince1970
+            try await db.write { db in
+                // INSERT OR REPLACE to upsert — updates timestamp for existing queries
+                try db.execute(
+                    sql: """
+                        INSERT INTO search_history (query, timestamp) VALUES (?, ?)
+                        ON CONFLICT(query) DO UPDATE SET timestamp = excluded.timestamp
+                    """,
+                    arguments: [trimmed, now]
+                )
+            }
+        } catch {
+            logger.error("Failed to write search history entry '\(trimmed)': \(error)")
+        }
+    }
+
+    /// Fetch recent search history, pruning entries older than `maxAgeDays`.
+    func fetchSearchHistory(limit: Int = 50, maxAgeDays: Int = 30) async -> [String] {
+        let db: DatabaseQueue
+        do {
+            db = try await ensureUserDatabase()
+        } catch {
+            logger.error("Failed to open user database for search history read: \(error)")
+            return []
+        }
+
+        let cutoff = Date().timeIntervalSince1970 - Double(maxAgeDays * 86400)
+
+        // Prune old entries
+        do {
+            try await db.write { db in
+                try db.execute(
+                    sql: "DELETE FROM search_history WHERE timestamp < ?",
+                    arguments: [cutoff]
+                )
+            }
+        } catch {
+            logger.error("Failed to prune old search history entries: \(error)")
+        }
+
+        // Fetch most recent entries
+        do {
+            return try await db.read { db in
+                try String.fetchAll(db, sql: """
+                    SELECT query FROM search_history
+                    WHERE timestamp >= ?
+                    ORDER BY timestamp DESC
+                    LIMIT ?
+                """, arguments: [cutoff, limit])
+            }
+        } catch {
+            logger.error("Failed to fetch search history: \(error)")
+            return []
+        }
+    }
+
     // MARK: - Private
     
     private func setupDatabase() async throws -> DatabaseQueue {
@@ -106,12 +268,16 @@ actor WordListDatabase {
         
         let dbURL = papiaDirectory.appendingPathComponent("wordlists.sqlite")
         
-        // Check if we need to rebuild the database (version check)
-        let currentVersion = 1 // Increment this when word lists change
+        // Encode both a schema version AND the selected dictionary into the
+        // version string so the database is rebuilt whenever either changes.
+        let schemaVersion = 3 // Increment when the DB schema or bundled files change
+        let selected = Self.selectedScrabbleDictionary
+        let currentVersionTag = "\(schemaVersion)-\(selected.rawValue)"
         let versionURL = papiaDirectory.appendingPathComponent("db_version.txt")
-        let existingVersion = (try? String(contentsOf: versionURL, encoding: .utf8)).flatMap { Int($0) } ?? 0
+        let existingVersionTag = try? String(contentsOf: versionURL, encoding: .utf8)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
         
-        if fileManager.fileExists(atPath: dbURL.path) && existingVersion == currentVersion {
+        if fileManager.fileExists(atPath: dbURL.path) && existingVersionTag == currentVersionTag {
             // Database exists and is up to date
             logger.info("Using existing database")
             return try DatabaseQueue(path: dbURL.path)
@@ -122,7 +288,7 @@ actor WordListDatabase {
             try fileManager.removeItem(at: dbURL)
         }
         
-        logger.info("Creating new database...")
+        logger.info("Creating new database with scrabble dictionary: \(selected.rawValue)")
         let dbQueue = try DatabaseQueue(path: dbURL.path)
         
         try await dbQueue.write { db in
@@ -142,16 +308,16 @@ actor WordListDatabase {
         }
         
         // Load word lists
-        try await loadWordLists(into: dbQueue)
+        try await loadWordLists(into: dbQueue, scrabbleDictionary: selected)
         
-        // Save version
-        try String(currentVersion).write(to: versionURL, atomically: true, encoding: .utf8)
+        // Save version tag
+        try currentVersionTag.write(to: versionURL, atomically: true, encoding: .utf8)
         
         logger.info("Database created successfully")
         return dbQueue
     }
     
-    private func loadWordLists(into dbQueue: DatabaseQueue) async throws {
+    private func loadWordLists(into dbQueue: DatabaseQueue, scrabbleDictionary: ScrabbleDictionary) async throws {
         // Collect all words with their flags
         var wordFlags: [String: WordFlags] = [:]
         
@@ -168,17 +334,30 @@ actor WordListDatabase {
             }
         }
         
-        // Load Scrabble words (sowpods)
-        if let url = Bundle.main.url(forResource: "sowpods", withExtension: "txt") {
+        // Load Scrabble words using the user's selected dictionary.
+        // Word list formats vary:
+        //   - sowpods.txt / twl06.txt: one word per line
+        //   - NWL*.txt:  "WORD definition [tags]"
+        //   - CSW*.txt:  "WORD (origin) definition [tags]" with # comment header
+        // We extract just the first whitespace-delimited token as the word.
+        if let url = Bundle.main.url(forResource: scrabbleDictionary.resourceName, withExtension: "txt") {
             let content = try String(contentsOf: url, encoding: .utf8)
             for line in content.components(separatedBy: .newlines) {
-                let word = line.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                // Skip empty lines and comment lines
+                if trimmed.isEmpty || trimmed.hasPrefix("#") { continue }
+                // Extract the first token (the word itself)
+                let word = trimmed.split(separator: " ", maxSplits: 1).first
+                    .map { String($0).lowercased() } ?? ""
                 if !word.isEmpty {
                     var flags = wordFlags[word] ?? WordFlags()
                     flags.isScrabble = true
                     wordFlags[word] = flags
                 }
             }
+            logger.info("Loaded scrabble dictionary: \(scrabbleDictionary.label) (\(scrabbleDictionary.resourceName).txt)")
+        } else {
+            logger.warning("Scrabble dictionary not found in bundle: \(scrabbleDictionary.resourceName).txt")
         }
         
         // Load Bongo common words
@@ -195,11 +374,12 @@ actor WordListDatabase {
         }
         
         // Batch insert all words
+        let allWordFlags = wordFlags // capture as let for Sendable safety
         try await dbQueue.write { db in
             // Use a prepared statement for efficiency
             let insertSQL = "INSERT INTO words (word, isWordle, isScrabble, isCommonBongo) VALUES (?, ?, ?, ?)"
             
-            for (word, flags) in wordFlags {
+            for (word, flags) in allWordFlags {
                 try db.execute(
                     sql: insertSQL,
                     arguments: [word, flags.isWordle, flags.isScrabble, flags.isCommonBongo]

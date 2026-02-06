@@ -10,7 +10,10 @@ import SwiftUI
 class InterfaceState: ObservableObject {
     // Nothing selected by default.
     @Published var selection: DataMuseWord?
-    @CodableAppStorage("search-history") var searchHistory: [String] = []
+
+    /// Search history backed by SQLite (loaded async on init).
+    @Published var searchHistory: [String] = []
+
     @CodableAppStorage("navigation-history") var navigationHistory: [DataMuseWord] = []
 
     @Published var navigation: [DataMuseWord] = [] {
@@ -20,6 +23,14 @@ class InterfaceState: ObservableObject {
             }
         }
     }
+
+    init() {
+        // Load search history from SQLite on startup
+        Task { @MainActor in
+            self.searchHistory = await WordListDatabase.shared.fetchSearchHistory()
+        }
+    }
+
     /// Add word to history
     /// Limit history to 15
     /// If word is already in history move to end
@@ -35,18 +46,14 @@ class InterfaceState: ObservableObject {
         }
     }
 
-    /// Add query to search history with a fixed cap.
-    func appendSearchHistory(_ query: String, maxCount: Int = 50) {
+    /// Add query to search history (writes to SQLite and refreshes the published array).
+    func appendSearchHistory(_ query: String) {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
 
-        if let existingIndex = searchHistory.firstIndex(of: trimmed) {
-            searchHistory.remove(at: existingIndex)
-        }
-        searchHistory.append(trimmed)
-
-        if searchHistory.count > maxCount {
-            searchHistory.removeFirst(searchHistory.count - maxCount)
+        Task { @MainActor in
+            await WordListDatabase.shared.addSearchHistoryEntry(trimmed)
+            self.searchHistory = await WordListDatabase.shared.fetchSearchHistory()
         }
     }
 }

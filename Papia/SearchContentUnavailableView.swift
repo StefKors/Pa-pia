@@ -142,22 +142,24 @@ struct SearchContentUnavailableView: View {
                         } description: {
                             Text("Start your search, then filter your query")
                         } actions: {
-                            WrappingHStack(alignment: .center) {
-                                ForEach(Array(Set(searchHistoryItems)), id: \.id) { word in
-                                    NavigationLink(value: word) {
-                                        Text(word.word.capitalized)
+                            VStack {
+                                WrappingHStack(alignment: .center) {
+                                    ForEach(Array(Set(searchHistoryItems)), id: \.id) { word in
+                                        NavigationLink(value: word) {
+                                            Text(word.word.capitalized)
+                                        }
+                                        .id(word)
+                                        .buttonStyle(NavigationButtonStyle())
                                     }
-                                    .id(word)
-                                    .buttonStyle(NavigationButtonStyle())
                                 }
+                                
+                                Button {
+                                    showSettings = true
+                                } label: {
+                                    Label("Settings", systemImage: "gearshape")
+                                }
+                                .buttonStyle(.bordered)
                             }
-                            
-                            Button {
-                                showSettings = true
-                            } label: {
-                                Label("Settings", systemImage: "gearshape")
-                            }
-                            .buttonStyle(.bordered)
                         }
                     } else {
                         VStack {

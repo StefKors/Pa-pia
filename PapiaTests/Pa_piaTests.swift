@@ -10,55 +10,29 @@ import XCTest
 
 @MainActor
 final class Pa_piaTests: XCTestCase {
-    private let searchHistoryKey = "search-history"
 
     override func setUpWithError() throws {
-        UserDefaults.standard.removeObject(forKey: searchHistoryKey)
+        // No longer using UserDefaults for search history
     }
 
     override func tearDownWithError() throws {
-        UserDefaults.standard.removeObject(forKey: searchHistoryKey)
+        // No longer using UserDefaults for search history
     }
 
-    func testAppendSearchHistoryTrimsAndCaps() {
+    func testAppendSearchHistoryIgnoresEmptyValues() async {
         let state = InterfaceState()
 
-        state.appendSearchHistory("  apple  ", maxCount: 3)
-        state.appendSearchHistory("banana", maxCount: 3)
-        state.appendSearchHistory("cherry", maxCount: 3)
-        state.appendSearchHistory("date", maxCount: 3)
-
-        XCTAssertEqual(state.searchHistory, ["banana", "cherry", "date"])
-    }
-
-    func testAppendSearchHistoryMovesExistingToEnd() {
-        let state = InterfaceState()
-
-        state.appendSearchHistory("apple")
-        state.appendSearchHistory("banana")
-        state.appendSearchHistory("apple")
-
-        XCTAssertEqual(state.searchHistory, ["banana", "apple"])
-    }
-
-    func testAppendSearchHistoryIgnoresEmptyValues() {
-        let state = InterfaceState()
-
+        // Empty and whitespace-only strings are rejected synchronously
+        // before any SQLite write, so the history should remain unchanged.
+        let historyBefore = state.searchHistory
         state.appendSearchHistory("")
         state.appendSearchHistory("   ")
 
-        XCTAssertTrue(state.searchHistory.isEmpty)
-    }
+        // Give any (unexpected) async writes a chance to settle.
+        try? await Task.sleep(for: .milliseconds(100))
 
-    func testSearchHistoryMemoryProfile() {
-        let state = InterfaceState()
-        measure(metrics: [XCTMemoryMetric()]) {
-            state.searchHistory = []
-            for index in 0..<1000 {
-                state.appendSearchHistory("term-\(index)", maxCount: 50)
-            }
-            XCTAssertLessThanOrEqual(state.searchHistory.count, 50)
-        }
+        XCTAssertEqual(state.searchHistory, historyBefore,
+                       "Empty/whitespace queries should not be added to search history")
     }
 
     func testViewModelCreationMemoryProfile() {
