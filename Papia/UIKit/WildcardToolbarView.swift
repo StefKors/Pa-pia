@@ -143,19 +143,14 @@ final class WildcardToolbarView: UIView {
         // Capture the caret position *before* the gesture recognizer fires
         // and the UISearchController potentially resigns the text field.
         savedSelectedRange = targetTextField?.selectedTextRange
-        logger.debug("touchesBegan — targetTextField: \(self.targetTextField.debugDescription), isFirstResponder: \(self.targetTextField?.isFirstResponder ?? false), savedRange: \(self.savedSelectedRange.debugDescription)")
         super.touchesBegan(touches, with: event)
     }
 
     // MARK: - Actions
 
     @objc private func keyTapped(_ gesture: UITapGestureRecognizer) {
-        guard let keyView = gesture.view else {
-            logger.warning("keyTapped — gesture.view is nil")
-            return
-        }
+        guard let keyView = gesture.view else { return }
         let def = Self.defs[keyView.tag]
-        logger.debug("keyTapped — label: '\(def.label)', tag: \(keyView.tag)")
 
         // Visual feedback
         animatePress(keyView)
@@ -185,19 +180,13 @@ final class WildcardToolbarView: UIView {
     // MARK: - Text Insertion
 
     private func insertTextAtCaret(_ text: String) {
-        logger.debug("insertTextAtCaret — text: '\(text)', targetTextField: \(self.targetTextField.debugDescription)")
-        logger.debug("  isFirstResponder: \(self.targetTextField?.isFirstResponder ?? false)")
-        logger.debug("  currentText: '\(self.targetTextField?.text ?? "nil")'")
-        logger.debug("  selectedTextRange: \(self.targetTextField?.selectedTextRange.debugDescription ?? "nil")")
-
         guard let tf = targetTextField, tf.isFirstResponder else {
-            logger.debug("  ⚠️ text field is NOT first responder — calling becomeFirstResponder + async insert")
+            // If the text field isn't first responder, make it so first,
+            // then insert on the next run loop tick after the keyboard is up.
             targetTextField?.becomeFirstResponder()
             let textToInsert = text
             DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                logger.debug("  async callback — isFirstResponder now: \(self.targetTextField?.isFirstResponder ?? false)")
-                self.doInsert(textToInsert)
+                self?.doInsert(textToInsert)
             }
             return
         }
@@ -206,30 +195,19 @@ final class WildcardToolbarView: UIView {
     }
 
     private func doInsert(_ text: String) {
-        guard let tf = targetTextField else {
-            logger.warning("doInsert — targetTextField is nil, aborting")
-            return
-        }
-
-        logger.debug("doInsert — text: '\(text)', currentText BEFORE: '\(tf.text ?? "nil")'")
-        logger.debug("  isFirstResponder: \(tf.isFirstResponder)")
-        logger.debug("  selectedTextRange: \(tf.selectedTextRange.debugDescription)")
-        logger.debug("  savedSelectedRange: \(self.savedSelectedRange.debugDescription)")
+        guard let tf = targetTextField else { return }
 
         // Restore the caret position that was saved in touchesBegan.
         if let savedRange = savedSelectedRange {
             tf.selectedTextRange = savedRange
             savedSelectedRange = nil
-            logger.debug("  restored savedSelectedRange")
         }
 
         // UITextInput.insertText inserts at the current caret position.
         tf.insertText(text)
-        logger.debug("  currentText AFTER insertText: '\(tf.text ?? "nil")'")
 
         // Notify UISearchController of the change
         tf.sendActions(for: .editingChanged)
-        logger.debug("  sent .editingChanged action")
     }
 
     // MARK: - Visual Feedback

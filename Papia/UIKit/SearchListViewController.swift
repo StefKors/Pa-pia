@@ -150,13 +150,6 @@ final class SearchListViewController: UIViewController {
             self.searchController.isActive = true
             self.searchController.searchBar.searchTextField.becomeFirstResponder()
 
-            // Debug: verify wildcard toolbar wiring
-            let resolved = self.wildcardToolbar.resolveTextField?()
-            let searchTF = self.searchController.searchBar.searchTextField
-            logger.debug("Wildcard resolveTextField(): \(resolved.debugDescription)")
-            logger.debug("  searchBar.searchTextField:  \(searchTF.debugDescription)")
-            logger.debug("  same object? \(resolved === searchTF)")
-            logger.debug("  isFirstResponder? \(searchTF.isFirstResponder)")
         }
     }
 
