@@ -169,121 +169,13 @@ struct ContentView: View {
 #endif
     }
 
-    private var backgroundColor: Color {
-#if os(macOS)
-        Color(nsColor: NSColor.windowBackgroundColor)
-#else
-        Color(uiColor: UIColor.secondarySystemBackground)
-#endif
-    }
-
-    // iOS search focus
-    @FocusState private var searchIsFocused: Bool
-
-    private var iOSContentView: some View {
-#if os(iOS)
-        NavigationStack(path: $state.navigation) {
-            List {
-                ForEach(model.filteredSearchResults) { word in
-                    NavigationLink(value: word) {
-                        WordView(word: word)
-                    }
-                    .accessibilityIdentifier("word-list-word-view")
-                }
-                resultsFooterRow
-            }
-            .modifier(
-                iOSContentViewAdjustmentsView(
-                    searchResultsCount: model.filteredSearchResults.count,
-                    totalResultsCount: model.searchResults.count,
-                    searchText: model.searchText,
-                    searchIsFocused: $searchIsFocused,
-                    searchHistoryItems: state.navigationHistory,
-                    hasActiveFilters: !model.activeFilters.isEmpty,
-                    onClearFilters: {
-                        model.clearFilters()
-                    },
-                    showSettings: $showSettings
-                )
-            )
-            .contentMargins(.top, 100, for: .scrollContent)
-            .scrollEdgeEffectStyle(.soft, for: .vertical)
-            .scrollBounceBehavior(.basedOnSize)
-            .navigationDestination(for: DataMuseWord.self, destination: { word in
-                WordDetailView(word: word)
-            })
-            .toolbar {
-                DefaultToolbarItem(kind: .search, placement: .bottomBar)
-            }
-            .searchable(text: $model.searchText, placement: .toolbar, prompt: "Find words...")
-            .searchSelection($model.searchTextSelection)
-            .searchFocused($searchIsFocused)
-            .onSubmit(of: .search) {
-                if !model.searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    state.appendSearchHistory(model.searchText.trimmingCharacters(in: .whitespacesAndNewlines))
-                }
-            }
-            .scrollDismissesKeyboard(.immediately)
-            .background(backgroundColor)
-            .environmentObject(model)
-            .overlay(alignment: .bottom) {
-                VStack(alignment: .trailing) {
-                    ToolbarButtonsGroup()
-                        .environmentObject(model)
-                }
-                .padding(.horizontal)
-                .padding(.bottom, 6)
-            }
-        }
-        .overlay(alignment: .top) {
-            VStack(spacing: 6) {
-                Picker("Search Scope", selection: $model.searchScope) {
-                    ForEach(model.globalSearchScopes) { scope in
-                        Text(scope.label)
-                            .font(.callout)
-                            .tag(scope)
-                    }
-                }
-                .pickerStyle(.segmented)
-
-                FilterButtonsGroup()
-                    .environmentObject(model)
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-        }
-#else
-        EmptyView()
-#endif
-    }
-
     var body: some View {
-        VStack {
 #if os(macOS)
+        VStack {
             macOSContentView
-#else
-            iOSContentView
-#endif
         }
         .environmentObject(state)
         .environmentObject(model)
-        .sheet(isPresented: $showSettings) {
-            NavigationStack {
-                SettingsView()
-                    .navigationTitle("Settings")
-                    .toolbar {
-#if os(macOS)
-                        ToolbarItem {
-                            Button("Done") { showSettings = false }
-                        }
-#else
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button("Done") { showSettings = false }
-                        }
-#endif
-                    }
-            }
-        }
         .task(id: model.searchQuery, priority: .userInitiated) {
             if model.searchText.isEmpty {
                 self.model.searchResults = []
@@ -301,6 +193,12 @@ struct ContentView: View {
                 searchText: self.model.searchText
             )
         }
+#else
+        // iOS uses UIKit navigation core (see Papia/UIKit/).
+        // This path should never be reached since Pa_piaApp routes
+        // iOS to iOSRootView() instead.
+        EmptyView()
+#endif
     }
 
     private var shouldShowResultsFooter: Bool {
