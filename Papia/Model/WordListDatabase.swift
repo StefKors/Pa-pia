@@ -18,15 +18,37 @@ actor WordListDatabase {
     private var dbQueue: DatabaseQueue?
     private var isInitialized = false
     
+    /// The scrabble dictionary that was used to build the current database.
+    private var loadedDictionary: ScrabbleDictionary?
+    
     private init() {}
     
-    /// Initialize the database and load word lists if needed
+    /// Initialize the database and load word lists if needed.
     func initialize() async throws {
-        guard !isInitialized else { return }
+        let selected = Self.selectedScrabbleDictionary
+        guard !isInitialized || loadedDictionary != selected else { return }
         
         let dbQueue = try await setupDatabase()
         self.dbQueue = dbQueue
         self.isInitialized = true
+        self.loadedDictionary = selected
+    }
+    
+    /// Re‑initialize the database when the user changes the scrabble dictionary.
+    func rebuildIfNeeded() async throws {
+        let selected = Self.selectedScrabbleDictionary
+        guard loadedDictionary != selected else { return }
+        isInitialized = false
+        try await initialize()
+    }
+    
+    /// Read the user's preferred scrabble dictionary from UserDefaults.
+    static var selectedScrabbleDictionary: ScrabbleDictionary {
+        guard let raw = UserDefaults.standard.string(forKey: "selected-scrabble-dictionary"),
+              let dict = ScrabbleDictionary(rawValue: raw) else {
+            return .default
+        }
+        return dict
     }
     
     /// Check if a word exists in the wordle list
@@ -106,12 +128,16 @@ actor WordListDatabase {
         
         let dbURL = papiaDirectory.appendingPathComponent("wordlists.sqlite")
         
-        // Check if we need to rebuild the database (version check)
-        let currentVersion = 1 // Increment this when word lists change
+        // Encode both a schema version AND the selected dictionary into the
+        // version string so the database is rebuilt whenever either changes.
+        let schemaVersion = 2 // Increment when the DB schema or bundled files change
+        let selected = Self.selectedScrabbleDictionary
+        let currentVersionTag = "\(schemaVersion)-\(selected.rawValue)"
         let versionURL = papiaDirectory.appendingPathComponent("db_version.txt")
-        let existingVersion = (try? String(contentsOf: versionURL, encoding: .utf8)).flatMap { Int($0) } ?? 0
+        let existingVersionTag = try? String(contentsOf: versionURL, encoding: .utf8)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
         
-        if fileManager.fileExists(atPath: dbURL.path) && existingVersion == currentVersion {
+        if fileManager.fileExists(atPath: dbURL.path) && existingVersionTag == currentVersionTag {
             // Database exists and is up to date
             logger.info("Using existing database")
             return try DatabaseQueue(path: dbURL.path)
@@ -122,7 +148,7 @@ actor WordListDatabase {
             try fileManager.removeItem(at: dbURL)
         }
         
-        logger.info("Creating new database...")
+        logger.info("Creating new database with scrabble dictionary: \(selected.rawValue)")
         let dbQueue = try DatabaseQueue(path: dbURL.path)
         
         try await dbQueue.write { db in
@@ -142,16 +168,16 @@ actor WordListDatabase {
         }
         
         // Load word lists
-        try await loadWordLists(into: dbQueue)
+        try await loadWordLists(into: dbQueue, scrabbleDictionary: selected)
         
-        // Save version
-        try String(currentVersion).write(to: versionURL, atomically: true, encoding: .utf8)
+        // Save version tag
+        try currentVersionTag.write(to: versionURL, atomically: true, encoding: .utf8)
         
         logger.info("Database created successfully")
         return dbQueue
     }
     
-    private func loadWordLists(into dbQueue: DatabaseQueue) async throws {
+    private func loadWordLists(into dbQueue: DatabaseQueue, scrabbleDictionary: ScrabbleDictionary) async throws {
         // Collect all words with their flags
         var wordFlags: [String: WordFlags] = [:]
         
@@ -168,8 +194,8 @@ actor WordListDatabase {
             }
         }
         
-        // Load Scrabble words (sowpods)
-        if let url = Bundle.main.url(forResource: "sowpods", withExtension: "txt") {
+        // Load Scrabble words using the user's selected dictionary
+        if let url = Bundle.main.url(forResource: scrabbleDictionary.resourceName, withExtension: "txt") {
             let content = try String(contentsOf: url, encoding: .utf8)
             for line in content.components(separatedBy: .newlines) {
                 let word = line.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -179,6 +205,9 @@ actor WordListDatabase {
                     wordFlags[word] = flags
                 }
             }
+            logger.info("Loaded scrabble dictionary: \(scrabbleDictionary.label) (\(scrabbleDictionary.resourceName).txt)")
+        } else {
+            logger.warning("Scrabble dictionary not found in bundle: \(scrabbleDictionary.resourceName).txt")
         }
         
         // Load Bongo common words
