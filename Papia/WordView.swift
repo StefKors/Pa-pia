@@ -22,7 +22,7 @@ struct WordView: View {
             }
 
             if word.isScrabble {
-                Image(.scrabble)
+                Image(ScrabbleIconStyle.current.rawValue)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 20, height: 20, alignment: .leadingLastTextBaseline)

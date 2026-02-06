@@ -9,16 +9,14 @@
 import UIKit
 import Combine
 
-/// A horizontal bar of capsule-shaped filter buttons (Wordle / Scrabble / Bongo).
-/// Observes the view model's `activeFilters` via Combine and updates visuals
-/// using `configurationUpdateHandler` for reliable button state rendering.
+/// A horizontal bar of capsule-shaped glass filter buttons (Wordle / Scrabble / Bongo).
 final class FilterBarView: UIView {
 
     // MARK: - Properties
 
     private let viewModel: DataMuseViewModel
     private var cancellables = Set<AnyCancellable>()
-    private var buttons: [WordFilter: UIButton] = [:]
+    private var buttons: [WordFilter: NonStealingButton] = [:]
 
     // MARK: - Init
 
@@ -43,7 +41,7 @@ final class FilterBarView: UIView {
 
         NSLayoutConstraint.activate([
             stack.topAnchor.constraint(equalTo: topAnchor),
-            stack.leadingAnchor.constraint(equalTo: leadingAnchor),
+            stack.centerXAnchor.constraint(equalTo: centerXAnchor),
             stack.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
 
@@ -54,57 +52,48 @@ final class FilterBarView: UIView {
         }
     }
 
-    private func makeFilterButton(for filter: WordFilter) -> UIButton {
+    private func makeFilterButton(for filter: WordFilter) -> NonStealingButton {
         let icon = UIImage(named: filter.imageName)?
             .withRenderingMode(.alwaysOriginal)
             .resized(to: CGSize(width: 16, height: 16))
 
-        let button = UIButton(type: .custom)
-        button.tag = WordFilter.allCases.firstIndex(of: filter) ?? 0
-        button.addTarget(self, action: #selector(filterTapped(_:)), for: .touchUpInside)
-
-        // Use configurationUpdateHandler so UIKit calls us whenever
-        // button.isSelected changes — no manual layer manipulation needed.
-        button.configurationUpdateHandler = { btn in
-            var config = UIButton.Configuration.plain()
-            config.cornerStyle = .capsule
-            config.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10)
-            config.imagePadding = 4
-            config.image = icon
-            config.title = filter.label
-            config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-                var out = incoming
-                out.font = UIFont.preferredFont(forTextStyle: .caption1)
-                return out
-            }
-
-            let tint = btn.tintColor ?? .systemBlue
-
-            if btn.isSelected {
-                config.baseForegroundColor = tint
-                config.background.backgroundColor = tint.withAlphaComponent(0.12)
-                config.background.strokeColor = tint
-                config.background.strokeWidth = 1
-            } else {
-                config.baseForegroundColor = .secondaryLabel
-                config.background.backgroundColor = .clear
-                config.background.strokeColor = UIColor.secondaryLabel.withAlphaComponent(0.3)
-                config.background.strokeWidth = 1
-            }
-
-            btn.configuration = config
+        var config: UIButton.Configuration
+        if #available(iOS 26.0, *) {
+            config = .glass()
+        } else {
+            config = .plain()
+            config.background.backgroundColor = UIColor.tertiarySystemFill
+        }
+        config.cornerStyle = .capsule
+        config.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10)
+        config.imagePadding = 4
+        config.image = icon
+        config.title = filter.label
+        config.baseForegroundColor = .secondaryLabel
+        config.background.strokeColor = UIColor.secondaryLabel.withAlphaComponent(0.3)
+        config.background.strokeWidth = 1
+        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var out = incoming
+            out.font = UIFont.preferredFont(forTextStyle: .caption1)
+            return out
         }
 
-        // Trigger initial configuration
-        button.isSelected = false
+        let button = NonStealingButton(configuration: config)
+        button.addAction(UIAction { [weak self] _ in
+            self?.viewModel.toggleFilter(filter)
+        }, for: .touchUpInside)
+
+        button.configurationUpdateHandler = { btn in
+            let active = btn.isSelected
+            let tint = btn.tintColor ?? .systemBlue
+            btn.configuration?.baseForegroundColor = active ? tint : .secondaryLabel
+            btn.configuration?.background.strokeColor = active ? tint : UIColor.secondaryLabel.withAlphaComponent(0.3)
+            if #unavailable(iOS 26.0) {
+                btn.configuration?.background.backgroundColor = active ? tint.withAlphaComponent(0.12) : UIColor.tertiarySystemFill
+            }
+        }
+
         return button
-    }
-
-    // MARK: - Actions
-
-    @objc private func filterTapped(_ sender: UIButton) {
-        let filter = WordFilter.allCases[sender.tag]
-        viewModel.toggleFilter(filter)
     }
 
     // MARK: - Binding
@@ -115,9 +104,7 @@ final class FilterBarView: UIView {
             .sink { [weak self] activeFilters in
                 guard let self else { return }
                 for filter in WordFilter.allCases {
-                    if let button = self.buttons[filter] {
-                        button.isSelected = activeFilters.contains(filter)
-                    }
+                    self.buttons[filter]?.isSelected = activeFilters.contains(filter)
                 }
             }
             .store(in: &cancellables)

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xcodebuild build:*)",
+      "Bash(xcodebuild:*)",
+      "mcp__acp__Bash"
+    ]
+  }
+}

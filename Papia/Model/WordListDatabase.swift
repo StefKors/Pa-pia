@@ -216,7 +216,7 @@ actor WordListDatabase {
         
         // Encode both a schema version AND the selected dictionary into the
         // version string so the database is rebuilt whenever either changes.
-        let schemaVersion = 2 // Increment when the DB schema or bundled files change
+        let schemaVersion = 3 // Increment when the DB schema or bundled files change
         let selected = Self.selectedScrabbleDictionary
         let currentVersionTag = "\(schemaVersion)-\(selected.rawValue)"
         let versionURL = papiaDirectory.appendingPathComponent("db_version.txt")
@@ -280,11 +280,21 @@ actor WordListDatabase {
             }
         }
         
-        // Load Scrabble words using the user's selected dictionary
+        // Load Scrabble words using the user's selected dictionary.
+        // Word list formats vary:
+        //   - sowpods.txt / twl06.txt: one word per line
+        //   - NWL*.txt:  "WORD definition [tags]"
+        //   - CSW*.txt:  "WORD (origin) definition [tags]" with # comment header
+        // We extract just the first whitespace-delimited token as the word.
         if let url = Bundle.main.url(forResource: scrabbleDictionary.resourceName, withExtension: "txt") {
             let content = try String(contentsOf: url, encoding: .utf8)
             for line in content.components(separatedBy: .newlines) {
-                let word = line.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                // Skip empty lines and comment lines
+                if trimmed.isEmpty || trimmed.hasPrefix("#") { continue }
+                // Extract the first token (the word itself)
+                let word = trimmed.split(separator: " ", maxSplits: 1).first
+                    .map { String($0).lowercased() } ?? ""
                 if !word.isEmpty {
                     var flags = wordFlags[word] ?? WordFlags()
                     flags.isScrabble = true
@@ -310,11 +320,12 @@ actor WordListDatabase {
         }
         
         // Batch insert all words
+        let allWordFlags = wordFlags // capture as let for Sendable safety
         try await dbQueue.write { db in
             // Use a prepared statement for efficiency
             let insertSQL = "INSERT INTO words (word, isWordle, isScrabble, isCommonBongo) VALUES (?, ?, ?, ?)"
             
-            for (word, flags) in wordFlags {
+            for (word, flags) in allWordFlags {
                 try db.execute(
                     sql: insertSQL,
                     arguments: [word, flags.isWordle, flags.isScrabble, flags.isCommonBongo]

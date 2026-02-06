@@ -16,12 +16,17 @@ struct SettingsView: View {
     @AppStorage("enable-wordle-dictionary") private var enableWordleDictionary: Bool = true
 
     @AppStorage("selected-scrabble-dictionary") private var selectedDictionary: String = ScrabbleDictionary.default.rawValue
+    @AppStorage("scrabble-icon-style") private var scrabbleIconStyle: String = ScrabbleIconStyle.scrabble.rawValue
 
     /// True while the word‑list database is being rebuilt after a dictionary change.
     @State private var isRebuilding = false
 
     private var selectedScrabbleDictionary: ScrabbleDictionary {
         ScrabbleDictionary(rawValue: selectedDictionary) ?? .default
+    }
+
+    private var currentIconStyle: ScrabbleIconStyle {
+        ScrabbleIconStyle(rawValue: scrabbleIconStyle) ?? .scrabble
     }
 
     var body: some View {
@@ -34,11 +39,27 @@ struct SettingsView: View {
                     isEnabled: $enableBongoDictionary
                 )
                 DictionaryToggleRow(
-                    imageName: "Scrabble",
+                    imageName: currentIconStyle.rawValue,
                     title: "Scrabble English Dictionary",
                     description: selectedScrabbleDictionary.subtitle,
                     isEnabled: $enableScrabbleEnglish
                 )
+
+                Picker("Icon", selection: $scrabbleIconStyle) {
+                    ForEach(ScrabbleIconStyle.allCases) { style in
+                        Label {
+                            Text(style.label)
+                        } icon: {
+                            Image(style.rawValue)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 20, height: 20)
+                        }
+                        .tag(style.rawValue)
+                    }
+                }
+                .pickerStyle(.menu)
+
                 DictionaryToggleRow(
                     imageName: "Wordle",
                     title: "Wordle Dictionary",

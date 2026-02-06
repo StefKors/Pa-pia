@@ -26,6 +26,30 @@ private enum DataMuseClient {
     }
 }
 
+/// Which icon to display for the Scrabble filter / badge.
+enum ScrabbleIconStyle: String, CaseIterable, Identifiable {
+    case scrabble = "Scrabble"
+    case crossPlay = "CrossPlay"
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .scrabble:  return "Scrabble"
+        case .crossPlay: return "CrossPlay"
+        }
+    }
+
+    /// Read the user's preference from UserDefaults.
+    static var current: ScrabbleIconStyle {
+        guard let raw = UserDefaults.standard.string(forKey: "scrabble-icon-style"),
+              let style = ScrabbleIconStyle(rawValue: raw) else {
+            return .scrabble
+        }
+        return style
+    }
+}
+
 /// Filter options for word results
 enum WordFilter: String, CaseIterable, Identifiable, Codable {
     case wordle = "wordle"
@@ -37,7 +61,7 @@ enum WordFilter: String, CaseIterable, Identifiable, Codable {
     var label: String {
         switch self {
         case .wordle: return "Wordle"
-        case .scrabble: return "Scrabble"
+        case .scrabble: return ScrabbleIconStyle.current.label
         case .bongo: return "Bongo"
         }
     }
@@ -45,7 +69,7 @@ enum WordFilter: String, CaseIterable, Identifiable, Codable {
     var imageName: String {
         switch self {
         case .wordle: return "Wordle"
-        case .scrabble: return "Scrabble"
+        case .scrabble: return ScrabbleIconStyle.current.rawValue
         case .bongo: return "Bongo"
         }
     }

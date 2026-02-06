@@ -10,65 +10,48 @@ import UIKit
 
 /// A horizontal row of wildcard character buttons (*, @, ?, etc.)
 /// that insert characters into a target `UITextField` at the caret position.
+///
+/// Uses raw UIViews with tap gesture recognizers — NOT UIButton or UIControl —
+/// so there is zero interference with the responder chain. The search text
+/// field stays first responder at all times.
 final class WildcardToolbarView: UIView {
 
-    /// The text field to insert characters into (the search bar's text field).
-    weak var targetTextField: UITextField?
+    /// Closure that resolves the *current* search text field.
+    /// UISearchController replaces its text field when it becomes active,
+    /// so a stored weak reference goes stale. This closure always returns
+    /// the live text field.
+    var resolveTextField: (() -> UITextField?)?
 
-    /// Called when a button is long-pressed with the explainer string.
-    var onLongPress: ((String) -> Void)?
+    /// Convenience accessor.
+    private var targetTextField: UITextField? { resolveTextField?() }
 
     // MARK: - Button Definitions
 
-    private struct WildcardButton {
+    private struct WildcardDef {
         let label: String
-        let shortExplainer: String
         let explainer: String
     }
 
-    private let wildcardButtons: [WildcardButton] = [
-        WildcardButton(
-            label: "*",
-            shortExplainer: "many",
-            explainer: "The asterisk (*) matches any number of letters. An asterisk can match zero letters, too."
-        ),
-        WildcardButton(
-            label: "@",
-            shortExplainer: "any vowel",
-            explainer: "The at-sign (@) matches any English vowel (including \"y\"). For example, the query abo@t finds the word \"about\" but not \"abort\"."
-        ),
-        WildcardButton(
-            label: "?",
-            shortExplainer: "any letter",
-            explainer: "The question mark (?) matches exactly one letter. That means that you can use it as a placeholder for a single letter or symbol."
-        ),
-        WildcardButton(
-            label: ",",
-            shortExplainer: "combine",
-            explainer: "The comma (,) lets you combine multiple patterns into one."
-        ),
-        WildcardButton(
-            label: "-",
-            shortExplainer: "exclude",
-            explainer: "A minus sign (-) followed by some letters at the end of a pattern means \"exclude these letters\"."
-        ),
-        WildcardButton(
-            label: "+",
-            shortExplainer: "restrict",
-            explainer: "A plus sign (+) followed by some letters at the end of a pattern means \"restrict to these letters\"."
-        ),
-        WildcardButton(
-            label: "//",
-            shortExplainer: "unscramble",
-            explainer: "Use double-slashes (//) before a group of letters to unscramble them (that is, find anagrams.)"
-        ),
+    private static let defs: [WildcardDef] = [
+        .init(label: "*",  explainer: "The asterisk (*) matches any number of letters. An asterisk can match zero letters, too."),
+        .init(label: "@",  explainer: "The at-sign (@) matches any English vowel (including \"y\")."),
+        .init(label: "?",  explainer: "The question mark (?) matches exactly one letter."),
+        .init(label: ",",  explainer: "The comma (,) lets you combine multiple patterns into one."),
+        .init(label: "-",  explainer: "A minus sign (-) followed by some letters means \"exclude these letters\"."),
+        .init(label: "+",  explainer: "A plus sign (+) followed by some letters means \"restrict to these letters\"."),
+        .init(label: "//", explainer: "Use double-slashes (//) before letters to unscramble them (find anagrams)."),
     ]
 
     // MARK: - UI
 
-    private let stackView = UIStackView()
+    private let buttonsStack = UIStackView()
     private let explainerLabel = UILabel()
     private let containerStack = UIStackView()
+    private static let keySize: CGFloat = 36
+
+    /// Saved caret position — captured in touchesBegan before the gesture
+    /// recognizer fires and the text field potentially loses first responder.
+    private var savedSelectedRange: UITextRange?
 
     // MARK: - Init
 
@@ -78,6 +61,8 @@ final class WildcardToolbarView: UIView {
     }
 
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    // MARK: - Setup
 
     private func setupUI() {
         containerStack.axis = .vertical
@@ -93,7 +78,7 @@ final class WildcardToolbarView: UIView {
             containerStack.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
 
-        // Explainer label (hidden by default)
+        // Explainer (hidden by default)
         explainerLabel.font = .preferredFont(forTextStyle: .footnote)
         explainerLabel.textColor = .secondaryLabel
         explainerLabel.numberOfLines = 0
@@ -102,72 +87,90 @@ final class WildcardToolbarView: UIView {
         containerStack.addArrangedSubview(explainerLabel)
 
         // Buttons row
-        stackView.axis = .horizontal
-        stackView.spacing = 4
-        stackView.alignment = .center
-        stackView.distribution = .fillEqually
-        containerStack.addArrangedSubview(stackView)
+        buttonsStack.axis = .horizontal
+        buttonsStack.spacing = 4
+        buttonsStack.alignment = .center
+        buttonsStack.distribution = .fillEqually
+        containerStack.addArrangedSubview(buttonsStack)
 
-        for (index, def) in wildcardButtons.enumerated() {
-            let button = makeButton(def: def, tag: index)
-            stackView.addArrangedSubview(button)
+        for (index, def) in Self.defs.enumerated() {
+            let keyView = makeKeyView(def: def, tag: index)
+            buttonsStack.addArrangedSubview(keyView)
         }
     }
 
-    private static let buttonSize: CGFloat = 36
+    private func makeKeyView(def: WildcardDef, tag: Int) -> UIView {
+        let keyView = UIView()
+        keyView.tag = tag
+        keyView.backgroundColor = UIColor.tertiarySystemFill
+        keyView.layer.cornerRadius = Self.keySize / 2
+        keyView.clipsToBounds = true
+        keyView.translatesAutoresizingMaskIntoConstraints = false
+        let w = keyView.widthAnchor.constraint(equalToConstant: Self.keySize)
+        let h = keyView.heightAnchor.constraint(equalToConstant: Self.keySize)
+        // High but not required — lets the parent stack view compress if needed.
+        w.priority = .defaultHigh
+        h.priority = .defaultHigh
+        NSLayoutConstraint.activate([w, h])
 
-    private func makeButton(def: WildcardButton, tag: Int) -> UIButton {
-        let button = UIButton(type: .system)
-        button.setTitle(def.label, for: .normal)
-        button.titleLabel?.font = .preferredFont(forTextStyle: .body)
-        button.titleLabel?.adjustsFontSizeToFitWidth = true
-        button.titleLabel?.minimumScaleFactor = 0.6
-        button.tag = tag
-
-        button.translatesAutoresizingMaskIntoConstraints = false
+        let label = UILabel()
+        label.text = def.label
+        label.font = .preferredFont(forTextStyle: .body)
+        label.textAlignment = .center
+        label.textColor = .label
+        label.translatesAutoresizingMaskIntoConstraints = false
+        keyView.addSubview(label)
         NSLayoutConstraint.activate([
-            button.widthAnchor.constraint(equalToConstant: Self.buttonSize),
-            button.heightAnchor.constraint(equalToConstant: Self.buttonSize),
+            label.centerXAnchor.constraint(equalTo: keyView.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: keyView.centerYAnchor),
         ])
-        button.layer.cornerRadius = Self.buttonSize / 2
-        button.clipsToBounds = true
-        if #available(iOS 26.0, *) {
-            button.configuration = .glass()
-        } else {
-            button.backgroundColor = UIColor.tertiarySystemFill
-        }
 
-        // Tap gesture (requires long press to fail first)
-        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
+        // Tap gesture — UIView gestures do NOT touch the responder chain
+        let tap = UITapGestureRecognizer(target: self, action: #selector(keyTapped(_:)))
+        keyView.addGestureRecognizer(tap)
+
+        // Long press for explainer
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(keyLongPressed(_:)))
         longPress.minimumPressDuration = 0.4
-        button.addGestureRecognizer(longPress)
+        keyView.addGestureRecognizer(longPress)
 
-        let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
-        tap.require(toFail: longPress)
-        button.addGestureRecognizer(tap)
+        return keyView
+    }
 
-        return button
+    // MARK: - Touch Handling
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        // Capture the caret position *before* the gesture recognizer fires
+        // and the UISearchController potentially resigns the text field.
+        savedSelectedRange = targetTextField?.selectedTextRange
+        logger.debug("touchesBegan — targetTextField: \(self.targetTextField.debugDescription), isFirstResponder: \(self.targetTextField?.isFirstResponder ?? false), savedRange: \(self.savedSelectedRange.debugDescription)")
+        super.touchesBegan(touches, with: event)
     }
 
     // MARK: - Actions
 
-    @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
-        guard gesture.state == .ended,
-              let button = gesture.view as? UIButton else { return }
-        let def = wildcardButtons[button.tag]
-        insertText(def.label)
+    @objc private func keyTapped(_ gesture: UITapGestureRecognizer) {
+        guard let keyView = gesture.view else {
+            logger.warning("keyTapped — gesture.view is nil")
+            return
+        }
+        let def = Self.defs[keyView.tag]
+        logger.debug("keyTapped — label: '\(def.label)', tag: \(keyView.tag)")
+
+        // Visual feedback
+        animatePress(keyView)
+
+        // Insert text at the caret
+        insertTextAtCaret(def.label)
     }
 
-    @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+    @objc private func keyLongPressed(_ gesture: UILongPressGestureRecognizer) {
         guard gesture.state == .began,
-              let button = gesture.view as? UIButton else { return }
-        let def = wildcardButtons[button.tag]
+              let keyView = gesture.view else { return }
+        let def = Self.defs[keyView.tag]
 
-        // Haptic feedback
-        let generator = UIImpactFeedbackGenerator(style: .medium)
-        generator.impactOccurred()
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
 
-        // Toggle explainer
         UIView.animate(withDuration: 0.2) {
             if self.explainerLabel.text == def.explainer && !self.explainerLabel.isHidden {
                 self.explainerLabel.isHidden = true
@@ -177,22 +180,69 @@ final class WildcardToolbarView: UIView {
             }
             self.layoutIfNeeded()
         }
-
-        onLongPress?(def.explainer)
     }
 
-    /// Insert text at the current caret position in the target text field,
-    /// or append to the end if there's no selection.
-    private func insertText(_ text: String) {
-        guard let textField = targetTextField else { return }
+    // MARK: - Text Insertion
 
-        if let selectedRange = textField.selectedTextRange {
-            textField.replace(selectedRange, withText: text)
-        } else {
-            // Fallback: append to end
-            textField.text = (textField.text ?? "") + text
-            // Notify delegate of the change
-            textField.sendActions(for: .editingChanged)
+    private func insertTextAtCaret(_ text: String) {
+        logger.debug("insertTextAtCaret — text: '\(text)', targetTextField: \(self.targetTextField.debugDescription)")
+        logger.debug("  isFirstResponder: \(self.targetTextField?.isFirstResponder ?? false)")
+        logger.debug("  currentText: '\(self.targetTextField?.text ?? "nil")'")
+        logger.debug("  selectedTextRange: \(self.targetTextField?.selectedTextRange.debugDescription ?? "nil")")
+
+        guard let tf = targetTextField, tf.isFirstResponder else {
+            logger.debug("  ⚠️ text field is NOT first responder — calling becomeFirstResponder + async insert")
+            targetTextField?.becomeFirstResponder()
+            let textToInsert = text
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                logger.debug("  async callback — isFirstResponder now: \(self.targetTextField?.isFirstResponder ?? false)")
+                self.doInsert(textToInsert)
+            }
+            return
+        }
+
+        doInsert(text)
+    }
+
+    private func doInsert(_ text: String) {
+        guard let tf = targetTextField else {
+            logger.warning("doInsert — targetTextField is nil, aborting")
+            return
+        }
+
+        logger.debug("doInsert — text: '\(text)', currentText BEFORE: '\(tf.text ?? "nil")'")
+        logger.debug("  isFirstResponder: \(tf.isFirstResponder)")
+        logger.debug("  selectedTextRange: \(tf.selectedTextRange.debugDescription)")
+        logger.debug("  savedSelectedRange: \(self.savedSelectedRange.debugDescription)")
+
+        // Restore the caret position that was saved in touchesBegan.
+        if let savedRange = savedSelectedRange {
+            tf.selectedTextRange = savedRange
+            savedSelectedRange = nil
+            logger.debug("  restored savedSelectedRange")
+        }
+
+        // UITextInput.insertText inserts at the current caret position.
+        tf.insertText(text)
+        logger.debug("  currentText AFTER insertText: '\(tf.text ?? "nil")'")
+
+        // Notify UISearchController of the change
+        tf.sendActions(for: .editingChanged)
+        logger.debug("  sent .editingChanged action")
+    }
+
+    // MARK: - Visual Feedback
+
+    private func animatePress(_ view: UIView) {
+        UIView.animate(withDuration: 0.08, animations: {
+            view.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+            view.alpha = 0.7
+        }) { _ in
+            UIView.animate(withDuration: 0.08) {
+                view.transform = .identity
+                view.alpha = 1.0
+            }
         }
     }
 }
