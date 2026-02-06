@@ -118,6 +118,7 @@ struct WordDetailView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var selectedScope: DataMuseViewModel.SearchScope? = nil
+    @AppStorage("scrabble-icon-style") private var scrabbleIconStyle: String = ScrabbleIconStyle.scrabble.rawValue
 
     /// Navigation bar title view with word name and dictionary badge icons.
     private var titleWithBadges: some View {
@@ -133,7 +134,7 @@ struct WordDetailView: View {
             }
 
             if word.isScrabble {
-                Image(ScrabbleIconStyle.current.rawValue)
+                Image(scrabbleIconStyle)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 16, height: 16)
