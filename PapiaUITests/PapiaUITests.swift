@@ -22,20 +22,47 @@ final class PapiaUITests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
+    // MARK: - Helpers
+
+    /// Tap a button multiple times with a short pause between each tap so the
+    /// UIKit responder chain has time to process every insertion.
+    private func tapRepeatedly(_ element: XCUIElement, count: Int) {
+        for _ in 0..<count {
+            element.tap()
+            // Small delay lets UITextField.insertText + sendActions settle
+            // before the next tap arrives.
+            usleep(150_000) // 150 ms
+        }
+    }
+
+    /// Poll the search field until its value equals `expected` or the timeout
+    /// elapses. Falls back to a plain XCTAssertEqual on timeout.
+    private func assertSearchFieldEquals(
+        _ searchInput: XCUIElement,
+        expected: String,
+        timeout: TimeInterval = 3,
+        message: String
+    ) {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if (searchInput.value as? String) == expected { break }
+            usleep(100_000) // 100 ms
+        }
+        XCTAssertEqual(searchInput.value as? String, expected, message)
+    }
+
+    // MARK: - Tests
+
     func testSearchAndNavigation() throws {
         let app = XCUIApplication()
         app.activate()
         let element = app.buttons.matching(identifier: "? any letter").firstMatch
         XCTAssertTrue(element.waitForExistence(timeout: 5), "Wildcard button should exist")
-        element.tap()
-        element.tap()
-        element.tap()
-        element.tap()
-        element.tap()
+        tapRepeatedly(element, count: 5)
 
         // confirm button result
         let searchInput = app.searchFields.matching(identifier: "search-input").firstMatch
-        XCTAssertEqual(searchInput.value as? String, "?????", "Expected search input to contain \"?????\"")
+        assertSearchFieldEquals(searchInput, expected: "?????", message: "Expected search input to contain \"?????\"")
 
         // navigate to word detail
         let firstResult = app.cells.matching(identifier: "word-list-word-view").firstMatch
@@ -60,15 +87,11 @@ final class PapiaUITests: XCTestCase {
                 app.activate()
                 let element = app.buttons.matching(identifier: "? any letter").firstMatch
                 XCTAssertTrue(element.waitForExistence(timeout: 5), "Wildcard button should exist")
-                element.tap()
-                element.tap()
-                element.tap()
-                element.tap()
-                element.tap()
+                tapRepeatedly(element, count: 5)
 
                 // confirm button result
                 let searchInput = app.searchFields.matching(identifier: "search-input").firstMatch
-                XCTAssertEqual(searchInput.value as? String, "?????", "Expected search input to contain \"?????\"")
+                assertSearchFieldEquals(searchInput, expected: "?????", message: "Expected search input to contain \"?????\"")
 
                 // navigate to word detail
                 let firstResult = app.cells.matching(identifier: "word-list-word-view").firstMatch
@@ -105,13 +128,11 @@ final class PapiaUITests: XCTestCase {
         // Add some characters using the toolbar buttons
         let questionMarkButton = app.buttons.matching(identifier: "? any letter").firstMatch
         XCTAssertTrue(questionMarkButton.waitForExistence(timeout: 5), "Wildcard button should exist")
-        questionMarkButton.tap()
-        questionMarkButton.tap()
-        questionMarkButton.tap()
+        tapRepeatedly(questionMarkButton, count: 3)
 
         // Verify text was added
         let searchInput = app.searchFields.matching(identifier: "search-input").firstMatch
-        XCTAssertEqual(searchInput.value as? String, "???", "Expected search input to contain \"???\"")
+        assertSearchFieldEquals(searchInput, expected: "???", message: "Expected search input to contain \"???\"")
 
         // Clear the input using the clear button
         let clearButton = app.buttons["Clear text"].firstMatch
@@ -127,10 +148,10 @@ final class PapiaUITests: XCTestCase {
         asteriskButton.tap()
 
         // Verify the character was added successfully
-        XCTAssertEqual(searchInput.value as? String, "*", "Expected search input to contain \"*\" after pressing toolbar button")
+        assertSearchFieldEquals(searchInput, expected: "*", message: "Expected search input to contain \"*\" after pressing toolbar button")
 
         // Tap another button to make sure it continues to work
         questionMarkButton.tap()
-        XCTAssertEqual(searchInput.value as? String, "*?", "Expected search input to contain \"*?\"")
+        assertSearchFieldEquals(searchInput, expected: "*?", message: "Expected search input to contain \"*?\"")
     }
 }
