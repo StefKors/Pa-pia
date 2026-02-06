@@ -9,149 +9,233 @@ import XCTest
 
 final class PapiaUITests: XCTestCase {
 
+    /// Generous timeout for Xcode Cloud which can be very slow.
+    private let ciTimeout: TimeInterval = 10
+
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-
-        // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
-
-        // In UI tests it's important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
     }
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
+    override func tearDownWithError() throws {}
 
     // MARK: - Helpers
 
-    /// Tap a button multiple times with a short pause between each tap so the
-    /// UIKit responder chain has time to process every insertion.
-    private func tapRepeatedly(_ element: XCUIElement, count: Int) {
-        for _ in 0..<count {
-            element.tap()
-            // Small delay lets UITextField.insertText + sendActions settle
-            // before the next tap arrives.
-            usleep(150_000) // 150 ms
+    /// Ensure the search field exists and is focused (first responder) so that
+    /// toolbar button taps actually insert text.
+    @discardableResult
+    private func focusSearchField(in app: XCUIApplication) -> XCUIElement {
+        let searchInput = app.searchFields.matching(identifier: "search-input").firstMatch
+        XCTAssertTrue(searchInput.waitForExistence(timeout: ciTimeout), "Search field should exist")
+        // Tap the search field to make sure the keyboard / first responder is active.
+        searchInput.tap()
+        // Give the keyboard time to appear on slow CI.
+        sleep(1)
+        return searchInput
+    }
+
+    /// Tap a toolbar button once and wait until the search field value changes
+    /// (or until timeout). Returns whether the tap was acknowledged.
+    @discardableResult
+    private func tapAndWaitForChange(
+        button: XCUIElement,
+        searchField: XCUIElement,
+        timeout: TimeInterval = 3
+    ) -> Bool {
+        let valueBefore = searchField.value as? String ?? ""
+        button.tap()
+
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            let current = searchField.value as? String ?? ""
+            if current != valueBefore { return true }
+            usleep(100_000) // 100 ms
+        }
+        return false
+    }
+
+    /// Tap a button `count` times, verifying after each tap that the search
+    /// field value grew. Retries each tap up to 3 times if the value didn't
+    /// change (handles slow Xcode Cloud runners).
+    private func tapRepeatedly(
+        _ button: XCUIElement,
+        count: Int,
+        searchField: XCUIElement
+    ) {
+        for i in 0..<count {
+            var success = false
+            for attempt in 0..<3 {
+                if tapAndWaitForChange(button: button, searchField: searchField) {
+                    success = true
+                    break
+                }
+                // Retry: re-focus the search field and try again.
+                searchField.tap()
+                usleep(300_000) // 300 ms
+            }
+            if !success {
+                XCTFail("Toolbar button tap \(i + 1) of \(count) did not register after 3 attempts")
+                return
+            }
         }
     }
 
     /// Poll the search field until its value equals `expected` or the timeout
-    /// elapses. Falls back to a plain XCTAssertEqual on timeout.
+    /// elapses. Uses a generous default for slow CI.
     private func assertSearchFieldEquals(
         _ searchInput: XCUIElement,
         expected: String,
-        timeout: TimeInterval = 3,
+        timeout: TimeInterval = 5,
         message: String
     ) {
         let deadline = Date().addingTimeInterval(timeout)
         while Date() < deadline {
             if (searchInput.value as? String) == expected { break }
-            usleep(100_000) // 100 ms
+            usleep(150_000) // 150 ms
         }
         XCTAssertEqual(searchInput.value as? String, expected, message)
+    }
+
+    /// Poll the search field until its value does NOT equal `unexpected`.
+    private func assertSearchFieldNotEquals(
+        _ searchInput: XCUIElement,
+        unexpected: String,
+        timeout: TimeInterval = 5,
+        message: String
+    ) {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if (searchInput.value as? String) != unexpected { break }
+            usleep(150_000)
+        }
+        XCTAssertNotEqual(searchInput.value as? String, unexpected, message)
     }
 
     // MARK: - Tests
 
     func testSearchAndNavigation() throws {
         let app = XCUIApplication()
-        app.activate()
-        let element = app.buttons.matching(identifier: "? any letter").firstMatch
-        XCTAssertTrue(element.waitForExistence(timeout: 5), "Wildcard button should exist")
-        tapRepeatedly(element, count: 5)
+        app.launch()
 
-        // confirm button result
-        let searchInput = app.searchFields.matching(identifier: "search-input").firstMatch
-        assertSearchFieldEquals(searchInput, expected: "?????", message: "Expected search input to contain \"?????\"")
+        // Wait for the UI to be fully loaded
+        let searchInput = focusSearchField(in: app)
+
+        let button = app.buttons.matching(identifier: "? any letter").firstMatch
+        XCTAssertTrue(button.waitForExistence(timeout: ciTimeout), "Wildcard button should exist")
+
+        // Re-focus search field right before tapping toolbar buttons
+        searchInput.tap()
+        sleep(1)
+
+        tapRepeatedly(button, count: 5, searchField: searchInput)
+
+        assertSearchFieldEquals(searchInput, expected: "?????",
+                                message: "Expected search input to contain \"?????\"")
 
         // navigate to word detail
         let firstResult = app.cells.matching(identifier: "word-list-word-view").firstMatch
-        XCTAssertTrue(firstResult.waitForExistence(timeout: 10), "Expected search results to appear")
+        XCTAssertTrue(firstResult.waitForExistence(timeout: 15), "Expected search results to appear")
         firstResult.tap()
 
         // navigate back
-        app.navigationBars.buttons.firstMatch.tap()
+        let backButton = app.navigationBars.buttons.firstMatch
+        XCTAssertTrue(backButton.waitForExistence(timeout: ciTimeout), "Back button should exist")
+        backButton.tap()
 
         // clear input
         let clearButton = app.buttons["Clear text"].firstMatch
-        XCTAssertTrue(clearButton.waitForExistence(timeout: 2), "Clear button should exist")
+        XCTAssertTrue(clearButton.waitForExistence(timeout: ciTimeout), "Clear button should exist")
         clearButton.tap()
-        XCTAssertNotEqual(searchInput.value as? String, "?????", "Expected search input to be cleared")
+        assertSearchFieldNotEquals(searchInput, unexpected: "?????",
+                                   message: "Expected search input to be cleared")
     }
 
     func testSearchAndNavigationPerformance() throws {
         if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
-            // This measures how long it takes to launch your application.
             measure() {
                 let app = XCUIApplication()
-                app.activate()
-                let element = app.buttons.matching(identifier: "? any letter").firstMatch
-                XCTAssertTrue(element.waitForExistence(timeout: 5), "Wildcard button should exist")
-                tapRepeatedly(element, count: 5)
+                app.launch()
 
-                // confirm button result
-                let searchInput = app.searchFields.matching(identifier: "search-input").firstMatch
-                assertSearchFieldEquals(searchInput, expected: "?????", message: "Expected search input to contain \"?????\"")
+                let searchInput = focusSearchField(in: app)
+
+                let button = app.buttons.matching(identifier: "? any letter").firstMatch
+                XCTAssertTrue(button.waitForExistence(timeout: ciTimeout), "Wildcard button should exist")
+
+                searchInput.tap()
+                sleep(1)
+
+                tapRepeatedly(button, count: 5, searchField: searchInput)
+
+                assertSearchFieldEquals(searchInput, expected: "?????",
+                                        message: "Expected search input to contain \"?????\"")
 
                 // navigate to word detail
                 let firstResult = app.cells.matching(identifier: "word-list-word-view").firstMatch
-                XCTAssertTrue(firstResult.waitForExistence(timeout: 10), "Expected search results to appear")
+                XCTAssertTrue(firstResult.waitForExistence(timeout: 15), "Expected search results to appear")
                 firstResult.tap()
 
                 // navigate back
-                app.navigationBars.buttons.firstMatch.tap()
+                let backButton = app.navigationBars.buttons.firstMatch
+                XCTAssertTrue(backButton.waitForExistence(timeout: ciTimeout), "Back button should exist")
+                backButton.tap()
 
                 // clear input
                 let clearButton = app.buttons["Clear text"].firstMatch
-                XCTAssertTrue(clearButton.waitForExistence(timeout: 2), "Clear button should exist")
+                XCTAssertTrue(clearButton.waitForExistence(timeout: ciTimeout), "Clear button should exist")
                 clearButton.tap()
-                XCTAssertNotEqual(searchInput.value as? String, "?????", "Expected search input to be cleared")
+                assertSearchFieldNotEquals(searchInput, unexpected: "?????",
+                                           message: "Expected search input to be cleared")
             }
         }
     }
 
     func testLaunchPerformance() throws {
         if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
-            // This measures how long it takes to launch your application.
             measure(metrics: [XCTApplicationLaunchMetric()]) {
                 XCUIApplication().launch()
             }
         }
     }
 
-    /// Test that pressing a toolbar button after clearing the search input does not crash
-    /// This tests for a bug where stale TextSelection indices would cause an index out of bounds crash
+    /// Test that pressing a toolbar button after clearing the search input does not crash.
+    /// Regression test for stale TextSelection indices causing index-out-of-bounds.
     func testToolbarButtonAfterClearDoesNotCrash() throws {
         let app = XCUIApplication()
         app.launch()
 
-        // Add some characters using the toolbar buttons
+        let searchInput = focusSearchField(in: app)
+
         let questionMarkButton = app.buttons.matching(identifier: "? any letter").firstMatch
-        XCTAssertTrue(questionMarkButton.waitForExistence(timeout: 5), "Wildcard button should exist")
-        tapRepeatedly(questionMarkButton, count: 3)
+        XCTAssertTrue(questionMarkButton.waitForExistence(timeout: ciTimeout), "Wildcard button should exist")
 
-        // Verify text was added
-        let searchInput = app.searchFields.matching(identifier: "search-input").firstMatch
-        assertSearchFieldEquals(searchInput, expected: "???", message: "Expected search input to contain \"???\"")
+        searchInput.tap()
+        sleep(1)
 
-        // Clear the input using the clear button
+        tapRepeatedly(questionMarkButton, count: 3, searchField: searchInput)
+
+        assertSearchFieldEquals(searchInput, expected: "???",
+                                message: "Expected search input to contain \"???\"")
+
+        // Clear the input
         let clearButton = app.buttons["Clear text"].firstMatch
-        XCTAssertTrue(clearButton.waitForExistence(timeout: 2), "Clear button should exist")
+        XCTAssertTrue(clearButton.waitForExistence(timeout: ciTimeout), "Clear button should exist")
         clearButton.tap()
+        assertSearchFieldNotEquals(searchInput, unexpected: "???",
+                                   message: "Expected search input to be cleared")
 
-        // Verify input is cleared
-        XCTAssertNotEqual(searchInput.value as? String, "???", "Expected search input to be cleared")
+        // Re-focus after clearing — the keyboard may have dismissed.
+        searchInput.tap()
+        sleep(1)
 
-        // Now tap a toolbar button again - this should NOT crash
-        // The bug was that stale TextSelection indices from the previous text would cause a crash
+        // Now tap a toolbar button again — this should NOT crash.
         let asteriskButton = app.buttons.matching(identifier: "* many").firstMatch
-        asteriskButton.tap()
+        XCTAssertTrue(asteriskButton.waitForExistence(timeout: ciTimeout), "Asterisk button should exist")
 
-        // Verify the character was added successfully
-        assertSearchFieldEquals(searchInput, expected: "*", message: "Expected search input to contain \"*\" after pressing toolbar button")
+        tapAndWaitForChange(button: asteriskButton, searchField: searchInput)
+        assertSearchFieldEquals(searchInput, expected: "*",
+                                message: "Expected search input to contain \"*\" after pressing toolbar button")
 
-        // Tap another button to make sure it continues to work
-        questionMarkButton.tap()
-        assertSearchFieldEquals(searchInput, expected: "*?", message: "Expected search input to contain \"*?\"")
+        tapAndWaitForChange(button: questionMarkButton, searchField: searchInput)
+        assertSearchFieldEquals(searchInput, expected: "*?",
+                                message: "Expected search input to contain \"*?\"")
     }
 }
