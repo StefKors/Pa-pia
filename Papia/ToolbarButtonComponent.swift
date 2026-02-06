@@ -60,9 +60,13 @@ struct ToolbarButtonComponent: View {
                 model.searchTextSelection = TextSelection(insertionPoint: newIndex)
             } else {
                 model.searchText += label
+                let endIndex = model.searchText.endIndex
+                model.searchTextSelection = TextSelection(insertionPoint: endIndex)
             }
         } else {
             model.searchText += label
+            let endIndex = model.searchText.endIndex
+            model.searchTextSelection = TextSelection(insertionPoint: endIndex)
         }
     }
 }
