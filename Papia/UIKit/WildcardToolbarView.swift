@@ -11,9 +11,9 @@ import UIKit
 /// A horizontal row of wildcard character buttons (*, @, ?, etc.)
 /// that insert characters into a target `UITextField` at the caret position.
 ///
-/// Uses raw UIViews with tap gesture recognizers — NOT UIButton or UIControl —
-/// so there is zero interference with the responder chain. The search text
-/// field stays first responder at all times.
+/// Uses `NonStealingButton` (a UIButton subclass that refuses first-responder
+/// status) with `UIAction` handlers so there is zero interference with the
+/// responder chain. The search text field stays first responder at all times.
 final class WildcardToolbarView: UIView {
 
     /// Closure that resolves the *current* search text field.
