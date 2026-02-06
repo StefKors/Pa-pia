@@ -90,19 +90,11 @@ final class SearchListViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         title = "Pápia"
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
         definesPresentationContext = true
-
-        // Settings button
-        navigationItem.rightBarButtonItem = UIBarButtonItem(
-            image: UIImage(systemName: "gearshape"),
-            style: .plain,
-            target: self,
-            action: #selector(settingsTapped)
-        )
 
         setupCollectionView()
         setupFilterBar()
@@ -119,7 +111,7 @@ final class SearchListViewController: UIViewController {
     // MARK: - Collection View Setup
 
     private func setupCollectionView() {
-        var listConfig = UICollectionLayoutListConfiguration(appearance: .plain)
+        var listConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
         listConfig.showsSeparators = true
         let layout = UICollectionViewCompositionalLayout.list(using: listConfig)
 
@@ -269,10 +261,6 @@ final class SearchListViewController: UIViewController {
         let host = UIHostingController(rootView: detailView)
         host.title = word.word.capitalized
         navigationController?.pushViewController(host, animated: true)
-    }
-
-    @objc private func settingsTapped() {
-        presentSettings()
     }
 
     private func presentSettings() {

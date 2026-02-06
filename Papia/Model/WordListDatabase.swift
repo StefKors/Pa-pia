@@ -21,6 +21,10 @@ actor WordListDatabase {
     /// The scrabble dictionary that was used to build the current database.
     private var loadedDictionary: ScrabbleDictionary?
     
+    /// Separate database for user data (search history) that survives
+    /// word-list rebuilds.
+    private var userDbQueue: DatabaseQueue?
+    
     private init() {}
     
     /// Initialize the database and load word lists if needed.
@@ -111,6 +115,88 @@ actor WordListDatabase {
         }) ?? [:]
     }
     
+    // MARK: - Search History (separate database, survives word-list rebuilds)
+
+    /// Ensure the user database (search history) is set up.
+    private func ensureUserDatabase() async throws -> DatabaseQueue {
+        if let userDbQueue { return userDbQueue }
+
+        let fileManager = FileManager.default
+        let appSupportURL = try fileManager.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        let papiaDirectory = appSupportURL.appendingPathComponent("Papia", isDirectory: true)
+        try fileManager.createDirectory(at: papiaDirectory, withIntermediateDirectories: true)
+
+        let dbURL = papiaDirectory.appendingPathComponent("user_data.sqlite")
+        let db = try DatabaseQueue(path: dbURL.path)
+
+        try await db.write { db in
+            try db.execute(sql: """
+                CREATE TABLE IF NOT EXISTS search_history (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    query TEXT NOT NULL UNIQUE,
+                    timestamp REAL NOT NULL
+                )
+            """)
+            try db.execute(sql: """
+                CREATE INDEX IF NOT EXISTS idx_search_history_timestamp
+                ON search_history(timestamp)
+            """)
+        }
+
+        self.userDbQueue = db
+        return db
+    }
+
+    /// Add or update a search history entry with the current timestamp.
+    func addSearchHistoryEntry(_ query: String) async {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        guard let db = try? await ensureUserDatabase() else { return }
+        let now = Date().timeIntervalSince1970
+
+        try? await db.write { db in
+            // INSERT OR REPLACE to upsert — updates timestamp for existing queries
+            try db.execute(
+                sql: """
+                    INSERT INTO search_history (query, timestamp) VALUES (?, ?)
+                    ON CONFLICT(query) DO UPDATE SET timestamp = excluded.timestamp
+                """,
+                arguments: [trimmed, now]
+            )
+        }
+    }
+
+    /// Fetch recent search history, pruning entries older than `maxAgeDays`.
+    func fetchSearchHistory(limit: Int = 50, maxAgeDays: Int = 30) async -> [String] {
+        guard let db = try? await ensureUserDatabase() else { return [] }
+
+        let cutoff = Date().timeIntervalSince1970 - Double(maxAgeDays * 86400)
+
+        // Prune old entries
+        try? await db.write { db in
+            try db.execute(
+                sql: "DELETE FROM search_history WHERE timestamp < ?",
+                arguments: [cutoff]
+            )
+        }
+
+        // Fetch most recent entries
+        return (try? await db.read { db in
+            try String.fetchAll(db, sql: """
+                SELECT query FROM search_history
+                WHERE timestamp >= ?
+                ORDER BY timestamp DESC
+                LIMIT ?
+            """, arguments: [cutoff, limit])
+        }) ?? []
+    }
+
     // MARK: - Private
     
     private func setupDatabase() async throws -> DatabaseQueue {
