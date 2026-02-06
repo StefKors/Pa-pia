@@ -101,6 +101,7 @@ final class SearchListViewController: UIViewController {
         bar.delegate = self
         bar.searchBarStyle = .minimal
         bar.returnKeyType = .search
+        bar.searchTextField.accessibilityIdentifier = "search-input"
         return bar
     }()
 
@@ -219,6 +220,7 @@ final class SearchListViewController: UIViewController {
                 WordView(word: word)
             }
             cell.accessories = [.disclosureIndicator()]
+            cell.accessibilityIdentifier = "word-list-word-view"
         }
 
         dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView) { collectionView, indexPath, word in

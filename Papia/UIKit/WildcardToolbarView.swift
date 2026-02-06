@@ -29,17 +29,18 @@ final class WildcardToolbarView: UIView {
 
     private struct WildcardDef {
         let label: String
+        let accessibilityID: String
         let explainer: String
     }
 
     private static let defs: [WildcardDef] = [
-        .init(label: "*",  explainer: "The asterisk (*) matches any number of letters. An asterisk can match zero letters, too."),
-        .init(label: "@",  explainer: "The at-sign (@) matches any English vowel (including \"y\")."),
-        .init(label: "?",  explainer: "The question mark (?) matches exactly one letter."),
-        .init(label: ",",  explainer: "The comma (,) lets you combine multiple patterns into one."),
-        .init(label: "-",  explainer: "A minus sign (-) followed by some letters means \"exclude these letters\"."),
-        .init(label: "+",  explainer: "A plus sign (+) followed by some letters means \"restrict to these letters\"."),
-        .init(label: "//", explainer: "Use double-slashes (//) before letters to unscramble them (find anagrams)."),
+        .init(label: "*",  accessibilityID: "* many",       explainer: "The asterisk (*) matches any number of letters. An asterisk can match zero letters, too."),
+        .init(label: "@",  accessibilityID: "@ vowel",      explainer: "The at-sign (@) matches any English vowel (including \"y\")."),
+        .init(label: "?",  accessibilityID: "? any letter",  explainer: "The question mark (?) matches exactly one letter."),
+        .init(label: ",",  accessibilityID: ", combine",     explainer: "The comma (,) lets you combine multiple patterns into one."),
+        .init(label: "-",  accessibilityID: "- exclude",     explainer: "A minus sign (-) followed by some letters means \"exclude these letters\"."),
+        .init(label: "+",  accessibilityID: "+ restrict",    explainer: "A plus sign (+) followed by some letters means \"restrict to these letters\"."),
+        .init(label: "//", accessibilityID: "// anagram",   explainer: "Use double-slashes (//) before letters to unscramble them (find anagrams)."),
     ]
 
     // MARK: - UI
@@ -119,6 +120,7 @@ final class WildcardToolbarView: UIView {
 
         let button = NonStealingButton(configuration: config)
         button.tag = tag
+        button.accessibilityIdentifier = def.accessibilityID
         button.translatesAutoresizingMaskIntoConstraints = false
         let w = button.widthAnchor.constraint(equalToConstant: Self.keySize)
         let h = button.heightAnchor.constraint(equalToConstant: Self.keySize)
