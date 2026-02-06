@@ -211,7 +211,10 @@ struct ContentView: View {
             .navigationDestination(for: DataMuseWord.self, destination: { word in
                 WordDetailView(word: word)
             })
-            .searchable(text: $model.searchText, placement: .automatic, prompt: "Find words...")
+            .toolbar {
+                DefaultToolbarItem(kind: .search, placement: .bottomBar)
+            }
+            .searchable(text: $model.searchText, placement: .toolbar, prompt: "Find words...")
             .searchFocused($searchIsFocused)
             .onSubmit(of: .search) {
                 if !model.searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {

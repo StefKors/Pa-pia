@@ -199,6 +199,8 @@ require that the results are spelled similarly to this string of characters, or 
                     ]
                 )
             ).value
+        } catch is CancellationError {
+            // Task was cancelled, this is expected.
         } catch {
             logger.error("Failed to fetch definitions: \(error.localizedDescription)")
         }
@@ -233,6 +235,8 @@ require that the results are spelled similarly to this string of characters, or 
                     query: [("max", String(clampedMax)), (scope.queryParam, search)]
                 )
             ).value
+        } catch is CancellationError {
+            // Task was cancelled (e.g. user typed a new character), this is expected.
         } catch {
             logger.error("Query failed for \(path) with scope \(scope.queryParam): \(error.localizedDescription)")
         }
