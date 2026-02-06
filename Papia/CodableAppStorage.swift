@@ -14,29 +14,31 @@ public struct CodableAppStorage<Value: Codable>: DynamicProperty {
 
     private let decoder = JSONDecoder()
     private let encoder = JSONEncoder()
+    private let defaultValue: Value
 
     public init(wrappedValue: Value, _ key: String, store: UserDefaults? = nil) {
-        do {
-            let initialValue = try encoder.encode(wrappedValue)
-            self._value = AppStorage(wrappedValue: initialValue, key, store: store)
-        } catch {
-            self._value = AppStorage(wrappedValue: Data(), key, store: store)
-        }
+        self.defaultValue = wrappedValue
+        let initialValue = (try? encoder.encode(wrappedValue)) ?? Data()
+        self._value = AppStorage(wrappedValue: initialValue, key, store: store)
     }
 
     public var wrappedValue: Value {
         get {
-            do {
-                return try decoder.decode(Value.self, from: value)
-            } catch {
-                return try! decoder.decode(Value.self, from: value)
+            // If the stored data can't be decoded (e.g. the type changed
+            // between app versions), fall back to the default value and
+            // silently reset the persisted data so subsequent reads succeed.
+            if let decoded = try? decoder.decode(Value.self, from: value) {
+                return decoded
             }
+            // Reset corrupted data to the default
+            if let resetData = try? encoder.encode(defaultValue) {
+                value = resetData
+            }
+            return defaultValue
         }
         nonmutating set {
-            do {
-                value = try encoder.encode(newValue)
-            } catch {
-                value = try! encoder.encode(newValue)
+            if let encoded = try? encoder.encode(newValue) {
+                value = encoded
             }
         }
     }
