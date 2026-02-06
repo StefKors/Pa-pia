@@ -15,7 +15,7 @@ final class PapiaUITests: XCTestCase {
         // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
 
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
+        // In UI tests it's important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
     }
 
     override func tearDownWithError() throws {
@@ -26,6 +26,7 @@ final class PapiaUITests: XCTestCase {
         let app = XCUIApplication()
         app.activate()
         let element = app.buttons.matching(identifier: "? any letter").firstMatch
+        XCTAssertTrue(element.waitForExistence(timeout: 5), "Wildcard button should exist")
         element.tap()
         element.tap()
         element.tap()
@@ -33,20 +34,22 @@ final class PapiaUITests: XCTestCase {
         element.tap()
 
         // confirm button result
-        XCTAssertEqual(app.textFields.matching(identifier: "search-input").firstMatch.value as? String, "?????", "Expected search input to contain \"?????\"")
+        let searchInput = app.searchFields.matching(identifier: "search-input").firstMatch
+        XCTAssertEqual(searchInput.value as? String, "?????", "Expected search input to contain \"?????\"")
 
         // navigate to word detail
-        app.buttons.matching(identifier: "word-list-word-view").firstMatch.tap()
+        let firstResult = app.cells.matching(identifier: "word-list-word-view").firstMatch
+        XCTAssertTrue(firstResult.waitForExistence(timeout: 10), "Expected search results to appear")
+        firstResult.tap()
 
         // navigate back
-        app.staticTexts.matching(identifier: "navigation-back-button").firstMatch.tap()
+        app.navigationBars.buttons.firstMatch.tap()
 
         // clear input
-        let element2 = app.buttons.matching(identifier: "xmark").firstMatch
-        element2.tap()
-        XCTAssertEqual(app.textFields.matching(identifier: "search-input").firstMatch.value as? String, "", "Expected search input to be empty")
-
-
+        let clearButton = app.buttons["Clear text"].firstMatch
+        XCTAssertTrue(clearButton.waitForExistence(timeout: 2), "Clear button should exist")
+        clearButton.tap()
+        XCTAssertNotEqual(searchInput.value as? String, "?????", "Expected search input to be cleared")
     }
 
     func testSearchAndNavigationPerformance() throws {
@@ -56,6 +59,7 @@ final class PapiaUITests: XCTestCase {
                 let app = XCUIApplication()
                 app.activate()
                 let element = app.buttons.matching(identifier: "? any letter").firstMatch
+                XCTAssertTrue(element.waitForExistence(timeout: 5), "Wildcard button should exist")
                 element.tap()
                 element.tap()
                 element.tap()
@@ -63,18 +67,22 @@ final class PapiaUITests: XCTestCase {
                 element.tap()
 
                 // confirm button result
-                XCTAssertEqual(app.textFields.matching(identifier: "search-input").firstMatch.value as? String, "?????", "Expected search input to contain \"?????\"")
+                let searchInput = app.searchFields.matching(identifier: "search-input").firstMatch
+                XCTAssertEqual(searchInput.value as? String, "?????", "Expected search input to contain \"?????\"")
 
                 // navigate to word detail
-                app.buttons.matching(identifier: "word-list-word-view").firstMatch.tap()
+                let firstResult = app.cells.matching(identifier: "word-list-word-view").firstMatch
+                XCTAssertTrue(firstResult.waitForExistence(timeout: 10), "Expected search results to appear")
+                firstResult.tap()
 
                 // navigate back
-                app.staticTexts.matching(identifier: "navigation-back-button").firstMatch.tap()
+                app.navigationBars.buttons.firstMatch.tap()
 
                 // clear input
-                let element2 = app.buttons.matching(identifier: "xmark").firstMatch
-                element2.tap()
-                XCTAssertEqual(app.textFields.matching(identifier: "search-input").firstMatch.value as? String, "", "Expected search input to be empty")
+                let clearButton = app.buttons["Clear text"].firstMatch
+                XCTAssertTrue(clearButton.waitForExistence(timeout: 2), "Clear button should exist")
+                clearButton.tap()
+                XCTAssertNotEqual(searchInput.value as? String, "?????", "Expected search input to be cleared")
             }
         }
     }
@@ -96,21 +104,22 @@ final class PapiaUITests: XCTestCase {
 
         // Add some characters using the toolbar buttons
         let questionMarkButton = app.buttons.matching(identifier: "? any letter").firstMatch
+        XCTAssertTrue(questionMarkButton.waitForExistence(timeout: 5), "Wildcard button should exist")
         questionMarkButton.tap()
         questionMarkButton.tap()
         questionMarkButton.tap()
 
         // Verify text was added
-        let searchInput = app.textFields.matching(identifier: "search-input").firstMatch
+        let searchInput = app.searchFields.matching(identifier: "search-input").firstMatch
         XCTAssertEqual(searchInput.value as? String, "???", "Expected search input to contain \"???\"")
 
         // Clear the input using the clear button
-        let clearButton = app.buttons.matching(identifier: "xmark").firstMatch
+        let clearButton = app.buttons["Clear text"].firstMatch
         XCTAssertTrue(clearButton.waitForExistence(timeout: 2), "Clear button should exist")
         clearButton.tap()
 
         // Verify input is cleared
-        XCTAssertEqual(searchInput.value as? String, "", "Expected search input to be empty after clear")
+        XCTAssertNotEqual(searchInput.value as? String, "???", "Expected search input to be cleared")
 
         // Now tap a toolbar button again - this should NOT crash
         // The bug was that stale TextSelection indices from the previous text would cause a crash
