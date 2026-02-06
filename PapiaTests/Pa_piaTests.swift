@@ -19,15 +19,20 @@ final class Pa_piaTests: XCTestCase {
         // No longer using UserDefaults for search history
     }
 
-    func testAppendSearchHistoryIgnoresEmptyValues() {
+    func testAppendSearchHistoryIgnoresEmptyValues() async {
         let state = InterfaceState()
 
-        // These should not crash and should leave history empty
+        // Empty and whitespace-only strings are rejected synchronously
+        // before any SQLite write, so the history should remain unchanged.
+        let historyBefore = state.searchHistory
         state.appendSearchHistory("")
         state.appendSearchHistory("   ")
 
-        // Note: the published array updates asynchronously via SQLite,
-        // but empty/whitespace queries are rejected synchronously.
+        // Give any (unexpected) async writes a chance to settle.
+        try? await Task.sleep(for: .milliseconds(100))
+
+        XCTAssertEqual(state.searchHistory, historyBefore,
+                       "Empty/whitespace queries should not be added to search history")
     }
 
     func testViewModelCreationMemoryProfile() {
