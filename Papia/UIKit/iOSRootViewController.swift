@@ -30,9 +30,6 @@ final class iOSRootViewController: UIViewController {
     private lazy var navigationController_: UINavigationController = {
         let nav = UINavigationController(rootViewController: searchListVC)
         nav.navigationBar.prefersLargeTitles = false
-        // Hide the navigation bar on the root screen — the search bar
-        // lives in the bottom area, not in the navigation bar.
-        nav.setNavigationBarHidden(true, animated: false)
         return nav
     }()
 
