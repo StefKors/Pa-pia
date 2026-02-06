@@ -42,8 +42,37 @@ actor WordListDatabase {
     func rebuildIfNeeded() async throws {
         let selected = Self.selectedScrabbleDictionary
         guard loadedDictionary != selected else { return }
+
+        // Close the current database connection so the file can be deleted.
+        dbQueue = nil
         isInitialized = false
+
+        // Delete the existing database file. If this fails we log and
+        // continue — `setupDatabase()` will recreate it.
+        do {
+            try deleteDatabase()
+        } catch {
+            logger.error("Failed to delete old database during rebuild: \(error)")
+        }
+
         try await initialize()
+    }
+
+    /// Remove the on-disk word-list database file so it can be recreated.
+    private func deleteDatabase() throws {
+        let fileManager = FileManager.default
+        let appSupportURL = try fileManager.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: false
+        )
+        let dbURL = appSupportURL
+            .appendingPathComponent("Papia", isDirectory: true)
+            .appendingPathComponent("wordlists.sqlite")
+        if fileManager.fileExists(atPath: dbURL.path) {
+            try fileManager.removeItem(at: dbURL)
+        }
     }
     
     /// Read the user's preferred scrabble dictionary from UserDefaults.
@@ -157,44 +186,69 @@ actor WordListDatabase {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
 
-        guard let db = try? await ensureUserDatabase() else { return }
-        let now = Date().timeIntervalSince1970
+        let db: DatabaseQueue
+        do {
+            db = try await ensureUserDatabase()
+        } catch {
+            logger.error("Failed to open user database for search history write: \(error)")
+            return
+        }
 
-        try? await db.write { db in
-            // INSERT OR REPLACE to upsert — updates timestamp for existing queries
-            try db.execute(
-                sql: """
-                    INSERT INTO search_history (query, timestamp) VALUES (?, ?)
-                    ON CONFLICT(query) DO UPDATE SET timestamp = excluded.timestamp
-                """,
-                arguments: [trimmed, now]
-            )
+        do {
+            let now = Date().timeIntervalSince1970
+            try await db.write { db in
+                // INSERT OR REPLACE to upsert — updates timestamp for existing queries
+                try db.execute(
+                    sql: """
+                        INSERT INTO search_history (query, timestamp) VALUES (?, ?)
+                        ON CONFLICT(query) DO UPDATE SET timestamp = excluded.timestamp
+                    """,
+                    arguments: [trimmed, now]
+                )
+            }
+        } catch {
+            logger.error("Failed to write search history entry '\(trimmed)': \(error)")
         }
     }
 
     /// Fetch recent search history, pruning entries older than `maxAgeDays`.
     func fetchSearchHistory(limit: Int = 50, maxAgeDays: Int = 30) async -> [String] {
-        guard let db = try? await ensureUserDatabase() else { return [] }
+        let db: DatabaseQueue
+        do {
+            db = try await ensureUserDatabase()
+        } catch {
+            logger.error("Failed to open user database for search history read: \(error)")
+            return []
+        }
 
         let cutoff = Date().timeIntervalSince1970 - Double(maxAgeDays * 86400)
 
         // Prune old entries
-        try? await db.write { db in
-            try db.execute(
-                sql: "DELETE FROM search_history WHERE timestamp < ?",
-                arguments: [cutoff]
-            )
+        do {
+            try await db.write { db in
+                try db.execute(
+                    sql: "DELETE FROM search_history WHERE timestamp < ?",
+                    arguments: [cutoff]
+                )
+            }
+        } catch {
+            logger.error("Failed to prune old search history entries: \(error)")
         }
 
         // Fetch most recent entries
-        return (try? await db.read { db in
-            try String.fetchAll(db, sql: """
-                SELECT query FROM search_history
-                WHERE timestamp >= ?
-                ORDER BY timestamp DESC
-                LIMIT ?
-            """, arguments: [cutoff, limit])
-        }) ?? []
+        do {
+            return try await db.read { db in
+                try String.fetchAll(db, sql: """
+                    SELECT query FROM search_history
+                    WHERE timestamp >= ?
+                    ORDER BY timestamp DESC
+                    LIMIT ?
+                """, arguments: [cutoff, limit])
+            }
+        } catch {
+            logger.error("Failed to fetch search history: \(error)")
+            return []
+        }
     }
 
     // MARK: - Private
