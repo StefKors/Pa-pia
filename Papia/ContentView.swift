@@ -168,14 +168,6 @@ struct ContentView: View {
 #endif
     }
 
-    private var showClearButton: Bool {
-        !model.searchText.isEmpty
-    }
-
-    private var showCancelButton: Bool {
-        showClearButton || searchIsFocused
-    }
-
     private var backgroundColor: Color {
 #if os(macOS)
         Color(nsColor: NSColor.windowBackgroundColor)
@@ -183,8 +175,6 @@ struct ContentView: View {
         Color(uiColor: UIColor.secondarySystemBackground)
 #endif
     }
-
-    @Namespace private var namespace
 
     // iOS search focus
     @FocusState private var searchIsFocused: Bool
@@ -201,63 +191,6 @@ struct ContentView: View {
                 }
                 resultsFooterRow
             }
-            .contentMargins(.bottom, 60, for: .scrollContent)
-            .scrollEdgeEffectStyle(.soft, for: .vertical)
-            .scrollBounceBehavior(.basedOnSize)
-            .toolbar {
-                ToolbarItem(placement: .title) {
-                    VStack {
-                        Picker("Search Scope", selection: $model.searchScope) {
-                            ForEach(model.globalSearchScopes) { scope in
-                                Text(scope.label)
-                                    .font(.callout)
-                                    .tag(scope)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                        .glassEffect()
-
-                        FilterButtonsGroup()
-                            .environmentObject(model)
-                    }
-                }
-
-                ToolbarItem(placement: .bottomBar) {
-                    HStack {
-                        Image(systemName: "magnifyingglass")
-                            .imageScale(.medium)
-                            .foregroundStyle(.tertiary)
-                        TextField("Find words...", text: $model.searchText, selection: $model.searchTextSelection)
-                            .focused($searchIsFocused)
-                            .environmentObject(model)
-                            .defaultFocus($searchIsFocused, true)
-                            .accessibilityIdentifier("search-input")
-                    }
-                    .padding(8)
-                    .glassEffectID("search", in: namespace)
-
-                }
-
-
-                if showClearButton {
-                    ToolbarSpacer(placement: .bottomBar)
-
-                    ToolbarItem(placement: .bottomBar) {
-                        Button {
-                            self.model.searchText = ""
-                        } label: {
-                            Image(systemName: "xmark")
-                                .foregroundColor(Color.secondary)
-                                .imageScale(.medium)
-                        }
-                        .accessibilityIdentifier("xmark")
-                        .glassEffectID("clear", in: namespace)
-                    }
-                }
-            }
-            .navigationDestination(for: DataMuseWord.self, destination: { word in
-                WordDetailView(word: word)
-            })
             .modifier(
                 iOSContentViewAdjustmentsView(
                     searchResultsCount: model.filteredSearchResults.count,
@@ -272,6 +205,19 @@ struct ContentView: View {
                     showSettings: $showSettings
                 )
             )
+            .contentMargins(.top, 100, for: .scrollContent)
+            .scrollEdgeEffectStyle(.soft, for: .vertical)
+            .scrollBounceBehavior(.basedOnSize)
+            .navigationDestination(for: DataMuseWord.self, destination: { word in
+                WordDetailView(word: word)
+            })
+            .searchable(text: $model.searchText, placement: .automatic, prompt: "Find words...")
+            .searchFocused($searchIsFocused)
+            .onSubmit(of: .search) {
+                if !model.searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    state.appendSearchHistory(model.searchText.trimmingCharacters(in: .whitespacesAndNewlines))
+                }
+            }
             .scrollDismissesKeyboard(.immediately)
             .background(backgroundColor)
             .environmentObject(model)
@@ -284,7 +230,23 @@ struct ContentView: View {
                 .padding(.bottom, 6)
             }
         }
-        .animation(.snappy(duration: 0.16), value: showClearButton)
+        .overlay(alignment: .top) {
+            VStack(spacing: 6) {
+                Picker("Search Scope", selection: $model.searchScope) {
+                    ForEach(model.globalSearchScopes) { scope in
+                        Text(scope.label)
+                            .font(.callout)
+                            .tag(scope)
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                FilterButtonsGroup()
+                    .environmentObject(model)
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+        }
 #else
         EmptyView()
 #endif
