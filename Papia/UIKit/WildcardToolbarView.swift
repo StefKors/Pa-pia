@@ -99,42 +99,46 @@ final class WildcardToolbarView: UIView {
         }
     }
 
-    private func makeKeyView(def: WildcardDef, tag: Int) -> UIView {
-        let keyView = UIView()
-        keyView.tag = tag
-        keyView.backgroundColor = UIColor.tertiarySystemFill
-        keyView.layer.cornerRadius = Self.keySize / 2
-        keyView.clipsToBounds = true
-        keyView.translatesAutoresizingMaskIntoConstraints = false
-        let w = keyView.widthAnchor.constraint(equalToConstant: Self.keySize)
-        let h = keyView.heightAnchor.constraint(equalToConstant: Self.keySize)
-        // High but not required — lets the parent stack view compress if needed.
+    private func makeKeyView(def: WildcardDef, tag: Int) -> NonStealingButton {
+        var config: UIButton.Configuration
+        if #available(iOS 26.0, *) {
+            config = .glass()
+        } else {
+            config = .plain()
+            config.background.backgroundColor = UIColor.tertiarySystemFill
+        }
+        config.cornerStyle = .capsule
+        config.title = def.label
+        config.baseForegroundColor = .label
+        config.contentInsets = .zero
+        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var out = incoming
+            out.font = UIFont.preferredFont(forTextStyle: .body)
+            return out
+        }
+
+        let button = NonStealingButton(configuration: config)
+        button.tag = tag
+        button.translatesAutoresizingMaskIntoConstraints = false
+        let w = button.widthAnchor.constraint(equalToConstant: Self.keySize)
+        let h = button.heightAnchor.constraint(equalToConstant: Self.keySize)
         w.priority = .defaultHigh
         h.priority = .defaultHigh
         NSLayoutConstraint.activate([w, h])
 
-        let label = UILabel()
-        label.text = def.label
-        label.font = .preferredFont(forTextStyle: .body)
-        label.textAlignment = .center
-        label.textColor = .label
-        label.translatesAutoresizingMaskIntoConstraints = false
-        keyView.addSubview(label)
-        NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: keyView.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: keyView.centerYAnchor),
-        ])
-
-        // Tap gesture — UIView gestures do NOT touch the responder chain
-        let tap = UITapGestureRecognizer(target: self, action: #selector(keyTapped(_:)))
-        keyView.addGestureRecognizer(tap)
+        // Tap action
+        button.addAction(UIAction { [weak self] action in
+            guard let btn = action.sender as? UIView else { return }
+            self?.animatePress(btn)
+            self?.insertTextAtCaret(def.label)
+        }, for: .touchUpInside)
 
         // Long press for explainer
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(keyLongPressed(_:)))
         longPress.minimumPressDuration = 0.4
-        keyView.addGestureRecognizer(longPress)
+        button.addGestureRecognizer(longPress)
 
-        return keyView
+        return button
     }
 
     // MARK: - Touch Handling
@@ -147,17 +151,6 @@ final class WildcardToolbarView: UIView {
     }
 
     // MARK: - Actions
-
-    @objc private func keyTapped(_ gesture: UITapGestureRecognizer) {
-        guard let keyView = gesture.view else { return }
-        let def = Self.defs[keyView.tag]
-
-        // Visual feedback
-        animatePress(keyView)
-
-        // Insert text at the caret
-        insertTextAtCaret(def.label)
-    }
 
     @objc private func keyLongPressed(_ gesture: UILongPressGestureRecognizer) {
         guard gesture.state == .began,

@@ -72,8 +72,6 @@ final class FilterBarView: UIView {
         config.image = icon
         config.title = filter.label
         config.baseForegroundColor = .secondaryLabel
-        config.background.strokeColor = UIColor.secondaryLabel.withAlphaComponent(0.3)
-        config.background.strokeWidth = 1
         config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
             var out = incoming
             out.font = UIFont.preferredFont(forTextStyle: .caption1)
@@ -89,7 +87,6 @@ final class FilterBarView: UIView {
             let active = btn.isSelected
             let tint = btn.tintColor ?? .systemBlue
             btn.configuration?.baseForegroundColor = active ? tint : .secondaryLabel
-            btn.configuration?.background.strokeColor = active ? tint : UIColor.secondaryLabel.withAlphaComponent(0.3)
             if #unavailable(iOS 26.0) {
                 btn.configuration?.background.backgroundColor = active ? tint.withAlphaComponent(0.12) : UIColor.tertiarySystemFill
             }
