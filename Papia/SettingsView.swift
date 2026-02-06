@@ -13,16 +13,22 @@ private let logger = Logger(subsystem: "com.stefkors.Papia", category: "Settings
 struct SettingsView: View {
     @AppStorage("enable-bongo-dictionary") private var enableBongoDictionary: Bool = true
     @AppStorage("enable-scrabble-english") private var enableScrabbleEnglish: Bool = true
+    @AppStorage("enable-crossplay-dictionary") private var enableCrossPlayDictionary: Bool = true
     @AppStorage("enable-wordle-dictionary") private var enableWordleDictionary: Bool = true
 
     @AppStorage("selected-scrabble-dictionary") private var selectedDictionary: String = ScrabbleDictionary.default.rawValue
+    @AppStorage("selected-crossplay-dictionary") private var selectedCrossPlayDictionary: String = CrossPlayDictionary.default.rawValue
     /// True while the word‑list database is being rebuilt after a dictionary change.
     @State private var isRebuilding = false
     /// The in‑flight rebuild task so we can cancel a previous one before starting a new rebuild.
     @State private var rebuildTask: Task<Void, Never>?
 
-    private var selectedScrabbleDictionary: ScrabbleDictionary {
+    private var selectedScrabbleDictionaryValue: ScrabbleDictionary {
         ScrabbleDictionary(rawValue: selectedDictionary) ?? .default
+    }
+
+    private var selectedCrossPlayDictionaryValue: CrossPlayDictionary {
+        CrossPlayDictionary(rawValue: selectedCrossPlayDictionary) ?? .default
     }
 
     var body: some View {
@@ -37,8 +43,14 @@ struct SettingsView: View {
                 DictionaryToggleRow(
                     imageName: "Scrabble",
                     title: "Scrabble English Dictionary",
-                    description: selectedScrabbleDictionary.subtitle,
+                    description: selectedScrabbleDictionaryValue.subtitle,
                     isEnabled: $enableScrabbleEnglish
+                )
+                DictionaryToggleRow(
+                    imageName: "CrossPlay",
+                    title: "CrossPlay Dictionary",
+                    description: selectedCrossPlayDictionaryValue.subtitle,
+                    isEnabled: $enableCrossPlayDictionary
                 )
 
                 DictionaryToggleRow(
@@ -51,9 +63,28 @@ struct SettingsView: View {
 
             Section {
                 Picker("Scrabble Dictionary", selection: $selectedDictionary) {
+                    ForEach(ScrabbleDictionary.allCases) { dict in
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(dict.label)
+                            Text(dict.subtitle)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        .tag(dict.rawValue)
+                    }
+                }
+                #if os(iOS)
+                .pickerStyle(.navigationLink)
+                #endif
+            } header: {
+                Text("Scrabble Word List")
+            }
+
+            Section {
+                Picker("CrossPlay Dictionary", selection: $selectedCrossPlayDictionary) {
                     ForEach(ScrabbleDictionaryRegion.allCases) { region in
                         Section(region.rawValue) {
-                            ForEach(ScrabbleDictionary.allCases.filter { $0.region == region }) { dict in
+                            ForEach(CrossPlayDictionary.allCases.filter { $0.region == region }) { dict in
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(dict.label)
                                     Text(dict.subtitle)
@@ -81,13 +112,16 @@ struct SettingsView: View {
                     }
                 }
             } header: {
-                Text("Scrabble Word List")
+                Text("CrossPlay Word List")
             } footer: {
                 Text("Changing the dictionary will rebuild the local word database. This may take a moment.")
             }
         }
         .navigationTitle("Settings")
         .onChange(of: selectedDictionary) {
+            rebuildDatabase()
+        }
+        .onChange(of: selectedCrossPlayDictionary) {
             rebuildDatabase()
         }
     }
