@@ -12,7 +12,7 @@
 
 -------
 
-Built by [Stef Kors](https://stefkors.com)
+Built by [Stef Kors](https://stefkors.com).
 
 -------
 
