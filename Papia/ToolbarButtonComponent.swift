@@ -98,7 +98,14 @@ struct PlatformButton: UIViewRepresentable {
         // Make it circular
         button.layer.cornerRadius = Self.buttonSize / 2
         button.clipsToBounds = true
+        #if !os(visionOS)
         button.configuration = .glass()
+        #else
+        var configuration = UIButton.Configuration.plain()
+        configuration.background.backgroundColor = UIColor.tertiarySystemFill
+        configuration.background.cornerRadius = Self.buttonSize / 2
+        button.configuration = configuration
+        #endif
 
         // Tap gesture - requires long press to fail first
         let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleTap))
@@ -144,8 +151,10 @@ struct PlatformButton: UIViewRepresentable {
         @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
             if gesture.state == .began {
                 // Haptic feedback on long press
+                #if !os(visionOS)
                 let generator = UIImpactFeedbackGenerator(style: .medium)
                 generator.impactOccurred()
+                #endif
                 onLongPress()
             }
         }

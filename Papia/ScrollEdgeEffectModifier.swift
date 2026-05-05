@@ -10,12 +10,16 @@ import SwiftUI
 
 struct ScrollEdgeEffectModifier: ViewModifier {
     func body(content: Content) -> some View {
-        if #available(iOS 26.0, *), #available(macOS 26.0, *) {
+        #if os(visionOS)
+        content
+        #else
+        if #available(iOS 26.0, macOS 26.0, *) {
             content
                 .scrollEdgeEffectStyle(.soft, for: .top)
                 .scrollEdgeEffectStyle(.soft, for: .bottom)
         } else {
             content
         }
+        #endif
     }
 }

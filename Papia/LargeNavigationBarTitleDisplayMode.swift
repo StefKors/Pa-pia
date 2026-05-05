@@ -15,7 +15,7 @@ extension View {
 
 struct LargeNavigationBarTitleDisplayMode: ViewModifier {
     func body(content: Content) -> some View {
-#if os(macOS)
+#if os(macOS) || os(visionOS)
         content
 #else
         content

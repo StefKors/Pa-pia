@@ -13,7 +13,7 @@ private let logger = Logger(subsystem: "com.stefkors.Papia", category: "App")
 @main
 struct Pa_piaApp: App {
     init() {
-#if os(macOS)
+#if os(macOS) || os(visionOS)
         // Initialize the word list database on app launch (macOS only;
         // on iOS the iOSRootViewController handles this).
         Task {
@@ -28,7 +28,7 @@ struct Pa_piaApp: App {
 
     var body: some Scene {
         WindowGroup {
-#if os(macOS)
+#if os(macOS) || os(visionOS)
             ContentView()
 #else
             iOSRootView()

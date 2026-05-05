@@ -19,7 +19,7 @@ struct WordDetailInformation: Identifiable {
     static let preview = WordDetailInformation(scope: .preview, words: [.preview, .preview2])
 }
 
-#if os(macOS)
+#if os(macOS) || os(visionOS)
 
 /// TODO: Add bookmark button
 /// TODO: Support definitions with: https://api.datamuse.com/words?sl=jirraf&md=dpsr

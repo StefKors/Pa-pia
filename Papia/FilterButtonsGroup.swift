@@ -42,6 +42,10 @@ struct FilterButton: View {
 
     @ViewBuilder
     private var glassyLabel: some View {
+        #if os(visionOS)
+        labelContent
+            .background(.quinary, in: Capsule(style: .continuous))
+        #else
         if #available(iOS 26.0, macOS 26.0, *) {
             labelContent
                 .glassEffect(.regular, in: .capsule(style: .continuous))
@@ -49,6 +53,7 @@ struct FilterButton: View {
             labelContent
                 .background(.quinary, in: Capsule(style: .continuous))
         }
+        #endif
     }
     
     var body: some View {

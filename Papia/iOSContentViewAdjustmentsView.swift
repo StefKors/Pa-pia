@@ -18,7 +18,7 @@ struct iOSContentViewAdjustmentsView: ViewModifier {
     let onClearFilters: () -> Void
     @Binding var showSettings: Bool
     func body(content: Content) -> some View {
-#if os(macOS)
+#if os(macOS) || os(visionOS)
         content
 #else
         content

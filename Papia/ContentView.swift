@@ -33,8 +33,14 @@ struct ContentView: View {
         return state.searchHistory.filter { $0.contains(model.searchText) }
     }
 
+    @ViewBuilder
+    private func navigationHistoryLabel(for word: DataMuseWord) -> some View {
+        Text(word.word.capitalized)
+            .modifier(NavigationHistoryButtonStyleModifier())
+    }
+
     private var macOSContentView: some View {
-#if os(macOS)
+#if os(macOS) || os(visionOS)
         NavigationSplitView {
             List(selection: $state.selection) {
                 ForEach(model.filteredSearchResults) { word in
@@ -62,9 +68,8 @@ struct ContentView: View {
                                     state.navigation = Array(state.navigation[...index])
                                 }
                             } label: {
-                                Text(nav.word.capitalized)
+                                navigationHistoryLabel(for: nav)
                             }
-                            .buttonStyle(.accessoryBar)
                             .id(nav)
                         }
                         Spacer()
@@ -151,7 +156,7 @@ struct ContentView: View {
                 SettingsView()
                     .navigationTitle("Settings")
                     .toolbar {
-#if os(macOS)
+#if os(macOS) || os(visionOS)
                         ToolbarItem {
                             Button("Done") { showSettings = false }
                         }
@@ -170,7 +175,7 @@ struct ContentView: View {
     }
 
     var body: some View {
-#if os(macOS)
+#if os(macOS) || os(visionOS)
         VStack {
             macOSContentView
         }
@@ -213,6 +218,20 @@ struct ContentView: View {
                 showsMax: model.isAtMaxResultsLimit
             )
         }
+    }
+}
+
+private struct NavigationHistoryButtonStyleModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        #if os(macOS)
+        if #available(macOS 26.0, *) {
+            content.buttonStyle(.accessoryBar)
+        } else {
+            content
+        }
+        #else
+        content
+        #endif
     }
 }
 

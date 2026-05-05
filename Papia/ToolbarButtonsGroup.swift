@@ -43,11 +43,7 @@ struct ToolbarButtonsGroup: View {
     var body: some View {
         VStack {
             if let presentedExplainer {
-                Text(presentedExplainer)
-                    .scenePadding()
-                    .glassEffect(in: RoundedRectangle(cornerRadius: 18))
-                    .modifier(GlassContainerModifier(spacing: 18))
-                    .transition(.scale.combined(with: .opacity).combined(with: .blurReplace))
+                explainerView(text: presentedExplainer)
             }
 
             HStack(alignment: .center, spacing: 4) {
@@ -98,6 +94,22 @@ struct ToolbarButtonsGroup: View {
             }
             .modifier(GlassContainerModifier(spacing: 28))
         }
+    }
+
+    @ViewBuilder
+    private func explainerView(text: String) -> some View {
+        #if os(visionOS)
+        Text(text)
+            .scenePadding()
+            .background(.quinary, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .transition(.opacity)
+        #else
+        Text(text)
+            .scenePadding()
+            .glassEffect(in: RoundedRectangle(cornerRadius: 18))
+            .modifier(GlassContainerModifier(spacing: 18))
+            .transition(.scale.combined(with: .opacity).combined(with: .blurReplace))
+        #endif
     }
 }
 
