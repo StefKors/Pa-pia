@@ -1,0 +1,154 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "srgb:0.00392,0.18431,0.07451,1.00000",
+      "srgb:0.00392,0.18431,0.07451,1.00000"
+    ],
+    "orientation" : {
+      "start" : {
+        "x" : 0.5,
+        "y" : 0
+      },
+      "stop" : {
+        "x" : 0.5,
+        "y" : 0.7
+      }
+    }
+  },
+  "groups" : [
+    {
+      "hidden" : false,
+      "layers" : [
+        {
+          "image-name" : "papia-top.png",
+          "name" : "papia-top",
+          "position" : {
+            "scale" : 0.13,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "image-name" : "papia-bottom-book-1.png",
+          "name" : "papia-bottom-book-1",
+          "position" : {
+            "scale" : 0.13,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "image-name" : "papia-bottom-book-2.png",
+          "name" : "papia-bottom-book-2",
+          "position" : {
+            "scale" : 0.13,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "hidden" : true,
+      "layers" : [
+        {
+          "blend-mode" : "hard-light",
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "papia-two.png",
+          "name" : "papia-two",
+          "position" : {
+            "scale" : 0.13,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "blend-mode" : "plus-lighter",
+          "hidden" : true,
+          "image-name" : "papia-contrast.png",
+          "name" : "papia-contrast",
+          "position" : {
+            "scale" : 0.12,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "blend-mode" : "soft-light",
+          "hidden" : true,
+          "image-name" : "papia-game-piece.png",
+          "name" : "papia-game-piece",
+          "position" : {
+            "scale" : 0.1,
+            "translation-in-points" : [
+              20.950000000000045,
+              -2.269999999999982
+            ]
+          }
+        },
+        {
+          "blend-mode" : "darken",
+          "glass" : true,
+          "hidden" : true,
+          "image-name" : "papia-8.png",
+          "name" : "papia-8",
+          "position" : {
+            "scale" : 0.12,
+            "translation-in-points" : [
+              2.340000000000032,
+              2.3999999999999773
+            ]
+          }
+        },
+        {
+          "blend-mode" : "hard-light",
+          "fill" : "automatic",
+          "glass" : true,
+          "hidden" : true,
+          "image-name" : "papia.png",
+          "name" : "papia",
+          "position" : {
+            "scale" : 0.12,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}
