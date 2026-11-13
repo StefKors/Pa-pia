@@ -10,6 +10,7 @@ Search by spelling, meaning, or sound, then narrow results with built-in filters
 Open any result to view definitions, synonyms, and related words so you can move from a rough idea to the exact word you need.
 
 #### Supported Platforms
+
 <img src="https://stefkors.com/api/platform/index.svg?os=macos,ios" />
 
 <img alt="Screenshot of Papia" src="Images/Screenshot-1.png">
@@ -44,4 +45,3 @@ Pápia uses the Datamuse API for online word search and related-word results.
 Built by [Stef Kors](https://stefkors.com).
 
 -------
-
